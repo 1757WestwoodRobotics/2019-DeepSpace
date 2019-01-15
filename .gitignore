@@ -77,6 +77,7 @@ hs_err_pid*
 ### macOS ###
 # General
 .DS_Store
+*.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -162,5 +163,7 @@ gradle-app.setting
 .settings/
 bin/
 
+### PYTHON ###
+/venv/
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
