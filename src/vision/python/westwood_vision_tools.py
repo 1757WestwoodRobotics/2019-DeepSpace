@@ -3,7 +3,7 @@ import numpy
 import cv2
 import time
 import copy
-# import PyWinMouse
+import PyWinMouse
 import math
 
 
@@ -65,12 +65,11 @@ def closest(row, col, coordinates_list):
     return close_index
 
 #######################################################################################################################
-
 #Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
 # in said picture, and a search radius in pixels, this returns a list of all the row/col pairs
 # within that radius that are true. It does not return the original input pixel.
 
-def in_range(picture, row, col, radius):
+def in_range(picture, object_type, row, col, radius):
 
     rows, cols = picture.shape
     coords_to_check=[]
@@ -88,14 +87,12 @@ def in_range(picture, row, col, radius):
         check_row = coords_to_check[list_index][0]
         check_col = coords_to_check[list_index][1]
 
-        if (picture[check_row, check_col]!=0) and not(check_row==row and check_col==col):
+        if (picture[check_row, check_col]==object_type) and not(check_row==row and check_col==col):
             pixels_found_list.append(copy.copy([check_row, check_col]))
 
     return pixels_found_list
 
 #######################################################################################################################
-
-
 #Given a picture reduced to true/false values (0=false, not 0 =true), and a row/col coordinate that describes a coordinate
 # in said picture, and a search radius in pixels, this sets all pixels within the radius of the original coordinate to
 # false.
@@ -149,7 +146,7 @@ def hollow_out(picture):
     return working
 
 #######################################################################################################################
-
+# this class records the information associate with an object
 
 class object_info_class(object):
         def __init__(self):
@@ -161,6 +158,7 @@ class object_info_class(object):
             self.max_col = [0,0]
             self.min_row = [0,0]
             self.min_col = [0,0]
+            self.object_type=-1
 
         # this returns the center coordinates of the object normalized to the dimensions of the image
         # in cartesian coordinates.  The center of the image is 0,0.  The upper right hand corner is 1,1
@@ -260,6 +258,7 @@ def find_objects(picture, search_radius, animate):
             if working_image[row, col] != 0:
 
                 pixel_found=True
+                object_info.object_type=working_image[row,col]
                 object_info.max_row=[row, col]
                 object_info.min_row=[row, col]
                 object_info.max_col=[row, col]
@@ -293,8 +292,8 @@ def find_objects(picture, search_radius, animate):
                         cv2.imshow("working", working_image)
                         cv2.waitKey(1)
 
-                    # find all the pixels within a radius
-                    close_by=in_range(working_image,check_row,check_col, search_radius)
+                    # find all the pixels of the same object id type within a radius
+                    close_by=in_range(working_image,object_info.object_type,check_row,check_col, search_radius)
 
                     if (len(close_by)>0):
                         closest_index = closest(check_row,check_col,close_by)

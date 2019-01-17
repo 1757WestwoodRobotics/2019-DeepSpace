@@ -51,22 +51,6 @@ def distance_to_ball_meters(ball_object_info):
 
     return distance_meters
 
-######################################################################################################################
-# this takes the information from a ball_info structure and reports it to the network table
-
-def report_ball_info_to_table(ball_info, table):
-
-    x, y = ball_info.normalized_center()
-    alt, azimuth = altAzi(x, y, 22.5, 23)
-    area = ball_info.relative_area()
-    aspect_ratio = ball_info.aspect_ratio()
-    distance = distance_to_ball_meters(ball_info)
-
-    descriptor_list = ['object', "elevation_angle", "azimuth", "distance_m"]
-    value_list = ['ball', alt, azimuth, distance]
-
-    publish_network_value("descriptor list", descriptor_list, table)
-    publish_network_value("value list", value_list, table)
 
 ######################################################################################################################
 # this takes the information from the object list and reports the information for each object in the
@@ -81,13 +65,14 @@ def report_object_list_to_table(object_list, count, table):
         area = object_info.relative_area()
         aspect_ratio = object_info.aspect_ratio()
         distance = distance_to_ball_meters(object_info)
+        object_type=object_info.object_type
 
         if (index==0):
             descriptor_list = ["count", "object", "number", "elevation_angle", "azimuth", "distance_m"]
             publish_network_value("attributes", descriptor_list, table)
 
-        value_table_tag = "ball_" + str(index)
-        value_list = [str(count), 'ball', index, alt, azimuth, distance]
+        value_table_tag = "object_" + str(index)
+        value_list = [str(count), object_type, index, alt, azimuth, distance]
         publish_network_value(value_table_tag, value_list, table)
 
 ######################################################################################################################
@@ -100,7 +85,7 @@ for i in range(0, 256):
 # given the value of one color component, calculate what
 # the other two should be if this is a ball
 
-def search_for_balls(picture_in, acceleration, animate):
+def search_for_objects(picture_in, acceleration, animate):
 
     picture_out=copy.copy(picture_in)
 
@@ -141,11 +126,17 @@ def search_for_balls(picture_in, acceleration, animate):
         for row in range (0, working_rows-1, 1):
             for col in range (0, working_cols-1, 1):
                 color=working_picture[row,col]
+
+                # apply the "color" mapping for each object that you may want to find and if found
+                #assign the object the object code
                 # if the value of the 1st component is within the expected range
                 # then check the other two color components
-                if ((color[1]>40) and (color[1]<170) and (color[2] < 255)):
+                if ((color[1] > 40) and (color[1] < 170) and (color[2] < 255)):
                     if (abs(color[0] - tar1[color[1]]) < 21) and (abs(color[2] - tar3[color[1]]) < 21):
-                        mask[row, col] = 255
+                        mask[row, col] = 255  # ball is 1
+
+                if ((color[0]>30) and (color[0]<70) and (color[1] >80) and (color[1]< 110) and (color[2] > 80) and (color[2] <120)):
+                    mask[row, col] = 254  # floor tape is 2
 
     mask=remove_chatter(mask,chatter_size)
     mask=remove_spurious_falses(mask,engorge_size)
@@ -167,6 +158,7 @@ def search_for_balls(picture_in, acceleration, animate):
         area= i.relative_area()
         aspect_ratio = i.aspect_ratio()
         distance=distance_to_ball_meters(i)
+        object_type=i.object_type
 
         # send the object information to the network table
         # report_ball_info_to_table(i, table)
@@ -183,16 +175,24 @@ def search_for_balls(picture_in, acceleration, animate):
 
         # if the ball has an actual width
         if (radius>=1):
-            cv2.circle(picture_out, (abs_col, abs_row), radius, (0, 0, 255), 1)
+            if (object_type==255):
+                cv2.circle(picture_out, (abs_col, abs_row), radius, (0, 0, 255), 1)
+            else:
+                cv2.circle(picture_out, (abs_col, abs_row), radius, (0, 255, 0), 1)
+
 
             # draw a box around the object
             min_row=int(i.relative_min_row()*original_rows)
             min_col=int(i.relative_min_col()*original_cols)
             max_row=int(i.relative_max_row()*original_rows)
             max_col=int(i.relative_max_col()*original_cols)
-            cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (0, 0, 255), 2)
 
-        print ("Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", i.perimeter, "Distance, m: ", round(distance,3))
+            if (object_type==255):
+                cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (0, 0, 255), 2)
+            else:
+                cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (0, 255, 0), 2)
+
+        print ("Object Type: ", object_type, "Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", i.perimeter, "Distance, m: ", round(distance,3))
 
 
     return [picture_out, object_list]
@@ -213,6 +213,8 @@ cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
 cap.set(cv2.CAP_PROP_EXPOSURE, -7)
 cap.set(cv2.CAP_PROP_CONTRAST, 5)
 cap.set(cv2.CAP_PROP_SATURATION, 83)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
 count=0
 
@@ -220,7 +222,7 @@ while True:
 
     picture = take_picture2(cap)
     #start_time = time.time()
-    processed_picture, object_list=search_for_balls(picture,10, False)
+    processed_picture, object_list=search_for_objects(picture,10, False)
     #stop_time=time.time()
     #print(stop_time-start_time)
     report_object_list_to_table(object_list,count,table)
