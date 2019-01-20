@@ -1,23 +1,77 @@
 from westwood_vision_tools import *
 import numpy
+
 from publish_data import *
 
+##################################################################################################################
+# given an object type, this generates the three color pixel value
+
+def generate_color_table(object_type):
+
+    index=0
+    color_table=[]
+    while (index<256):
+
+        if (object_type == constant.TYPE_BALL):
+            # for a ball the primary color is 3
+            color_1 = int(index * 0.383 - 40.9)
+            color_2 = int(index * 0.505 - 28.6)
+            color_3 = int(index)
+        elif (object_type == constant.TYPE_FLOOR_TAPE):
+            # for floor tape the primary color is ?
+            color_1 = int(index)
+            color_2 = int(index * 1.19 - 2.56)
+            color_3 = int(index * 1.25 + 10.7)
+        elif (object_type == constant.TYPE_REFLECTIVE_TAPE):
+            # for reflective tape the primary color is ?
+            color_1 = int(index * 0.647 + 4.63)
+            color_2 = int(index)
+            color_3 = int(index * -0.213 + 62.2)
+        elif (object_type == constant.HATCH_COVER):
+            # for a hatch cover the primary color is 2
+            color_1 = int(index * 0.25 + 11.5)
+            color_2 = int(index)
+            color_3 = int(index * 1.96 - 55.9)
+
+        color_table.append([color_1,color_2,color_3])
+        index=index+1
+
+    return color_table
 
 ##################################################################################################################
-# given an object list of what is supposed to be balls, this checks the list and removes objects
-# from the list that are not likely to be boxes
+# given an object list, check the object properties and remove objects
+# from the list that are not likely to be what they appear to be
 
-def check_ball_object_list(list_in):
+def check_object_list(list_in):
 
     list_out=copy.copy(list_in)
 
     index=0
+
     while index<len(list_out):
 
-        # the box is square and should have an aspect ratio near 1
-        if (list_out[index].aspect_ratio > 1.3 or list_out[index].aspect_ratio < .75) and (list_out[index].relative_area()<0.003): # require a minimum size
-            list_out.pop(index)
-        elif (list_out[index].aspect_ratio < 1.75 or list_out[index].aspect_ratio > 2.3) and (list_out[index].relative_area()<0.006):
+        remove_object = False
+        check_object=list_out[index]
+
+        # gather information about the object position and shape
+        altitude, azimuth = check_object.altitude_and_azimuth()
+        aspect_ratio=check_object.aspect_ratio()
+        relative_area=check_object.relative_area()
+
+        if (check_object.object_type==constant.TYPE_FLOOR_TAPE):
+            if (altitude > 0):
+                remove_object = True
+        elif (check_object.object_type==constant.TYPE_BALL):
+            # the ball is round and should have an aspect ratio near 1
+            if (aspect_ratio > 1.3 or aspect_ratio < .75) and (relative_area<0.003): # require a minimum size
+                remove_object=True
+        elif (check_object.object_type==constant.TYPE_REFLECTIVE_TAPE):
+            if (altitude < 0):
+                remove_object = True
+        elif (check_object.object_type == constant.TYPE_HATCH_COVER):
+            remove_object = False
+
+        if (remove_object):
             list_out.pop(index)
         else:
             index+=1
@@ -56,34 +110,38 @@ def distance_to_ball_meters(ball_object_info):
 # this takes the information from the object list and reports the information for each object in the
 # list to the network table
 
-def report_object_list_to_table(object_list, count, table):
+def report_object_list_to_table(object_list, count, parent_table, sub_table):
+
+    # post the loop count to the table even if nothing is found, this lets the
+    # listening code know we still exist
+    publish_network_value("count", count, sub_table)
 
     for index in range(0, len(object_list)):
         object_info=object_list[index]
         x, y = object_info.normalized_center()
-        alt, azimuth = altAzi(x, y, 22.5, 23)
+        alt, azimuth = altitude_and_azimuth(x, y, constant.HORIZONTAL_ANGLE, constant.VERTICAL_ANGLE)
         area = object_info.relative_area()
         aspect_ratio = object_info.aspect_ratio()
-        distance = distance_to_ball_meters(object_info)
         object_type=object_info.object_type
+
+        if (object_type==constant.TYPE_REFLECTIVE_TAPE):
+            distance_m, x=distance_from_elevation(alt,0.5524)
+        elif (object_type==constant.TYPE_BALL):
+            distance_m = distance_to_ball_meters(object_info)
+        else:
+            distance_m = 0
 
         if (index==0):
             descriptor_list = ["count", "object", "number", "elevation_angle", "azimuth", "distance_m"]
-            publish_network_value("attributes", descriptor_list, table)
+            publish_network_value("attributes", descriptor_list, parent_table)
 
         value_table_tag = "object_" + str(index)
-        value_list = [str(count), object_type, index, alt, azimuth, distance]
-        publish_network_value(value_table_tag, value_list, table)
+        value_list = [str(count), object_type, index, alt, azimuth, distance_m]
+        publish_network_value(value_table_tag, value_list, parent_table)
 
 ######################################################################################################################
 
-tar1 = []
-tar3 = []
-for i in range(0, 256):
-    tar1.append(0.922*i-21.8)
-    tar3.append(1.18*i+114)
-# given the value of one color component, calculate what
-# the other two should be if this is a ball
+
 
 def search_for_objects(picture_in, acceleration, animate):
 
@@ -132,11 +190,18 @@ def search_for_objects(picture_in, acceleration, animate):
                 # if the value of the 1st component is within the expected range
                 # then check the other two color components
                 if ((color[1] > 40) and (color[1] < 170) and (color[2] < 255)):
-                    if (abs(color[0] - tar1[color[1]]) < 21) and (abs(color[2] - tar3[color[1]]) < 21):
-                        mask[row, col] = 255  # ball is 1
+                    target=ball_color_table[color[1]]
+                    if (abs(color[0] - target[0]) < 21) and (abs(color[2] - target[2]) < 21):
+                        mask[row, col] = constant.TYPE_BALL
 
                 if ((color[0]>30) and (color[0]<70) and (color[1] >80) and (color[1]< 110) and (color[2] > 80) and (color[2] <120)):
-                    mask[row, col] = 254  # floor tape is 2
+                    mask[row, col] = constant.TYPE_FLOOR_TAPE
+
+                if ((color[0]>30) and (color[0]<70) and (color[1] >80) and (color[1]< 110) and (color[2] > 80) and (color[2] <120)):
+                    mask[row, col] = constant.TYPE_HATCH_COVER
+
+                if ((color[0]>30) and (color[0]<70) and (color[1] >80) and (color[1]< 110) and (color[2] > 80) and (color[2] <120)):
+                    mask[row, col] = constant.TYPE_REFLECTIVE_TAPE
 
     mask=remove_chatter(mask,chatter_size)
     mask=remove_spurious_falses(mask,engorge_size)
@@ -146,22 +211,20 @@ def search_for_objects(picture_in, acceleration, animate):
     else:
         object_list = find_objects(mask, 3, animate)
 
-    # remove items from the list that are probably just noise or not balls
-    object_list=check_ball_object_list(object_list)
+    # remove items from the list that are probably just noise and not actual target objects
+    object_list=check_object_list(object_list)
     object_list=remove_object_in_object(object_list)
 
-    object_list = sort_object_info_list(object_list, 0)
+    object_list = sort_object_info_list(object_list, constant.SORT_AZIMUTH_CENTER)
 
     for i in object_list:
         x, y = i.normalized_center()
-        alt, azimuth = altAzi(x,y,22.5,23)
+        alt, azimuth = altitude_and_azimuth(x,y,constant.HORIZONTAL_ANGLE,constant.VERTICAL_ANGLE)
         area= i.relative_area()
         aspect_ratio = i.aspect_ratio()
         distance=distance_to_ball_meters(i)
-        object_type=i.object_type
+        object_type=int(i.object_type)
 
-        # send the object information to the network table
-        # report_ball_info_to_table(i, table)
 
         #draw a circle around the center of the object
         abs_col=int(i.relative_center_col()*original_cols)
@@ -173,12 +236,9 @@ def search_for_objects(picture_in, acceleration, animate):
         else:
             radius=int(abs_height/2)
 
-        # if the ball has an actual width
+        # if the object has an actual width
         if (radius>=1):
-            if (object_type==255):
-                cv2.circle(picture_out, (abs_col, abs_row), radius, (0, 0, 255), 1)
-            else:
-                cv2.circle(picture_out, (abs_col, abs_row), radius, (0, 255, 0), 1)
+            cv2.circle(picture_out, (abs_col, abs_row), radius, (object_type, 0, object_type), 1)
 
 
             # draw a box around the object
@@ -187,10 +247,7 @@ def search_for_objects(picture_in, acceleration, animate):
             max_row=int(i.relative_max_row()*original_rows)
             max_col=int(i.relative_max_col()*original_cols)
 
-            if (object_type==255):
-                cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (0, 0, 255), 2)
-            else:
-                cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (0, 255, 0), 2)
+            cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), (object_type, 0, object_type), 2)
 
         print ("Object Type: ", object_type, "Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", i.perimeter, "Distance, m: ", round(distance,3))
 
@@ -204,7 +261,7 @@ def search_for_objects(picture_in, acceleration, animate):
 
 #picture = take_picture(False, 1)
 #picture = cv2.imread("C:\Users/20jgrassi\Pictures\Camera Roll\edited.jpg")
-table = init_network_tables()
+parent_table, sub_table = init_network_tables()
 
 
 cap = cv2.VideoCapture(0)
@@ -218,6 +275,8 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
 count=0
 
+ball_color_table=generate_color_table(constant.TYPE_BALL)
+
 while True:
 
     picture = take_picture2(cap)
@@ -225,7 +284,7 @@ while True:
     processed_picture, object_list=search_for_objects(picture,10, False)
     #stop_time=time.time()
     #print(stop_time-start_time)
-    report_object_list_to_table(object_list,count,table)
+    report_object_list_to_table(object_list,count,parent_table,sub_table)
     show_picture("processed",processed_picture,10)
 
     count=count+1

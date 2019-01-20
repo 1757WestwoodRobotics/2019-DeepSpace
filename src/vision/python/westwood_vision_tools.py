@@ -3,8 +3,26 @@ import numpy
 import cv2
 import time
 import copy
-import PyWinMouse
+# import PyWinMouse
 import math
+
+class constant_class():
+    TYPE_BALL =            int(70)
+    TYPE_FLOOR_TAPE =      int(90)
+    TYPE_REFLECTIVE_TAPE = int(100)
+    TYPE_HATCH_COVER =     int(120)
+
+    # camera half angle from center pixel to edge
+    HORIZONTAL_ANGLE =     23.3
+    VERTICAL_ANGLE =       23.3
+
+    SORT_RELATIVE_AREA  = 0
+    SORT_ASPECT_RATIO   = 1
+    SORT_PERIMETER      = 2
+    SORT_AZIMUTH_CENTER = 3
+    SORT_OBJECT_TYPE    = 4
+
+constant=constant_class()
 
 
 #######################################################################################################################
@@ -44,8 +62,6 @@ def take_picture2(stream):
     return picture
 
 #######################################################################################################################
-
-
 #Given a row and column input, and a list of row/column pairs, this returns the index of the element in the list
 # which is closest to the input row/column.
 
@@ -158,7 +174,7 @@ class object_info_class(object):
             self.max_col = [0,0]
             self.min_row = [0,0]
             self.min_col = [0,0]
-            self.object_type=-1
+            self.object_type=0
 
         # this returns the center coordinates of the object normalized to the dimensions of the image
         # in cartesian coordinates.  The center of the image is 0,0.  The upper right hand corner is 1,1
@@ -202,7 +218,9 @@ class object_info_class(object):
         def relative_max_col(self):
             return float(1.0*self.max_col[1]/self.source_dimensions[1])
 
-
+        def altitude_and_azimuth(self):
+            norm_x,norm_y = self.normalized_center()
+            return (altitude_and_azimuth(norm_x, norm_y, constant.HORIZONTAL_ANGLE, constant.VERTICAL_ANGLE))
 
 
 #######################################################################################################################
@@ -235,8 +253,8 @@ def find_objects_fast(picture):
     return object_info_list
 
 #######################################################################################################################
-# Given a true/false bitmap and a search radius, this locates discrete blobs
-# by tracing their outlines with accuracy of search_radius, and
+# Given a bitmap of 0 and object type and a search radius, this locates discrete blobs
+# of the same object type by tracing their outlines with accuracy of search_radius, and
 # returns a list (object_info_list) of 'object_info_class'
 
 def find_objects(picture, search_radius, animate):
@@ -252,6 +270,7 @@ def find_objects(picture, search_radius, animate):
 
     objects_found=0
 
+    # search each pixel in the image
     for row in range(0, rows-1, 1):
         for col in range(0, cols-1, 1):
 
@@ -271,6 +290,7 @@ def find_objects(picture, search_radius, animate):
                 check_row=row
                 check_col=col
 
+                # follow the outline of the object
                 while(pixel_found):
                     total_pixels_found+=1
                     sum_row+=check_row
@@ -292,7 +312,7 @@ def find_objects(picture, search_radius, animate):
                         cv2.imshow("working", working_image)
                         cv2.waitKey(1)
 
-                    # find all the pixels of the same object id type within a radius
+                    # find all the pixels of the same object type within a radius
                     close_by=in_range(working_image,object_info.object_type,check_row,check_col, search_radius)
 
                     if (len(close_by)>0):
@@ -417,17 +437,14 @@ def normalizecoordinatesRC(rows, cols, row, col):
 # y=+1 is topmost and y=-1 is bottommost, horizontal angle is angle from center to rightmost viewing angle,
 # this returns the altitude and azimuth of that normalized position.
 
-def altAzi(normx, normy, horizontal_angle, vertical_angle):
+def altitude_and_azimuth(normx, normy, horizontal_angle, vertical_angle):
     altitude = normy * vertical_angle
     azimuth = normx * horizontal_angle
     return altitude, azimuth
 
 #######################################################################################################################
+#sorts the object list,  sorts largest to smallest.
 
-#sorts a list of text outputs based on a parameter for easy viewing. Sorts largest to smallest.
-# 0 is sort by relative area
-# 1 is aspect ratio
-# 2 is perimeter
 
 def sort_object_info_list(unsorted_list, sort_by):
 
@@ -443,15 +460,23 @@ def sort_object_info_list(unsorted_list, sort_by):
 
         while found==False:
 
-            if sort_by==0:
+            if sort_by==constant.SORT_RELATIVE_AREA:
                 unsorted_value=unsorted_list[unsorted_index].relative_area()
                 sorted_value=sorted_list[sorted_index].relative_area()
-            elif sort_by == 1:
+            elif sort_by == constant.SORT_ASPECT_RATIO:
                 unsorted_value = unsorted_list[unsorted_index].aspect_ratio()
                 sorted_value = sorted_list[sorted_index].aspect_ratio()
-            elif sort_by == 2:
+            elif sort_by == constant.SORT_PERIMETER:
                 unsorted_value = unsorted_list[unsorted_index].perimeter
                 sorted_value = sorted_list[sorted_index].perimeter
+            elif sort_by == constant.SORT_AZIMUTH_CENTER:
+                unsorted_value, x = unsorted_list[unsorted_index].altitude_and_azimuth()
+                sorted_value, x = sorted_list[sorted_index].altitude_and_azimuth()
+                unsorted_value=1-numpy.absolute(unsorted_value)
+                orted_value=1-numpy.absolute(sorted_value)
+            elif sort_by == constant.SORT_OBJECT_TYPE:
+                unsorted_value = unsorted_list[unsorted_index].object_type
+                sorted_value   = sorted_list[sorted_index].object_type
 
             if unsorted_value>sorted_value:
                 found=True
@@ -669,6 +694,24 @@ def euclidian_distance(one, two):
 
 
 #####################################################################################################################
+# this calculates the horizontal distance and hypotenuse given an elevation angle and height of the opposing
+# target
+
+def distance_from_elevation(angle_degrees,opposite_m):
+
+    horizontal=-1
+    hypotenuse=-1
+
+    if (angle_degrees!=0):
+        horizontal=opposite_m/math.tan(math.radians(angle_degrees))
+
+    if (angle_degrees<90):
+        hypotenuse=opposite_m/math.sin(math.radians(angle_degrees))
+
+    return horizontal, hypotenuse
+
+
+#####################################################################################################################
 
 
 def two_source_distance(separation_m, angle1_deg, angle2_deg):
@@ -684,4 +727,4 @@ def two_source_distance(separation_m, angle1_deg, angle2_deg):
     return distance_m
 
 
-thing = two_source_distance(10, 10, -10)
+
