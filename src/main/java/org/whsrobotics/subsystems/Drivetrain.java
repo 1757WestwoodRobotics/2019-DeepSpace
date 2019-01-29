@@ -29,15 +29,15 @@ public class Drivetrain extends Subsystem {
     public static void init() {
 
         //TODO: Tune Spark IDs
-        LeftA = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
-        LeftB = new CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless);
-        RightA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
-        RightB = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
+        LeftA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
+        LeftB = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
+        RightA = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
+        RightB = new CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         leftDrive = new SpeedControllerGroup(LeftA, LeftB);
         rightDrive = new SpeedControllerGroup(RightA, RightB);
 
-        differentialDrive = new DifferentialDrive(rightDrive, leftDrive);
+        differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
     }
 
@@ -53,9 +53,11 @@ public class Drivetrain extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
+        
         setDefaultCommand(new Drive());
-    }
 
+    }
+ 
     public static void stopDrive() {
         
     }
