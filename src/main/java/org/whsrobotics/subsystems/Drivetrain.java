@@ -18,8 +18,10 @@ public class Drivetrain extends Subsystem {
 
     private static CANSparkMax LeftA;
     private static CANSparkMax LeftB;
+    private static CANSparkMax LeftC;
     private static CANSparkMax RightA;
     private static CANSparkMax RightB;
+    private static CANSparkMax RightC;
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
@@ -31,11 +33,13 @@ public class Drivetrain extends Subsystem {
         //TODO: Tune Spark IDs
         LeftA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
         LeftB = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
+        LeftC = new CANSparkMax(6, CANSparkMaxLowLevel.MotorType.kBrushless);
         RightA = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
         RightB = new CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless);
+        RightC = new CANSparkMax(5, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        leftDrive = new SpeedControllerGroup(LeftA, LeftB);
-        rightDrive = new SpeedControllerGroup(RightA, RightB);
+        leftDrive = new SpeedControllerGroup(LeftA, LeftB, LeftC);
+        rightDrive = new SpeedControllerGroup(RightA, RightB, RightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
