@@ -16,24 +16,24 @@
 #define FREQUENCY 400000  // Maximum I2C frequency
 
 // Device control commands
-#define RingLEDsOff 0
-#define RingLEDsRed 1
-#define RingLEDsGreen 2
-#define RingLEDsYellow 3
-#define RingLEDsOrange 4
-#define RingLEDsBlue 5
-#define RingLEDsWhite 6
+#define RingLEDsOff       '0'
+#define RingLEDsRed       '1'
+#define RingLEDsGreen     '2'
+#define RingLEDsYellow    '3'
+#define RingLEDsOrange    '4'
+#define RingLEDsBlue      '5'
+#define RingLEDsWhite     '6'
 
 
 #define RING_LIGHT_PIN     6    // Ring Light control
 
 
 // LED Light section
-#define COLOR_ORDER GRB
-#define CHIPSET     WS2812B   // WS2812B has 4 pins/LED, WS2812 has 6 pins/LED
-#define NUM_LED_UNITS        1
-#define NUM_RING_LEDS        24
-#define MAX_LEDS             NUM_LED_UNITS *  NUM_RING_LEDS
+#define COLOR_ORDER       GRB
+#define CHIPSET           WS2812B   // WS2812B has 4 pins/LED, WS2812 has 6 pins/LED
+#define NUM_LED_UNITS     1
+#define NUM_RING_LEDS     24
+#define MAX_LEDS          NUM_LED_UNITS *  NUM_RING_LEDS
 
 CRGB leds[MAX_LEDS];
 
@@ -49,7 +49,7 @@ const CHSV OFF(0, 0, 0);
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 double distance;
-int led_command = RingLEDsOff;
+char  led_command =  RingLEDsOff;
 boolean do_led_command = false;
 boolean debug = true;
 
@@ -61,20 +61,35 @@ void setup() {
   // Set up LED Control PIN
   pinMode (RING_LIGHT_PIN, OUTPUT);
 
+  //For testing
+  pinMode(13, OUTPUT);
+ 
   FastLED.delay(3000); // Sanity delay
   FastLED.addLeds<CHIPSET, RING_LIGHT_PIN, COLOR_ORDER>(leds, MAX_LEDS); // Initializes Ring leds
 
   Wire.begin(DEV_ADDRESS);       // join i2c bus with address #4
-  Wire.setClock(FREQUENCY);      // Set the wire frequency fast mode
+  //Wire.setClock(FREQUENCY);      // Set the wire frequency fast mode
   Wire.onReceive(receiveEvent);  // register callback to recieve events
   Wire.onRequest(requestEvent);  // register callback to request events
 }
 
 void loop() {
-  if(debug) {
-     do_led_command = true;
-     led_command++;
-     led_command = led_command % 7;
+  // Read  Serial PORT to see if you received a command
+  if (Serial.available()) {
+    // read the byte
+    led_command = Serial.read();
+    do_led_command = true;
+    
+    switch (led_command) {
+      case '0' : digitalWrite (13, LOW);
+                 break;
+      
+      case '1' : digitalWrite(13, HIGH);
+                 break;
+                 
+      default: break ; // do nothing
+     
+    }    
   }
 
   // If we received an LED command event, then process the LED command.
@@ -112,14 +127,14 @@ void receiveEvent(int howMany)
     Serial.println(LED.toInt());
   }
   // Save the command and set the do_led_command flag to true and get out of the interrupt
-  led_command = LED.toInt();
+  led_command = LED[0];
     
   do_led_command = true;
 }
 
 // LED Control Section
 
-void ledCommands(int cmd)
+void ledCommands(char cmd)
 {
   if (debug) {
     Serial.print("Led Command -");
