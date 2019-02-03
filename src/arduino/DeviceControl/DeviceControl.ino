@@ -31,7 +31,7 @@
 // LED Light section
 #define COLOR_ORDER       GRB
 #define CHIPSET           WS2812B   // WS2812B has 4 pins/LED, WS2812 has 6 pins/LED
-#define NUM_LED_UNITS     1
+#define NUM_LED_UNITS     2
 #define NUM_RING_LEDS     24
 #define MAX_LEDS          NUM_LED_UNITS *  NUM_RING_LEDS
 
@@ -90,6 +90,11 @@ void loop() {
       default: break ; // do nothing
      
     }    
+  }
+
+  if(debug) {
+    do_led_command = true;
+    led_command = RingLEDsGreen;
   }
 
   // If we received an LED command event, then process the LED command.
