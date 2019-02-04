@@ -29,14 +29,40 @@ def generate_color_table(object_type):
             color_3 = int(index * 0 + 255)
         elif (object_type == constant.TYPE_HATCH_COVER):
             # for a hatch cover the primary color is 2
-            color_1 = int(index * -0.119 + 47.9)
+            color_1 = int(index * 0.0156 + 12.9)
             color_2 = int(index)
-            color_3 = int(index * 0.475 + 23.7)
+            color_3 = int(index * 0.173 + 129)
 
         color_table.append([color_1,color_2,color_3])
         index=index+1
 
     return color_table
+
+###################################################################################################
+# given the there "color" pixel value and object_type, this returns a "goodness of fit" for the pixel
+# where the lower the value the better the fit expect -1 means no fit
+
+def match_pixel_to_object(color,object_type):
+
+    fit_distance = float(-1)
+
+    if (object_type==constant.TYPE_REFLECTIVE_TAPE):
+        if ((color[1]>30 and color[1])<180):
+            target=reflective_tape_color_table[color[1]]
+            if ((abs(color[0] - target[0]) < 10) and (abs(color[2] - target[2]) < 20)):
+                fit_distance = euclidian_distance(color, target)
+
+    elif (object_type == constant.TYPE_HATCH_COVER):
+        if ((color[0] > 15) and color[0] < 25 and color[1] > 50 and color[1] < 150 and color[2] > 125 and color[2] < 150):
+            target=hatch_cover_color_table[color[1]]
+            fit_distance = euclidian_distance(color, target)
+
+    elif (object_type==constant.TYPE_FLOOR_TAPE):
+        if ((color[0] > 60) and color[0] < 110 and color[1] > 20 and color[1] < 60 and color[2] > 130 and color[2] < 190):
+            target=floor_tape_color_table[color[1]]
+            fit_distance = euclidian_distance(color, target)
+
+    return fit_distance
 
 ###################################################################################################
 # given a USB camera number, this configures the camera
@@ -50,7 +76,7 @@ def configure_camera(camera_number):
     cap.set(cv2.CAP_PROP_EXPOSURE, -7)
     cap.set(cv2.CAP_PROP_CONTRAST, 5)
     cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 240)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
   #  cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     return cap
@@ -78,14 +104,14 @@ def check_object_list(list_in):
 
         if (check_object.object_type==constant.TYPE_FLOOR_TAPE):
             if (altitude > 0):
-                remove_object = False
+                remove_object = True
         elif (check_object.object_type==constant.TYPE_BALL):
             # the ball is round and should have an aspect ratio near 1
             if (aspect_ratio > 1.3 or aspect_ratio < .75) and (relative_area<0.003): # require a minimum size
                 remove_object=True
         elif (check_object.object_type==constant.TYPE_REFLECTIVE_TAPE):
             if (altitude < 0):
-                remove_object = False
+                remove_object = True
         elif (check_object.object_type == constant.TYPE_HATCH_COVER):
             remove_object = False
 
@@ -141,9 +167,10 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table):
         area = object_info.relative_area()
         aspect_ratio = object_info.aspect_ratio()
         object_type=object_info.object_type
+        perimeter=object_info.perimeter
 
         if (object_type==constant.TYPE_REFLECTIVE_TAPE):
-            distance_m, x=distance_from_elevation(alt,0.5524)
+            distance_m, x=distance_from_elevation(alt,constant.REFLECTIVE_TAPE_HEIGHT_M-constant.CAMERA_HEIGHT_M)
         elif (object_type==constant.TYPE_BALL):
             distance_m = distance_to_ball_meters(object_info)
         else:
@@ -156,6 +183,8 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table):
         value_table_tag = "object_" + str(index)
         value_list = [str(count), object_type, index, alt, azimuth, distance_m]
         publish_network_value(value_table_tag, value_list, parent_table)
+
+        print ("Object Type: ", object_type, "Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", perimeter, "Distance, m: ", round(distance_m,3))
 
 ######################################################################################################################
 #This reads the network table and gets the String[] of items we are currently searching for, and uses that to update
@@ -192,9 +221,9 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
    # original_rows, original_cols, layers = picture_in.shape
 
     # remove pixels that aren't
-    chatter_size=3
+    chatter_size=1
     # fill out pixels that are in clusters
-    engorge_size=5
+    engorge_size=4
 
     #if this is too slow, make the picture smaller
     if (acceleration>1.0):
@@ -209,7 +238,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
     else:
         working_picture=copy.copy(working_picture)
 
-    working_picture=cv2.bilateralFilter(working_picture,10,150,150)
+    working_picture=cv2.bilateralFilter(working_picture,5,50,50)
 
     working_rows, working_cols, layers = working_picture.shape
 
@@ -218,7 +247,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
     if run_fast:
         mask = cv2.inRange(working_picture, (0, 100, 150), (100, 255, 255))
     else:
-        # create an initial mask where evertying is false
+        # create an initial mask where everything is 0 (i.e. nothing found)
         mask = numpy.zeros((working_rows, working_cols), numpy.uint8)
 
         #check each pixel and determine if its color profile is that of an object
@@ -228,56 +257,27 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
                 # get the current pixel
                 color=working_picture[row,col]
 
-                # apply the "color" mapping for each object that you may want to find and if found
-                # assign the object the object code
-                # if the value of the 1st component is within the expected range
-                # then check the other two color components
+                # since this searches for multiple objects, you have to keep track of
+                # what object is the best fit, so compare the current fit of the against
+                # the best so far
+                distance_best      = 99999999
+                distance_current   = 99999999
 
-                distance_best            = 99999999
-                distance_ball            = 99999999
-                distance_hatch           = 99999999
-                distance_floor_tape      = 99999999
-                distance_reflective_tape = 99999999
+                # searh for reflective tape
+                distance_current=match_pixel_to_object(color,constant.TYPE_REFLECTIVE_TAPE)
+                if (distance_current>=0 and distance_current<distance_best):
+                    best_type=int(constant.TYPE_REFLECTIVE_TAPE)
+                    distance_best=distance_current
 
-                # ball
-                if (constant.TYPE_BALL in objects_to_find):
-                    if ((color[2] > 0) and (color[2] < 255)):
-                        target=ball_color_table[color[2]]
-                        if (abs(color[0] - target[0]) < 255) and (abs(color[1] - target[1]) < 255):
-                            distance_ball = euclidian_distance(color, target)
-                            if (distance_ball<distance_best):
-                                distance_best=distance_ball
-                                best_type=int(constant.TYPE_BALL)
+                distance_current=match_pixel_to_object(color,constant.TYPE_HATCH_COVER)
+                if (distance_current>=0 and distance_current<distance_best):
+                    best_type=int(constant.TYPE_HATCH_COVER)
+                    distance_best=distance_current
 
-                # floor tape
-                if (constant.TYPE_FLOOR_TAPE in objects_to_find):
-                    if ((color[0]>15) and (color[0]<45)):
-                        target=floor_tape_color_table[color[0]]
-                        if ((abs(color[1] - target[1]) <30) and (abs(color[2]-target[2])< 30)):
-                            distance_floor_tape = euclidian_distance(color, target)
-                            if (distance_floor_tape<distance_best):
-                                distance_best=distance_floor_tape
-                                best_type=int(constant.TYPE_FLOOR_TAPE)
-
-                # hatch cover
-                if (constant.TYPE_HATCH_COVER in objects_to_find):
-                    if ((color[1]>150) and (color[1]<=255)):
-                        target=hatch_cover_color_table[color[1]]
-                        if ((abs(color[0] - target[0]) < 12) and (abs(color[2] - target[2]) < 60)):
-                            distance_hatch = euclidian_distance(color, target)
-                            if (distance_hatch < distance_best):
-                                distance_best = distance_hatch
-                                best_type = int(constant.TYPE_HATCH_COVER)
-
-                # reflective tape
-                if (constant.TYPE_REFLECTIVE_TAPE in objects_to_find):
-                    if ((color[1]>50 and color[1])<150):
-                        target=reflective_tape_color_table[color[1]]
-                        if ((abs(color[0] - target[0]) < 5) and (abs(color[2] - target[2]) < 2)):
-                            distance_reflective_tape = euclidian_distance(color, target)
-                            if (distance_reflective_tape<distance_best):
-                               distance_best=distance_reflective_tape
-                               best_type=int(constant.TYPE_REFLECTIVE_TAPE)
+                distance_current=match_pixel_to_object(color,constant.TYPE_FLOOR_TAPE)
+                if (distance_current>=0 and distance_current<distance_best):
+                    best_type=int(constant.TYPE_FLOOR_TAPE)
+                    distance_best=distance_current
 
                 # if there has been a match, set the mask to the best fit
                 if (distance_best<9999999):
@@ -285,13 +285,14 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
 
     # show_picture("HSV", mask, 10)
 
-    # remove "found" pixels that are most likely isoloated noise
-    mask=remove_chatter(mask,chatter_size)
+    # remove "found" pixels that are most likely isolated noise
+    if (chatter_size>1):
+        mask=remove_chatter(mask,chatter_size)
 
    #  show_picture("HSV", mask, 10)
 
     # remove "false" pixels that are most likely actual objects
-    mask=remove_spurious_falses(mask,engorge_size)
+#    mask=remove_spurious_falses(mask,engorge_size)
 
     # show_picture("HSV", mask, 10)
 
@@ -321,10 +322,6 @@ def outline_objects(picture_in, object_list):
 
     for object in object_list:
         x, y = object.normalized_center()
-        alt, azimuth = object.altitude_and_azimuth()
-        area= object.relative_area()
-        aspect_ratio = object.aspect_ratio()
-        distance=distance_to_ball_meters(object)
         object_type=object.object_type
 
         #draw a circle around the center of the object
@@ -359,7 +356,7 @@ def outline_objects(picture_in, object_list):
 
             cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), color, 2)
 
-        print ("Object Type: ", object_type, "Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", object.perimeter, "Distance, m: ", round(distance,3))
+
 
     return (picture_out)
 
@@ -392,7 +389,7 @@ while True:
     # this returns a list of object type numbers
     objects_to_find = read_object_list_from_table(sub_table)
    # print(objects_to_find)
-    objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_HATCH_COVER]
+    objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_HATCH_COVER, constant.TYPE_FLOOR_TAPE]
 
     # search the picture for objects
     object_list=search_for_objects(picture, 1, False, objects_to_find)

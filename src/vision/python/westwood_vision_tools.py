@@ -20,13 +20,18 @@ class constant_class():
 
     # camera half angle from center pixel to edge
     HORIZONTAL_HALF_ANGLE =     26.4
-    VERTICAL_HALF_ANGLE =       26.4
+    VERTICAL_HALF_ANGLE =       17.7
 
     SORT_RELATIVE_AREA  = 0
     SORT_ASPECT_RATIO   = 1
     SORT_PERIMETER      = 2
     SORT_AZIMUTH_CENTER = 3
     SORT_OBJECT_TYPE    = 4
+
+    # height above the floor of reflective tape for cargo bay
+    REFLECTIVE_TAPE_HEIGHT_M    = 0.76
+    # height above the floor of camera
+    CAMERA_HEIGHT_M = 0.55
 
 constant=constant_class()
 
@@ -87,14 +92,22 @@ def closest(row, col, coordinates_list):
 
 #######################################################################################################################
 # this hasn't been tested
+# if "no center" is true, the center of the mask is set to False
+# this doesn't work
 
-def create_circular_mask(radius, value_to_set):
+def create_circular_mask(radius, value_to_set,no_center):
 
     Y, X = numpy.ogrid[:radius*2, :radius*2]
-    dist_from_center = numpy.sqrt((X - radius)**2 + (Y-radius)**2)
+    distance_from_center = numpy.sqrt((X - radius)**2 + (Y-radius)**2)
 
     # set to true any coordinate that's within the radius
-    mask = dist_from_center <= radius
+    mask = numpy.array([distance_from_center <= radius])
+
+    if (no_center):
+        [r,c]=distance_from_center.shape
+        r=int(r/2)
+        c=int(c/2)
+        mask[r,c]=False
 
     # convert the true/false to 0/set_value
     mask=mask*value_to_set
@@ -102,7 +115,29 @@ def create_circular_mask(radius, value_to_set):
     return mask
 
 #######################################################################################################################
-#Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
+# Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
+# in said picture, and a search radius in pixels, this returns a list of all the row/col pairs
+# within that radius that have the same object type value. It does not return the original input pixel.
+# this doesn't work, it needs help but it can work and may be faster than in range
+
+def in_range2(picture, object_type, row, col, radius):
+
+    pixels_found_list=[]
+
+    mask=create_circular_mask(radius,object_type,True)
+    found=(mask==object_type)
+
+    if (numpy.any(found)):
+        [m_row, m_col] = found.shape
+        for f_row in range(-1*radius, radius):
+            for f_col in range(-1*radius, radius):
+                if (found[f_row+radius,f_col+radius]):
+                    pixels_found_list.append(copy.copy([f_row+row, f_col+col]))
+
+    return pixels_found_list
+
+#######################################################################################################################
+# Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
 # in said picture, and a search radius in pixels, this returns a list of all the row/col pairs
 # within that radius that have the same object type value. It does not return the original input pixel.
 
@@ -112,7 +147,7 @@ def in_range(picture, object_type, row, col, radius):
     coords_to_check=[]
     pixels_found_list=[]
 
-    create_circular_mask(radius,object_type)
+#    create_circular_mask(radius,object_type)
 
     for check_row in range(row-radius, row+radius, 1):
         for check_col in range(col-radius, col+radius, 1):
@@ -163,33 +198,51 @@ def obliterate(picture, row, col, radius):
 
 def hollow_out(picture):
 
-     working=copy.copy(picture)
+    working=copy.copy(picture)
 
 #    this doesn't work if you encode the object values in the image, it changes the values
 #    kernel=numpy.ones((2,2),numpy.uint8)
 #    working=cv2.morphologyEx(working,cv2.MORPH_GRADIENT,kernel)
 
-     rows, cols = working.shape
+    rows, cols = working.shape
 
-     #     for row in range(1, rows - 2, 1):
-     #         for col in range(1, cols - 2, 1):
-     #             value= picture[row,col]
-     #             if (value!=0):
-     #                 mask=numpy.full((3,3),value)
-     #                 test=picture[row-1:row+2,col-1:col+2]
-     #                 diff=test-mask
-     #                 if (not numpy.any(diff)):
-     #                     working[row,col]=0
+    #    for row in range(1, rows - 2, 1):
+    #        for col in range(1, cols - 2, 1):
+    #            if (picture[row, col] != 0):
+    #                #               diff=[picture[row-1:row+2,col-1:col+2]==picture[row,col]]
+    #                diff = [picture[row - 2:row + 3, col - 2:col + 3] == picture[row, col]]
+    #                if (numpy.all(diff)):
+    #                   working[row - 1:row + 2, col - 1:col + 2] = 0
 
-     for row in range(1, rows - 2, 1):
-        for col in range(1, cols - 2, 1):
-            if (picture[row,col]!=0):
-                test=picture[row-1:row+2,col-1:col+2]
-                diff=[test==picture[row,col]]
-                if (numpy.all(diff)):
-                    working[row,col]=0
+    row = 1
+    while (row < rows):
+        col = 1
+        while (col < cols):
+            if (working[row, col] != 0):
+                if (numpy.all([picture[row - 5:row + 6, col - 5:col + 6] == picture[row, col]])):
+                    working[row - 4:row + 5, col - 4:col + 5] = 0
+                    col = col + 5
+                elif numpy.all([picture[row - 3:row + 4, col - 3:col + 4] == picture[row, col]]):
+                    working[row - 2:row + 3, col - 2:col + 3] = 0
+                    col = col + 2
+                elif numpy.all([picture[row - 1:row + 2, col - 1:col + 2] == picture[row, col]]):
+                    working[row, col] = 0
+            col = col + 1
+        row = row + 1
+        cv2.imshow("working", working)
+        cv2.waitKey(1)
 
- #    for row in range(1, rows - 2, 1):
+
+
+#    for row in range(1, rows - 2, 1):
+#        for col in range(1, cols - 2, 1):
+#            if (picture[row, col] != 0):
+#                diff=[picture[row-1:row+2,col-1:col+2]==picture[row,col]]
+#                if (numpy.all(diff)):
+#                    working[row, col] = 0
+
+
+    #    for row in range(1, rows - 2, 1):
  #        for col in range(1, cols - 2, 1):
  #            value = picture[row, col]
  #            if (value!=0):
@@ -212,7 +265,7 @@ def hollow_out(picture):
 
 
 
-     return working
+    return working
 
 #######################################################################################################################
 # this class records the information associate with an object
@@ -629,7 +682,7 @@ def get_pixel_values(picture):
 
         if (abs_row>=0 and abs_row<rows and abs_col>=0 and abs_col<cols):
              working=copy.copy(picture)
-             cv2.circle(working,(abs_col,abs_row),5,(255,0,0),2)
+             cv2.circle(working,(abs_col,abs_row),3,(255,0,0),1)
              cv2.imshow("location", working)
              cv2.waitKey(10)
              print(picture[abs_row, abs_col])
@@ -653,7 +706,7 @@ def get_pixel_values_momin(picture):
 
         if (0<=new_row<rows and 0<=new_col<cols):
              working=copy.copy(picture)
-             cv2.circle(working,(new_col,new_row),5,(0,0,255),2)
+             cv2.circle(working,(new_col,new_row),3,(0,0,255),1)
              cv2.imshow("location", working)
              cv2.waitKey(10)
              print(picture[new_row, new_col])
