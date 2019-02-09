@@ -15,7 +15,7 @@ def configure_camera(camera_number):
     cap.set(cv2.CAP_PROP_EXPOSURE, -7)
     cap.set(cv2.CAP_PROP_CONTRAST, 5)
     cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 240)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     return cap

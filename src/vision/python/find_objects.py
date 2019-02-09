@@ -3,6 +3,7 @@ import numpy
 
 from publish_data import *
 
+
 ##################################################################################################################
 # given an object type, this generates the three color pixel value
 
@@ -29,9 +30,9 @@ def generate_color_table(object_type):
             color_3 = int(index * 0 + 255)
         elif (object_type == constant.TYPE_HATCH_COVER):
             # for a hatch cover the primary color is 2
-            color_1 = int(index * 0.0156 + 12.9)
+            color_1 = int(index * 0.0 + 17)
             color_2 = int(index)
-            color_3 = int(index * 0.173 + 129)
+            color_3 = int(index * 0.0 + 156)
 
         color_table.append([color_1,color_2,color_3])
         index=index+1
@@ -53,7 +54,7 @@ def match_pixel_to_object(color,object_type):
                 fit_distance = euclidian_distance(color, target)
 
     elif (object_type == constant.TYPE_HATCH_COVER):
-        if ((color[0] > 15) and color[0] < 25 and color[1] > 50 and color[1] < 150 and color[2] > 125 and color[2] < 150):
+        if ((color[0] > 14) and color[0] < 25 and color[1] > 130 and color[1] < 215 and color[2] > 110 and color[2] < 200):
             target=hatch_cover_color_table[color[1]]
             fit_distance = euclidian_distance(color, target)
 
@@ -69,15 +70,44 @@ def match_pixel_to_object(color,object_type):
 
 def configure_camera(camera_number):
 
+#exposure code, time ? just got this from the web......
+# -1    640 ms
+# -2    320 ms
+# -3    160 ms
+# -4    80 ms
+# -5    40 ms
+# -6    20 ms
+# -7    10 ms
+# -8    5 ms
+# -9    2.5 ms
+# -10	1.25 ms
+# -11	650 us
+# -12	312 us
+# -13	150 us
+
+    # for opencv2 the settings format is cap.set(cv2.cv.CV_CAP_PROP_XXXXXX)
+
     cap = cv2.VideoCapture(camera_number)
 
+    # this code works for the cv3 version installed on the PC used to develop the code
     cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
     cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
     cap.set(cv2.CAP_PROP_EXPOSURE, -7)
     cap.set(cv2.CAP_PROP_CONTRAST, 5)
     cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-  #  cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 240)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+#   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
+    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+
+# this code works for the Jetson TX 2 running Unbuntu
+#    cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
+#    cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
+#    cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
+#    cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
+#    cap.set(cv2.cv_CV_CAP_PROP_SATURATION, 83)
+#    cap.set(cv2.cv_CV_CAP_PROP_FRAME_WIDTH, 240)
+    #  cap.set(cv2.cv_CV_CAP_PROP_FRAME_HEIGHT, 480)
 
     return cap
 
@@ -104,14 +134,14 @@ def check_object_list(list_in):
 
         if (check_object.object_type==constant.TYPE_FLOOR_TAPE):
             if (altitude > 0):
-                remove_object = True
+                remove_object = False
         elif (check_object.object_type==constant.TYPE_BALL):
             # the ball is round and should have an aspect ratio near 1
             if (aspect_ratio > 1.3 or aspect_ratio < .75) and (relative_area<0.003): # require a minimum size
                 remove_object=True
         elif (check_object.object_type==constant.TYPE_REFLECTIVE_TAPE):
             if (altitude < 0):
-                remove_object = True
+                remove_object = False
         elif (check_object.object_type == constant.TYPE_HATCH_COVER):
             remove_object = False
 
@@ -168,6 +198,7 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table):
         aspect_ratio = object_info.aspect_ratio()
         object_type=object_info.object_type
         perimeter=object_info.perimeter
+        fit=object_info.goodness_of_fit
 
         if (object_type==constant.TYPE_REFLECTIVE_TAPE):
             distance_m, x=distance_from_elevation(alt,constant.REFLECTIVE_TAPE_HEIGHT_M-constant.CAMERA_HEIGHT_M)
@@ -184,7 +215,17 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table):
         value_list = [str(count), object_type, index, alt, azimuth, distance_m]
         publish_network_value(value_table_tag, value_list, parent_table)
 
-        print ("Object Type: ", object_type, "Alt: ", round(alt,2), "Azimuth: ", round(azimuth,2), "Relative Area: ", round(area,4), "Aspect Ratio: ", round(aspect_ratio,2), "Perimeter: ", perimeter, "Distance, m: ", round(distance_m,3))
+        string_to_print="Object Type: " + str(object_type)
+        string_to_print=string_to_print + " Azimuth: " + str(round(azimuth,2))
+        string_to_print=string_to_print + " Alt: " + str(round(alt,2))
+        string_to_print=string_to_print + " Rel. Area: " + str(round(area,5))
+        string_to_print=string_to_print + " Aspect Ratio: " + str(round(aspect_ratio,2))
+        string_to_print=string_to_print + " Perimeter: " + str(perimeter)
+        string_to_print=string_to_print + " Distance, m: " + str(round(distance_m,3))
+        string_to_print=string_to_print + " Fit: " + str(round(fit,3))
+
+        print (string_to_print)
+
 
 ######################################################################################################################
 #This reads the network table and gets the String[] of items we are currently searching for, and uses that to update
@@ -218,7 +259,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
 
     #show_picture("HSV", working_picture, 10)
 
-   # original_rows, original_cols, layers = picture_in.shape
+ #   original_rows, original_cols, layers = picture_in.shape
 
     # remove pixels that aren't
     chatter_size=1
@@ -250,38 +291,47 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
         # create an initial mask where everything is 0 (i.e. nothing found)
         mask = numpy.zeros((working_rows, working_cols), numpy.uint8)
 
+        # keep track of how well each pixel fits an object, -1 means no object
+        goodness_of_fit = numpy.full((working_rows, working_cols), -1, numpy.float)
+
         #check each pixel and determine if its color profile is that of an object
 
-        for row in range (0, working_rows-1, 1):
-            for col in range (0, working_cols-1, 1):
+        # don't search the edges of the image, having "true" pixels along the
+        # edge messes up the routines extract the blobs from the picture
+        for row in range (constant.SEARCH_RADIUS, working_rows-constant.SEARCH_RADIUS, 1):
+            for col in range (constant.SEARCH_RADIUS, working_cols-constant.SEARCH_RADIUS, 1):
                 # get the current pixel
                 color=working_picture[row,col]
 
                 # since this searches for multiple objects, you have to keep track of
                 # what object is the best fit, so compare the current fit of the against
                 # the best so far
-                distance_best      = 99999999
-                distance_current   = 99999999
+                best_fit      = 99999999
+                current_fit   = 99999999
 
                 # searh for reflective tape
-                distance_current=match_pixel_to_object(color,constant.TYPE_REFLECTIVE_TAPE)
-                if (distance_current>=0 and distance_current<distance_best):
-                    best_type=int(constant.TYPE_REFLECTIVE_TAPE)
-                    distance_best=distance_current
+                if (constant.TYPE_REFLECTIVE_TAPE in objects_to_find):
+                    current_fit=match_pixel_to_object(color,constant.TYPE_REFLECTIVE_TAPE)
+                    if (current_fit>=0 and current_fit<best_fit):
+                        best_type=int(constant.TYPE_REFLECTIVE_TAPE)
+                        best_fit=current_fit
 
-                distance_current=match_pixel_to_object(color,constant.TYPE_HATCH_COVER)
-                if (distance_current>=0 and distance_current<distance_best):
-                    best_type=int(constant.TYPE_HATCH_COVER)
-                    distance_best=distance_current
+                if (constant.TYPE_HATCH_COVER in objects_to_find):
+                    current_fit=match_pixel_to_object(color,constant.TYPE_HATCH_COVER)
+                    if (current_fit>=0 and current_fit<best_fit):
+                        best_type=int(constant.TYPE_HATCH_COVER)
+                        best_fit=current_fit
 
-                distance_current=match_pixel_to_object(color,constant.TYPE_FLOOR_TAPE)
-                if (distance_current>=0 and distance_current<distance_best):
-                    best_type=int(constant.TYPE_FLOOR_TAPE)
-                    distance_best=distance_current
+                if (constant.TYPE_FLOOR_TAPE in objects_to_find):
+                    current_fit=match_pixel_to_object(color,constant.TYPE_FLOOR_TAPE)
+                    if (current_fit>=0 and current_fit<best_fit):
+                        best_type=int(constant.TYPE_FLOOR_TAPE)
+                        best_fit=current_fit
 
                 # if there has been a match, set the mask to the best fit
-                if (distance_best<9999999):
+                if (best_fit<9999999):
                     mask[row, col] = int(best_type)
+                    goodness_of_fit[row,col]=best_fit
 
     # show_picture("HSV", mask, 10)
 
@@ -291,15 +341,11 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
 
    #  show_picture("HSV", mask, 10)
 
-    # remove "false" pixels that are most likely actual objects
-#    mask=remove_spurious_falses(mask,engorge_size)
-
-    # show_picture("HSV", mask, 10)
 
     if run_fast:
         object_list = find_objects_fast(mask)
     else:
-        object_list = find_objects(mask, 3, animate)
+        object_list = find_objects(mask, goodness_of_fit, constant.SEARCH_RADIUS, animate)
 
     # remove items from the list that are probably just noise and not actual target objects
     object_list=check_object_list(object_list)
@@ -316,7 +362,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
 
 def outline_objects(picture_in, object_list):
 
-    picture_out=picture_in
+    picture_out=copy.copy(picture_in)
 
     original_rows, original_cols, layers = picture_in.shape
 
@@ -369,6 +415,9 @@ def outline_objects(picture_in, object_list):
 # this is how the code communicates with the robot
 parent_table, sub_table = init_network_tables()
 
+# keep track of how many images have been processed
+# this is used as an ID number so someone processing
+# the information knows if the data has been updated
 count=0
 
 # generate the color tables for each object
@@ -379,17 +428,17 @@ reflective_tape_color_table = generate_color_table(constant.TYPE_REFLECTIVE_TAPE
 
 cap=configure_camera(1)
 
+start_time = time.time()
 while True:
 
     picture = take_picture2(cap)
 
-    #start_time = time.time()
 
     # read the network table to find out what the robot wants the code to look for
     # this returns a list of object type numbers
     objects_to_find = read_object_list_from_table(sub_table)
    # print(objects_to_find)
-    objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_HATCH_COVER, constant.TYPE_FLOOR_TAPE]
+    objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_FLOOR_TAPE]
 
     # search the picture for objects
     object_list=search_for_objects(picture, 1, False, objects_to_find)
@@ -397,14 +446,13 @@ while True:
     # superimpose boxes around the found objects in the picture
     processed_picture= outline_objects(picture,object_list)
 
-    #stop_time=time.time()
-    #print(stop_time-start_time)
-
     # post the object information to the network table, this is how the code communicates
     # with the robot
     report_object_list_to_table(object_list,count,parent_table,sub_table)
+    #   print(time.time()-start_time)/(count+1)
 
     show_picture("processed",processed_picture,10)
 
+    # increment the image count
     count=count+1
 s
