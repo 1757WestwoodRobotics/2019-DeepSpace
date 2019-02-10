@@ -1,13 +1,7 @@
 package org.whsrobotics.subsystems;
 
-import java.lang.module.ModuleDescriptor.Requires;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.ConfigParameter;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.sun.javadoc.Type;
-
 import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -28,7 +22,7 @@ public class Drivetrain extends Subsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    public static void init() {
+    public Drivetrain() {
 
         //TODO: Tune Spark IDs
         LeftA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);

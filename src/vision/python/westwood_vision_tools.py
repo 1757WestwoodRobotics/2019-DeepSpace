@@ -3,8 +3,9 @@ import numpy
 import cv2
 import time
 import copy
-# import PyWinMouse
+import PyWinMouse
 import math
+
 
 class constant_class():
     TYPE_BALL =            int(70)
@@ -12,15 +13,27 @@ class constant_class():
     TYPE_REFLECTIVE_TAPE = int(100)
     TYPE_HATCH_COVER =     int(120)
 
+    # this is used in to translate the network tables from the robot that tells the vision
+    # code what objects to look for
+    TYPE_LIST_INT = [TYPE_BALL, TYPE_FLOOR_TAPE, TYPE_REFLECTIVE_TAPE, TYPE_HATCH_COVER]
+    TYPE_LIST_STRING = ["CARGO", "TAPE", "TARGET", "PANEL"]  # This assumes that the list is all caps
+
     # camera half angle from center pixel to edge
-    HORIZONTAL_ANGLE =     23.3
-    VERTICAL_ANGLE =       23.3
+    HORIZONTAL_HALF_ANGLE =     26.4
+    VERTICAL_HALF_ANGLE =       17.7
 
     SORT_RELATIVE_AREA  = 0
     SORT_ASPECT_RATIO   = 1
     SORT_PERIMETER      = 2
     SORT_AZIMUTH_CENTER = 3
     SORT_OBJECT_TYPE    = 4
+
+    # height above the floor of reflective tape for cargo bay
+    REFLECTIVE_TAPE_HEIGHT_M    = 0.76
+    # height above the floor of camera
+    CAMERA_HEIGHT_M = 0.55
+
+    SEARCH_RADIUS  = 3
 
 constant=constant_class()
 
@@ -56,13 +69,12 @@ def take_picture(show, device_number):
 
 def take_picture2(stream):
 
-
     ret, picture = stream.read()
 
     return picture
 
 #######################################################################################################################
-#Given a row and column input, and a list of row/column pairs, this returns the index of the element in the list
+# Given a row and column input, and a list of row/column pairs, this returns the index of the element in the list
 # which is closest to the input row/column.
 
 def closest(row, col, coordinates_list):
@@ -71,9 +83,13 @@ def closest(row, col, coordinates_list):
     closest_so_far=999999999999999999999999
 
     for list_index in range (0,len(coordinates_list),1):
-        check_row=coordinates_list[list_index][0]
-        check_col=coordinates_list[list_index][1]
-        distance = numpy.sqrt((check_row-row)**2 + (check_col-col)**2)
+# the logic of the lines below is implemented in the single distance line
+# commented out to imporve speed, don't actually have to calculate the distance just get a measure
+# of what is closest, hence, don't do waste the time on the square root
+#       check_row=coordinates_list[list_index][0]
+#       check_col=coordinates_list[list_index][1]
+#       distance = numpy.sqrt((check_row-row)**2 + (check_col-col)**2)
+        distance = ((coordinates_list[list_index][0]-row)**2 + (coordinates_list[list_index][1]-col)**2)
         if distance<closest_so_far:
             closest_so_far=distance
             close_index=list_index
@@ -81,15 +97,65 @@ def closest(row, col, coordinates_list):
     return close_index
 
 #######################################################################################################################
-#Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
-# in said picture, and a search radius in pixels, this returns a list of all the row/col pairs
-# within that radius that are true. It does not return the original input pixel.
 
-def in_range(picture, object_type, row, col, radius):
+def create_circular_mask(radius, value_to_set, no_center):
+
+    mask=numpy.zeros((radius*2+1,radius*2+1))
+
+    [rows, cols]=mask.shape
+
+    for row in range(0, rows):
+        for col in range (0,cols):
+            if (numpy.sqrt(abs(radius-row)**2 + abs(radius-col)**2)<(radius+0.5)):
+                mask[row,col]=value_to_set
+
+    if (no_center):
+        mask[radius,radius]=0
+
+    return mask
+
+#######################################################################################################################
+# Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
+# in said picture, and a search mask where 1 means check if a pixel is in this location, this returns a list of all the row/col pairs
+# within that mask that have the same object type value. It does not return the original input pixel.
+
+
+def in_range(picture, object_type, row, col, mask):
+
+    pixels_found_list=[]
+
+    [rows, cols]=mask.shape
+    height=int(rows/2)
+    width=int(cols/2)
+
+    section=picture[row-height:row+height+1,col-width:col+width+1]
+
+    if (mask.shape==section.shape):
+        match1=numpy.multiply(section,mask)
+        [match_rows, match_cols]=numpy.where(match1==object_type)
+        # convert the row, col mask coordinates to the picture coordinates
+        match_rows=match_rows-height+row
+        match_cols=match_cols-width+col
+
+        for index in range(0,len(match_rows)):
+            pixels_found_list.append(copy.copy([match_rows[index], match_cols[index]]))
+    else:
+        print("wrong shape")
+
+    return pixels_found_list
+
+#######################################################################################################################
+# Given a picture reduced to true/false values (0=false,  not zero=true), and a row/col coordinate that describes a coordinate
+# in said picture, and a search radius in pixels, this returns a list of all the row/col pairs
+# within that radius that have the same object type value. It does not return the original input pixel.
+
+def in_range_old(picture, object_type, row, col, radius):
 
     rows, cols = picture.shape
     coords_to_check=[]
     pixels_found_list=[]
+
+#    create_circular_mask(radius,object_type)
 
     for check_row in range(row-radius, row+radius, 1):
         for check_col in range(col-radius, col+radius, 1):
@@ -131,31 +197,84 @@ def obliterate(picture, row, col, radius):
     return return_picture
 
 #######################################################################################################################
-
-#Given a picture reduced to true/false values (0=false, not 0 =true), this sets all pixels otherwise surrounded by true
-# pixels to false. Does not check the edges because that fringe problem is
-# probably not worth spending a bunch of time and cpu to fix.
+# given a picture where each pixel has the value of 0 or object type values this sets the pixels that are entirely
+# surrounded by pixels of the same object type to 0
+# this is slightly faster than the hollow_outX version particularly if there aren't that many non zero pixels
 
 def hollow_out(picture):
 
     working=copy.copy(picture)
 
-    kernel=numpy.ones((2,2),numpy.uint8)
-    working=cv2.morphologyEx(working,cv2.MORPH_GRADIENT,kernel)
+    # find all of the pixel coordinates that aren't 0
+    [rows, cols]=numpy.where(working!=0)
 
-#    rows, cols = working.shape
-#    for row in range(1, rows - 2, 1):
-#        for col in range(1, cols - 2, 1):
-#            if (picture[row,col]==255):
-#                if(picture[row,col-1]==255):
-#                    if(picture[row,col+1]==255):
-#                        if(picture[row-1,col]==255):
-#                           if(picture[row-1,col-1]==255):
-#                                if(picture[row-1,col+1]==255):
-#                                   if(picture[row+1,col]==255):
-#                                      if(picture[row+1,col-1]==255):
-#                                        if(picture[row+1,col+1]==255):
-#                                               working[row,col]=0
+    # check each location to see if it is entirely surrounded by pixels of the same object type
+    # if it is, then set the interior object type value to zero
+    for index in range(0,len(rows)):
+#        row=check_row[index]
+#        col=check_col[index]
+        if (working[rows[index], cols[index]] != 0):
+            if (numpy.all([picture[rows[index] - 5:rows[index] + 6, cols[index] - 5:cols[index] + 6] == picture[rows[index], cols[index]]])):
+                working[rows[index] - 4:rows[index] + 5, cols[index] - 4:cols[index] + 5] = 0
+            elif numpy.all([picture[rows[index] - 3:rows[index] + 4, cols[index] - 3:cols[index] + 4] == picture[rows[index], cols[index]]]):
+               working[rows[index] - 2:rows[index] + 3, cols[index] - 2:cols[index] + 3] = 0
+            elif numpy.all([picture[rows[index] - 1:rows[index] + 2, cols[index] - 1:cols[index] + 2] == picture[rows[index], cols[index]]]):
+                    working[rows[index], cols[index]] = 0
+
+    return working
+
+#######################################################################################################################
+# given a picture where each pixel has the value of 0 or object type values this sets the pixels that are entirely
+# surrounded by pixels of the same object type to 0
+# this version may be faster in instances where many pixels are not 0
+
+def hollow_outX(picture):
+    working = copy.copy(picture)
+
+    #    this doesn't work if you encode the object values in the image, it changes the values
+    #    kernel=numpy.ones((2,2),numpy.uint8)
+    #    working=cv2.morphologyEx(working,cv2.MORPH_GRADIENT,kernel)
+
+    rows, cols = working.shape
+
+    row = 1
+    while (row < rows):
+        col = 1
+        while (col < cols):
+            if (working[row, col] != 0):
+                if (numpy.all([picture[row - 5:row + 6, col - 5:col + 6] == picture[row, col]])):
+                    working[row - 4:row + 5, col - 4:col + 5] = 0
+                    col = col + 9
+                elif numpy.all([picture[row - 3:row + 4, col - 3:col + 4] == picture[row, col]]):
+                    working[row - 2:row + 3, col - 2:col + 3] = 0
+                    col = col + 5
+                elif numpy.all([picture[row - 1:row + 2, col - 1:col + 2] == picture[row, col]]):
+                    working[row, col] = 0
+            col = col + 1
+        row = row + 1
+    #       cv2.imshow("working", working)
+ #       cv2.waitKey(1)
+
+    #    for row in range(1, rows - 2, 1):
+ #        for col in range(1, cols - 2, 1):
+ #            value = picture[row, col]
+ #            if (value!=0):
+ #               if (picture[row,col-1] == value and picture[row,col+1] == value and picture[row-1,col] == value and picture[row-1, col-1] == value and picture[row-1,col+1] == value and picture[row+1, col] == value and picture[row+1,col-1] == value and picture[row+1,col+1]==value):
+ #                  working[row, col] = 0
+
+#     for row in range(1, rows - 2, 1):
+#         for col in range(1, cols - 2, 1):
+#             value = picture[row, col]
+#             if (value != 0):
+#                 if(picture[row,col-1]==value):
+#                     if(picture[row,col+1]==value):
+#                         if(picture[row-1,col]==value):
+#                            if(picture[row-1,col-1]==value):
+#                                 if(picture[row-1,col+1]==value):
+#                                    if(picture[row+1,col]==value):
+#                                       if(picture[row+1,col-1]==value):
+#                                         if(picture[row+1,col+1]==value):
+#                                             working[row, col] = 0
 
 
 
@@ -175,6 +294,7 @@ class object_info_class(object):
             self.min_row = [0,0]
             self.min_col = [0,0]
             self.object_type=0
+            self.goodness_of_fit=float(0)
 
         # this returns the center coordinates of the object normalized to the dimensions of the image
         # in cartesian coordinates.  The center of the image is 0,0.  The upper right hand corner is 1,1
@@ -220,7 +340,7 @@ class object_info_class(object):
 
         def altitude_and_azimuth(self):
             norm_x,norm_y = self.normalized_center()
-            return (altitude_and_azimuth(norm_x, norm_y, constant.HORIZONTAL_ANGLE, constant.VERTICAL_ANGLE))
+            return (altitude_and_azimuth(norm_x, norm_y, constant.HORIZONTAL_HALF_ANGLE, constant.VERTICAL_HALF_ANGLE))
 
 
 #######################################################################################################################
@@ -257,7 +377,7 @@ def find_objects_fast(picture):
 # of the same object type by tracing their outlines with accuracy of search_radius, and
 # returns a list (object_info_list) of 'object_info_class'
 
-def find_objects(picture, search_radius, animate):
+def find_objects(picture, goodness_of_fit, search_radius, animate):
     object_info = object_info_class()
     object_info_list = []
 
@@ -270,9 +390,12 @@ def find_objects(picture, search_radius, animate):
 
     objects_found=0
 
-    # search each pixel in the image
-    for row in range(0, rows-1, 1):
-        for col in range(0, cols-1, 1):
+    search_mask=create_circular_mask(search_radius,1,True)
+
+    # search the pixels in the image
+    # don't search the edges of the picture
+    for row in range(search_radius, rows-search_radius, 1):
+        for col in range(search_radius, cols-search_radius, 1):
 
             if working_image[row, col] != 0:
 
@@ -285,7 +408,8 @@ def find_objects(picture, search_radius, animate):
 
                 sum_row=0
                 sum_col=0
-                total_pixels_found=0
+                fit=float(0)
+                total_pixels_found = 0
 
                 check_row=row
                 check_col=col
@@ -295,6 +419,7 @@ def find_objects(picture, search_radius, animate):
                     total_pixels_found+=1
                     sum_row+=check_row
                     sum_col+=check_col
+                    fit+=goodness_of_fit[row,col]
 
                     if check_row>object_info.max_row[0]:
                         object_info.max_row=[check_row,check_col]
@@ -313,16 +438,17 @@ def find_objects(picture, search_radius, animate):
                         cv2.waitKey(1)
 
                     # find all the pixels of the same object type within a radius
-                    close_by=in_range(working_image,object_info.object_type,check_row,check_col, search_radius)
+                    close_by=in_range(working_image,object_info.object_type,check_row,check_col, search_mask)
 
                     if (len(close_by)>0):
                         closest_index = closest(check_row,check_col,close_by)
                         check_row=close_by[closest_index][0]
                         check_col=close_by[closest_index][1]
                     else:
-                        object_info.perimeter = total_pixels_found
-                        object_info.center_RC = [float(1.0*sum_row/total_pixels_found), float(1.0*sum_col/total_pixels_found)]
-                        object_info.source_dimensions=[rows, cols]
+                        object_info.goodness_of_fit   = fit/total_pixels_found
+                        object_info.perimeter         = total_pixels_found
+                        object_info.center_RC         = [float(1.0*sum_row/total_pixels_found), float(1.0*sum_col/total_pixels_found)]
+                        object_info.source_dimensions =[rows, cols]
                         pixel_found = False
                         object_info_list.append(copy.copy(object_info))
                         objects_found+=1
@@ -438,8 +564,10 @@ def normalizecoordinatesRC(rows, cols, row, col):
 # this returns the altitude and azimuth of that normalized position.
 
 def altitude_and_azimuth(normx, normy, horizontal_angle, vertical_angle):
+
     altitude = normy * vertical_angle
     azimuth = normx * horizontal_angle
+
     return altitude, azimuth
 
 #######################################################################################################################
@@ -473,7 +601,7 @@ def sort_object_info_list(unsorted_list, sort_by):
                 unsorted_value, x = unsorted_list[unsorted_index].altitude_and_azimuth()
                 sorted_value, x = sorted_list[sorted_index].altitude_and_azimuth()
                 unsorted_value=1-numpy.absolute(unsorted_value)
-                orted_value=1-numpy.absolute(sorted_value)
+                sorted_value=1-numpy.absolute(sorted_value)
             elif sort_by == constant.SORT_OBJECT_TYPE:
                 unsorted_value = unsorted_list[unsorted_index].object_type
                 sorted_value   = sorted_list[sorted_index].object_type
@@ -517,7 +645,8 @@ def remove_object_in_object(list_in):
                 if (check_object.relative_max_row()>last_object.relative_max_row() and
                     check_object.relative_max_col()>last_object.relative_max_col() and
                     check_object.relative_min_row()<last_object.relative_min_row() and
-                    check_object.relative_min_col()<last_object.relative_min_col()):
+                    check_object.relative_min_col()<last_object.relative_min_col() and
+                    check_object.object_type==last_object.object_type):
                     list_out.pop(last_index)
                     check_next=False
                 else:
@@ -553,8 +682,8 @@ def get_pixel_values(picture):
 
         new_col, new_row = PyWinMouse.Mouse().get_mouse_pos()
 
-        rel_col=+0.075*(new_col-old_col)
-        rel_row=+0.075*(new_row-old_row)
+        rel_col=+0.08*(new_col-old_col)
+        rel_row=+0.08*(new_row-old_row)
 
         if (rel_row<0):
             rel_row=0
@@ -573,11 +702,34 @@ def get_pixel_values(picture):
 
         if (abs_row>=0 and abs_row<rows and abs_col>=0 and abs_col<cols):
              working=copy.copy(picture)
-             cv2.circle(working,(abs_col,abs_row),5,(0,0,255),2)
+             cv2.circle(working,(abs_col,abs_row),3,(255,0,0),1)
              cv2.imshow("location", working)
              cv2.waitKey(10)
              print(picture[abs_row, abs_col])
 
+######################################################################################################################
+# given a picture, this allows the user to select a locations on the picture and reports the three color
+# values associated with the location
+# this is intended as a tool to held with object identification
+# to exit the function, the user enters a negative X location
+
+def get_pixel_values_momin(picture):
+
+    [rows, cols, depth] = picture.shape
+
+    run_again=True
+
+    while run_again:
+        time.sleep(0.25)
+
+        new_col, new_row = PyWinMouse.Mouse().get_mouse_pos()
+
+        if (0<=new_row<rows and 0<=new_col<cols):
+             working=copy.copy(picture)
+             cv2.circle(working,(new_col,new_row),3,(0,0,255),1)
+             cv2.imshow("location", working)
+             cv2.waitKey(10)
+             print(picture[new_row, new_col])
 
 #######################################################################################################################
 # given a picture, this allows the user to select a locations on the picture and reports the three color
@@ -705,7 +857,7 @@ def distance_from_elevation(angle_degrees,opposite_m):
     if (angle_degrees!=0):
         horizontal=opposite_m/math.tan(math.radians(angle_degrees))
 
-    if (angle_degrees<90):
+    if (angle_degrees<90 and angle_degrees!=0):
         hypotenuse=opposite_m/math.sin(math.radians(angle_degrees))
 
     return horizontal, hypotenuse
