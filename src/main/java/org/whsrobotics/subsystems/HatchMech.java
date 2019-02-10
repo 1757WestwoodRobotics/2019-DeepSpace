@@ -2,7 +2,6 @@ package org.whsrobotics.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.SpeedController;
 
 public class HatchMech {
 
