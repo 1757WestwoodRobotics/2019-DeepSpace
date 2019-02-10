@@ -7,11 +7,12 @@ public class Actuators {
 
     public static class MotorControllers {
         public static TalonSRX ballScrewTalon;
-    }
-
-    public static class Servos {
         public static Servo lS;
         public static Servo rS;
+    }
+
+    public static class Pneumatics {
+
     }
 
     public static void configureActuators() {

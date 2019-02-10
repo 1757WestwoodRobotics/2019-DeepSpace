@@ -2,10 +2,6 @@ package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.ConfigParameter;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.command.Scheduler;
 import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -24,11 +20,7 @@ public class Drivetrain extends Subsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    private static Drivetrain instance;
-
-    public static void init() {
-
-        instance = new Drivetrain();    // Used to invoke the superconstructor
+    public Drivetrain() {
 
         //TODO: Tune Spark IDs
         LeftA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -40,10 +32,6 @@ public class Drivetrain extends Subsystem {
         rightDrive = new SpeedControllerGroup(RightA, RightB);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
-
-    }
-
-    private Drivetrain() {
 
     }
 

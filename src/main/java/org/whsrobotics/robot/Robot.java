@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        hatchMech = new HatchMech(Servos.lS, Servos.rS, MotorControllers.ballScrewTalon);
+        hatchMech = new HatchMech(MotorControllers.lS, MotorControllers.rS, MotorControllers.ballScrewTalon);
 
 
     }
