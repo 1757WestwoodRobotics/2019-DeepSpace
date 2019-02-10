@@ -1,4 +1,4 @@
-# file last changed on 10February2018
+# file last changed on 10February2019
 import numpy
 import cv2
 import time
@@ -19,8 +19,9 @@ class constant_class():
     TYPE_LIST_STRING = ["CARGO", "TAPE", "TARGET", "PANEL"]  # This assumes that the list is all caps
 
     # camera half angle from center pixel to edge
-    HORIZONTAL_HALF_ANGLE =     26.4
-    VERTICAL_HALF_ANGLE =       17.7
+    HORIZONTAL_HALF_ANGLE          = 26.4
+    VERTICAL_HALF_ANGLE            = 17.7
+    CAMERA_VERTICAL_TILT_DEGREES   = 0.0 # positive is up
 
     SORT_RELATIVE_AREA  = 0
     SORT_ASPECT_RATIO   = 1
@@ -33,10 +34,58 @@ class constant_class():
     # height above the floor of camera
     CAMERA_HEIGHT_M = 0.55
 
+    # how far to searchfor adjacent pixels
+    # used when tracing the outline of an object
     SEARCH_RADIUS  = 3
+
 
 constant=constant_class()
 
+###################################################################################################
+# given a USB camera number, this configures the camera
+
+def configure_camera(camera_number):
+
+#exposure code, time ? just got this from the web......
+# -1    640 ms
+# -2    320 ms
+# -3    160 ms
+# -4    80 ms
+# -5    40 ms
+# -6    20 ms
+# -7    10 ms
+# -8    5 ms
+# -9    2.5 ms
+# -10	1.25 ms
+# -11	650 us
+# -12	312 us
+# -13	150 us
+
+    # for opencv2 the settings format is cap.set(cv2.cv.CV_CAP_PROP_XXXXXX)
+
+    cap = cv2.VideoCapture(camera_number)
+
+    # this code works for the cv3 version installed on the PC used to develop the code
+    cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
+    cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
+    cap.set(cv2.CAP_PROP_EXPOSURE, -7)
+    cap.set(cv2.CAP_PROP_CONTRAST, 5)
+    cap.set(cv2.CAP_PROP_SATURATION, 83)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+#   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
+    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+
+# this code works for the Jetson TX 2 running Unbuntu
+#    cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
+#    cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
+#    cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
+#    cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
+#    cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
+#    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 240)
+#    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
+
+    return cap
 
 #######################################################################################################################
 
@@ -154,8 +203,6 @@ def in_range_old(picture, object_type, row, col, radius):
     rows, cols = picture.shape
     coords_to_check=[]
     pixels_found_list=[]
-
-#    create_circular_mask(radius,object_type)
 
     for check_row in range(row-radius, row+radius, 1):
         for check_col in range(col-radius, col+radius, 1):
@@ -340,7 +387,7 @@ class object_info_class(object):
 
         def altitude_and_azimuth(self):
             norm_x,norm_y = self.normalized_center()
-            return (altitude_and_azimuth(norm_x, norm_y, constant.HORIZONTAL_HALF_ANGLE, constant.VERTICAL_HALF_ANGLE))
+            return altitude_and_azimuth(norm_x, norm_y, constant.HORIZONTAL_HALF_ANGLE, constant.VERTICAL_HALF_ANGLE+constant.CAMERA_VERTICAL_TILT_DEGREES)
 
 
 #######################################################################################################################
@@ -461,7 +508,7 @@ def find_objects(picture, goodness_of_fit, search_radius, animate):
 
 def remove_chatter(mask_in,square_width):
 
-    mask_out=copy.copy(mask_in)
+#    mask_out=copy.copy(mask_in)
     kernel=numpy.ones((square_width,square_width),numpy.uint8)
     mask_out=cv2.erode(mask_in,kernel,iterations=1)
 
@@ -473,7 +520,7 @@ def remove_chatter(mask_in,square_width):
 
 def remove_spurious_falses(mask_in,square_width):
 
-    mask_out=copy.copy(mask_in)
+#    mask_out=copy.copy(mask_in)
     kernel=numpy.ones((square_width,square_width),numpy.uint8)
     mask_out=cv2.dilate(mask_in,kernel,iterations=1)
 
@@ -481,6 +528,7 @@ def remove_spurious_falses(mask_in,square_width):
 
 #######################################################################################################################
 #Given t/f bitmap, every pixel that isn't surrounded completely by otherwise true pixels is set to false.
+# this can be sped up using masks
 
 def clean_edge(picture):
 
@@ -665,71 +713,39 @@ def remove_object_in_object(list_in):
 # given a picture, this allows the user to select a locations on the picture and reports the three color
 # values associated with the location
 # this is intended as a tool to held with object identification
-# to exit the function, the user enters a negative X location
 
 def get_pixel_values(picture):
 
     [rows, cols, depth] = picture.shape
 
     run_again=True
-    rel_row = 50
-    rel_col = 50
 
-    old_col, old_row = PyWinMouse.Mouse().get_mouse_pos()
+    # if I could figure out how to get the window coordinates automatically I would just
+    # read them, but the python module that interacts with the operating system to get the
+    # coordinates won't install
+    window_row=0
+    window_col=0
+    window_width=cols
+    window_height=rows
 
-    while run_again:
-        time.sleep(0.25)
+    working = copy.copy(picture)
+    cv2.imshow("location", working)
+    cv2.waitKey(10)
 
-        new_col, new_row = PyWinMouse.Mouse().get_mouse_pos()
-
-        rel_col=+0.08*(new_col-old_col)
-        rel_row=+0.08*(new_row-old_row)
-
-        if (rel_row<0):
-            rel_row=0
-        elif rel_row>100:
-            rel_row=100
-
-        if (rel_col<0):
-            rel_col=0
-        elif rel_col>100:
-            rel_col=100
-
-        #convert from relative position to absolute row and colmn
-        abs_col=int(cols*1.0*rel_col/100)
-
-        abs_row=int(rows*1.0*rel_row/100)
-
-        if (abs_row>=0 and abs_row<rows and abs_col>=0 and abs_col<cols):
-             working=copy.copy(picture)
-             cv2.circle(working,(abs_col,abs_row),3,(255,0,0),1)
-             cv2.imshow("location", working)
-             cv2.waitKey(10)
-             print(picture[abs_row, abs_col])
-
-######################################################################################################################
-# given a picture, this allows the user to select a locations on the picture and reports the three color
-# values associated with the location
-# this is intended as a tool to held with object identification
-# to exit the function, the user enters a negative X location
-
-def get_pixel_values_momin(picture):
-
-    [rows, cols, depth] = picture.shape
-
-    run_again=True
+    # have the user move the window to the upper left hand corner so we know where the window is
+    print("Move window to upper left hand corner of the display.  Enter a number when done.")
+    x=input()
 
     while run_again:
-        time.sleep(0.25)
+        col, row = PyWinMouse.Mouse().get_mouse_pos()
 
-        new_col, new_row = PyWinMouse.Mouse().get_mouse_pos()
+        if (window_row<row<window_height and window_col<col<window_width):
+            working = copy.copy(picture)
+            cv2.circle(working, (col, row), 3, (255, 0, 0), 1)
+            cv2.imshow("location", working)
+            cv2.waitKey(100)
+            print(picture[row, col])
 
-        if (0<=new_row<rows and 0<=new_col<cols):
-             working=copy.copy(picture)
-             cv2.circle(working,(new_col,new_row),3,(0,0,255),1)
-             cv2.imshow("location", working)
-             cv2.waitKey(10)
-             print(picture[new_row, new_col])
 
 #######################################################################################################################
 # given a picture, this allows the user to select a locations on the picture and reports the three color
