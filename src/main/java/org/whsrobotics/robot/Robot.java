@@ -5,11 +5,16 @@ import org.whsrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import org.whsrobotics.subsystems.HatchMech;
+
+import static org.whsrobotics.subsystems.Actuators.*;
 
 /**
  *
  */
 public class Robot extends TimedRobot {
+
+    HatchMech hatchMech;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -18,7 +23,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        Drivetrain.init();
+        hatchMech = new HatchMech(Servos.lS, Servos.rS, MotorControllers.ballScrewTalon);
+
+
     }
 
     /**
