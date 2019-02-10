@@ -48,9 +48,9 @@ def match_pixel_to_object(color,object_type):
     fit_distance = float(-1)
 
     if (object_type==constant.TYPE_REFLECTIVE_TAPE):
-        if ((color[1]>30 and color[1])<180):
+        if ((color[1]>30 and color[1])<120):
             target=reflective_tape_color_table[color[1]]
-            if ((abs(color[0] - target[0]) < 10) and (abs(color[2] - target[2]) < 20)):
+            if ((abs(color[0] - target[0]) < 60) and (abs(color[2] - target[2]) < 10)):
                 fit_distance = euclidian_distance(color, target)
 
     elif (object_type == constant.TYPE_HATCH_COVER):
@@ -65,51 +65,6 @@ def match_pixel_to_object(color,object_type):
 
     return fit_distance
 
-###################################################################################################
-# given a USB camera number, this configures the camera
-
-def configure_camera(camera_number):
-
-#exposure code, time ? just got this from the web......
-# -1    640 ms
-# -2    320 ms
-# -3    160 ms
-# -4    80 ms
-# -5    40 ms
-# -6    20 ms
-# -7    10 ms
-# -8    5 ms
-# -9    2.5 ms
-# -10	1.25 ms
-# -11	650 us
-# -12	312 us
-# -13	150 us
-
-    # for opencv2 the settings format is cap.set(cv2.cv.CV_CAP_PROP_XXXXXX)
-
-    cap = cv2.VideoCapture(camera_number)
-
-    # this code works for the cv3 version installed on the PC used to develop the code
-    cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
-    cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
-    cap.set(cv2.CAP_PROP_EXPOSURE, -7)
-    cap.set(cv2.CAP_PROP_CONTRAST, 5)
-    cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 240)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-#   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
-    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
-
-# this code works for the Jetson TX 2 running Unbuntu
-#    cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
-#    cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
-#    cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
-#    cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
-#    cap.set(cv2.cv_CV_CAP_PROP_SATURATION, 83)
-#    cap.set(cv2.cv_CV_CAP_PROP_FRAME_WIDTH, 240)
-    #  cap.set(cv2.cv_CV_CAP_PROP_FRAME_HEIGHT, 480)
-
-    return cap
 
 
 ##################################################################################################################
@@ -130,20 +85,16 @@ def check_object_list(list_in):
         # gather information about the object position and shape
         altitude, azimuth = check_object.altitude_and_azimuth()
         aspect_ratio=check_object.aspect_ratio()
-        relative_area=check_object.relative_area()
+        perimeter=check_object.perimeter
 
-        if (check_object.object_type==constant.TYPE_FLOOR_TAPE):
+        if (perimeter<4):
+            remove_object=True
+        elif (check_object.object_type==constant.TYPE_FLOOR_TAPE and False):
             if (altitude > 0):
-                remove_object = False
-        elif (check_object.object_type==constant.TYPE_BALL):
-            # the ball is round and should have an aspect ratio near 1
-            if (aspect_ratio > 1.3 or aspect_ratio < .75) and (relative_area<0.003): # require a minimum size
-                remove_object=True
-        elif (check_object.object_type==constant.TYPE_REFLECTIVE_TAPE):
+                remove_object = True
+        elif (check_object.object_type==constant.TYPE_REFLECTIVE_TAPE and False):
             if (altitude < 0):
-                remove_object = False
-        elif (check_object.object_type == constant.TYPE_HATCH_COVER):
-            remove_object = False
+                remove_object = True
 
         if (remove_object):
             list_out.pop(index)
@@ -262,7 +213,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
  #   original_rows, original_cols, layers = picture_in.shape
 
     # remove pixels that aren't
-    chatter_size=1
+    chatter_size=2
     # fill out pixels that are in clusters
     engorge_size=4
 
@@ -307,24 +258,17 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
                 # what object is the best fit, so compare the current fit of the against
                 # the best so far
                 best_fit      = 99999999
-                current_fit   = 99999999
 
                 # searh for reflective tape
                 if (constant.TYPE_REFLECTIVE_TAPE in objects_to_find):
                     current_fit=match_pixel_to_object(color,constant.TYPE_REFLECTIVE_TAPE)
-                    if (current_fit>=0 and current_fit<best_fit):
+                    if (0<=current_fit< best_fit):
                         best_type=int(constant.TYPE_REFLECTIVE_TAPE)
-                        best_fit=current_fit
-
-                if (constant.TYPE_HATCH_COVER in objects_to_find):
-                    current_fit=match_pixel_to_object(color,constant.TYPE_HATCH_COVER)
-                    if (current_fit>=0 and current_fit<best_fit):
-                        best_type=int(constant.TYPE_HATCH_COVER)
                         best_fit=current_fit
 
                 if (constant.TYPE_FLOOR_TAPE in objects_to_find):
                     current_fit=match_pixel_to_object(color,constant.TYPE_FLOOR_TAPE)
-                    if (current_fit>=0 and current_fit<best_fit):
+                    if (0<=current_fit<best_fit):
                         best_type=int(constant.TYPE_FLOOR_TAPE)
                         best_fit=current_fit
 
@@ -340,7 +284,6 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find):
         mask=remove_chatter(mask,chatter_size)
 
    #  show_picture("HSV", mask, 10)
-
 
     if run_fast:
         object_list = find_objects_fast(mask)
@@ -402,23 +345,68 @@ def outline_objects(picture_in, object_list):
 
             cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), color, 2)
 
-
-
     return (picture_out)
 
 ################################################################################################################################################
+# if given a test picture, this searches the picture for object.  If test picture is None, it takes pictures
+# from the camera, test_picture allows for testing the routine against a consistent image
+# acceleration attempts to speed up the processing by shrinking the picture, acceleration == 1 means no
+# acceleration, 2 means twice as fast, 3 three times as fast....
 
-#picture = take_picture(False, 1)
-#picture = cv2.imread("C:\Users/20jgrassi\Pictures\Camera Roll\edited.jpg")
+def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution):
 
-# setup the communication with the network tables
-# this is how the code communicates with the robot
-parent_table, sub_table = init_network_tables()
+    #picture = take_picture(False, 1)
+    #picture = cv2.imread("C:\Users/20jgrassi\Pictures\Camera Roll\edited.jpg")
 
-# keep track of how many images have been processed
-# this is used as an ID number so someone processing
-# the information knows if the data has been updated
-count=0
+    # setup the communication with the network tables
+    # this is how the code communicates with the robot
+    parent_table, sub_table = init_network_tables()
+
+    # keep track of how many images have been processed
+    # this is used as an ID number so someone processing
+    # the information knows if the data has been updated
+    count=0
+
+    # if not using a test picture, configure the camera
+    #if (test_picture!=None):
+    cap=configure_camera(camera_number)
+
+    start_time = time.time()
+    while True:
+
+        if (test_picture==None):
+            picture = take_picture2(cap)
+        else:
+            picture=test_picture
+
+        # read the network table to find out what the robot wants the code to look for
+        # this returns a list of object type numbers
+        if (robot_execution==True):
+            objects_to_find = read_object_list_from_table(sub_table)
+        else:
+            objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_FLOOR_TAPE]
+
+        # search the picture for objects
+        object_list=search_for_objects(picture, acceleration_factor, False, objects_to_find)
+
+        # superimpose boxes around the found objects in the picture
+        processed_picture= outline_objects(picture,object_list)
+
+        # post the object information to the network table, this is how the code communicates
+        # with the robot
+        report_object_list_to_table(object_list,count,parent_table,sub_table)
+
+        #   print(time.time()-start_time)/(count+1)
+
+        if (robot_execution == False):
+            show_picture("processed",processed_picture,10)
+
+        # increment the image count
+        count=count+1
+
+
+##############################################################################################################
+
 
 # generate the color tables for each object
 ball_color_table            = generate_color_table(constant.TYPE_BALL)
@@ -426,33 +414,9 @@ floor_tape_color_table      = generate_color_table(constant.TYPE_FLOOR_TAPE)
 hatch_cover_color_table     = generate_color_table(constant.TYPE_HATCH_COVER)
 reflective_tape_color_table = generate_color_table(constant.TYPE_REFLECTIVE_TAPE)
 
-cap=configure_camera(1)
 
-start_time = time.time()
-while True:
-
-    picture = take_picture2(cap)
-
-
-    # read the network table to find out what the robot wants the code to look for
-    # this returns a list of object type numbers
-    objects_to_find = read_object_list_from_table(sub_table)
-   # print(objects_to_find)
-    objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_FLOOR_TAPE]
-
-    # search the picture for objects
-    object_list=search_for_objects(picture, 1, False, objects_to_find)
-
-    # superimpose boxes around the found objects in the picture
-    processed_picture= outline_objects(picture,object_list)
-
-    # post the object information to the network table, this is how the code communicates
-    # with the robot
-    report_object_list_to_table(object_list,count,parent_table,sub_table)
-    #   print(time.time()-start_time)/(count+1)
-
-    show_picture("processed",processed_picture,10)
-
-    # increment the image count
-    count=count+1
-s
+# parameters are test picture or None if using the camera
+# camera number
+# acceleration factor, 1== no acceleration
+# robot execution True or False
+this_is_it(None,1,4,False)
