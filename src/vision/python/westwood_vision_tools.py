@@ -3,7 +3,7 @@ import numpy
 import cv2
 import time
 import copy
-import PyWinMouse
+#import PyWinMouse
 import math
 
 
