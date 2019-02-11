@@ -15,6 +15,7 @@ import static org.whsrobotics.subsystems.Actuators.*;
 public class Robot extends TimedRobot {
 
     HatchMech hatchMech;
+    Drivetrain drivetrain;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -24,7 +25,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
 
         hatchMech = new HatchMech(MotorControllers.lS, MotorControllers.rS, MotorControllers.ballScrewTalon);
-
+        drivetrain = new Drivetrain(LeftA, LeftB, LeftC, rightA, rightB, rightC);
 
     }
 
