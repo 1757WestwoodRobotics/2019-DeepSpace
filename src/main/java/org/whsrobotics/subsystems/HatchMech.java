@@ -21,6 +21,12 @@ public class HatchMech {
         FREE
     }
 
+    public enum BallScrewMode {
+        MANUAL,
+        SETPOINT,
+        AUTO
+    }
+
     public static boolean verify() {
         return false;   // TODO
     }
