@@ -16,6 +16,11 @@ public class HatchMech {
 
     }
 
+    public enum HatchMechState {
+        LOCKED,
+        FREE
+    }
+
     public static boolean verify() {
         return false;   // TODO
     }

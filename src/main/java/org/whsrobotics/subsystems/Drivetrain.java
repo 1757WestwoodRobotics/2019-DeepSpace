@@ -35,6 +35,17 @@ public class Drivetrain extends Subsystem {
 
     }
 
+    public enum DrivetrainAutoState {
+        MANUAL,
+        SEMIAUTO,
+        FULLAUTO
+    }
+
+    public enum DrivetrainSpeedState {
+        SLOW,
+        FAST
+    }
+
     // -----Drivetrain Methods----- //
 
     public static void arcadeDrive(double xSpeed, double zRotation){
