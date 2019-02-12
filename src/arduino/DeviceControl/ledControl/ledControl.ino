@@ -2,18 +2,8 @@
    Controls WS2812 leds on a ring light.
    Uses the FastLED library: https://github.com/FastLED/FastLED.
    Tested with Arduino Leonardo++ (16Hertz) from FRC.
-
-   Since there are two ringlights and one array of leds,
-   configure the loops properly. 0-23 or 24-48.
-
-   Controls Ultrasound Sensor SR04 from Elegoo
-*/
-#include <Wire.h>
+**/
 #include <FastLED.h>          // Includes the FastLED library
-
-// I2C Section
-#define DEV_ADDRESS 0X4
-#define FREQUENCY 400000  // Maximum I2C frequency
 
 // Device control commands
 #define RingLEDsOff       '0'
@@ -31,7 +21,7 @@
 // LED Light section
 #define COLOR_ORDER       GRB
 #define CHIPSET           WS2812B   // WS2812B has 4 pins/LED, WS2812 has 6 pins/LED
-#define NUM_LED_UNITS     2
+#define NUM_LED_UNITS     3
 #define NUM_RING_LEDS     24
 #define MAX_LEDS          NUM_LED_UNITS *  NUM_RING_LEDS
 
@@ -67,10 +57,6 @@ void setup() {
   FastLED.delay(3000); // Sanity delay
   FastLED.addLeds<CHIPSET, RING_LIGHT_PIN, COLOR_ORDER>(leds, MAX_LEDS); // Initializes Ring leds
 
-  Wire.begin(DEV_ADDRESS);       // join i2c bus with address #4
-  //Wire.setClock(FREQUENCY);      // Set the wire frequency fast mode
-  Wire.onReceive(receiveEvent);  // register callback to recieve events
-  Wire.onRequest(requestEvent);  // register callback to request events
 }
 
 void loop() {
@@ -82,9 +68,11 @@ void loop() {
     
     switch (led_command) {
       case '0' : digitalWrite (13, LOW);
+                 led_command = RingLEDsOff;
                  break;
       
       case '1' : digitalWrite(13, HIGH);
+                 led_command = RingLEDsOff;
                  break;
                  
       default: break ; // do nothing
@@ -102,43 +90,10 @@ void loop() {
     ledCommands(led_command);
     do_led_command = false;
   }
-  delay(1000);
-}
-
-// Listens to Wire for a request event and then reads the sensor distance value and sends it back on the I2C Wire.
-void requestEvent() {
-}
-
-
-// Wire callback will be called when event is recieved on the I2C BUS
-void receiveEvent(int howMany)
-{
-  String LED = "";
-  int bytes_to_read = howMany;
-
-  if (debug) {
-    Serial.print("Received - ");
-    Serial.println(howMany);
-  }
-
-  while ( bytes_to_read > 0 )
-  {
-    char n = (char)Wire.read(); // Roborio is sending character commands
-    LED += n;
-    bytes_to_read --; // decrement byte counter
-  }
-  if (debug) {
-    Serial.print("Value = ");
-    Serial.println(LED.toInt());
-  }
-  // Save the command and set the do_led_command flag to true and get out of the interrupt
-  led_command = LED[0];
-    
-  do_led_command = true;
+  delay(200);
 }
 
 // LED Control Section
-
 void ledCommands(char cmd)
 {
   if (debug) {
