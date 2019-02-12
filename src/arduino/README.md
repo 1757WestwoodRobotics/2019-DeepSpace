@@ -15,39 +15,49 @@ Lidars: Used to detect objects around the Robot - Directories fronBackLidarContr
 ----------------------------------------------------------------------------------------------------------
 
 Front & Back Lidars:
--------------------
 * Front Lidar is GARMIN Lidar Lite V3
 * Rear Lidar is a VL53L0X
 
-Front Connections:
-  LIDAR-Lite 5 Vdc (red) to Arduino 5v
-  LIDAR-Lite I2C SCL (green) to Arduino SCL
-  LIDAR-Lite I2C SDA (blue) to Arduino SDA
-  LIDAR-Lite Ground (black) to Arduino GND
+Front LIDAR Connections:
 
-  Back Connections:
-  LOX 5 VDC to Arduino 5v
-  LOX GND to Arduino GND
-  LOX I2C SCL to Arduino SCL
-  LOX I2C SDA to Ardunio SDA
+|  Lidar-Lite      | Arduino 1 |
+|------------------|-----------|
+| 5v dc (red)      |     5v    |
+| I2C SCL (green)  |     SCL   |
+| I2C SDA (blue)   |     SDA   |
+| Ground (black)   |     GND   |
+ 
+Back LIDAR Connections:
+
+|  LOX Back  | Arduino 1 |
+|------------|-----------|
+|    5v      |     5v    |
+|    GND     |     GND   |
+|    SCL     |     SCL   |
+|    SDA     |     SDA   |
 
 Left & Right Lidars:
--------------------
-  Left & Right Connections:
-  LOX 5 VDC to Arduino 5v
-  LOX GND to Arduino GND
-  LOX I2C SCL to Arduino SCL
-  LOX I2C SDA to Ardunio SDA
+* Shutdown PINS for each of the VL53L0X to set up I2C Address. Make sure to connect Digital Out Pins of Arduino appropriately to the LOX XSHUT Pins.
+
+|  LOX Left  | Arduino 2 |
+|------------|-----------|
+|    5v      |     5v    |
+|    GND     |     GND   |
+|    SCL     |     SCL   |
+|    SDA     |     SDA   |
+|    XSHUT   |     D7    |
+
+| LOX Right  | Arduino 2 |
+|------------|-----------|
+|    5v      |     5v    |
+|    GND     |     GND   |
+|    SCL     |     SCL   |
+|    SDA     |     SDA   |
+|    XSHUT   |     D8    |
+
   
-Shutdown PINS for each of the VL53L0X to set up I2C Address. Make sure to connect Digital Out Pins of Arduino appropriately to the LOX XSHUT Pins.
 
-| LOX XSHUT | Arduino |
-|-----------|---------|
-|  Left     |    D7   |
-|  Right    |    D8   |
-
-
-I2C is used to communicate between Arduinos and Lidar - Only between LIDAR and Arduino. The Front and Back LIDARs use default I2C Addressed. The Left and Right VL53L0X use specfic I2C addressed as detailed in the table below.
+* I2C is used to communicate between Arduinos and Lidar - Only between LIDAR and Arduino. The Front and Back LIDARs use default I2C Addressed. The Left and Right VL53L0X use specfic I2C addressed as detailed in the table below.
 
 | LOX  | I2C Address |
 |------|-------------|
