@@ -1,13 +1,12 @@
 package org.whsrobotics.robot;
 
 import org.whsrobotics.commands.Drive;
-import org.whsrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import org.whsrobotics.subsystems.HatchMech;
 
-import static org.whsrobotics.subsystems.Actuators.*;
+import static org.whsrobotics.hardware.Actuators.*;
 
 /**
  *

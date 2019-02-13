@@ -1,4 +1,4 @@
-package org.whsrobotics.subsystems;
+package org.whsrobotics.hardware;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
