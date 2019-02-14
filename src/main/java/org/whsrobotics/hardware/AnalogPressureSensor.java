@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * Class to access data from an analog Pressure Sensor (SSI Technologies - P51-200-G-A-I36-4.5V-000-000)
- * Uses WPILib's AnalogInput to access sensor data
+ * Uses WPILib's AnalogInput to access sensor data.
+ *
+ * @version 1.1 - Fixed the conversion between Volts and PSI.
  *
  * @author Larry Tseng
  */
@@ -47,11 +49,9 @@ public class AnalogPressureSensor {
         return sensor != null ? sensor.getVoltage() : -1.0;
     }
 
-
-    // FIXME: Equation may NOT be linear! Test and create a line of best fit.
     private static double scaleFn(double voltage) {
-        // Equation is y = 45x - 2.5
-        return (45 * voltage) - 12.5;
+        // Equation is y = 50(v-0.5)
+        return 50 * (voltage - 0.5);
     }
 
 }
