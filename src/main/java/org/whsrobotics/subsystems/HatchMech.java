@@ -9,7 +9,7 @@ public class HatchMech {
     private static Servo rightServo;
     private static TalonSRX ballScrewTalon;
 
-    public HatchMech(Servo left, Servo right, TalonSRX talon) {
+    public static void init(Servo left, Servo right, TalonSRX talon) {
         leftServo = left;
         rightServo = right;
         ballScrewTalon = talon;
