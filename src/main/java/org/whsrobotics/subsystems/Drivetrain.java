@@ -41,7 +41,7 @@ public class Drivetrain extends Subsystem {
         FULLAUTO
     }
 
-    public enum DrivetrainSpeedState {
+    public enum DrivetrainSpeedMode {
         SLOW,
         FAST
     }

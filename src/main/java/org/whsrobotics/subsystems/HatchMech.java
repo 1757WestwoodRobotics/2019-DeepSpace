@@ -2,17 +2,23 @@ package org.whsrobotics.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Servo;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class HatchMech {
+public class HatchMech extends WolverinesSubsystem {
 
-    private static Servo leftServo;
-    private static Servo rightServo;
+    private static Servo topServo;
+    private static Servo bottomServo;
     private static TalonSRX ballScrewTalon;
 
-    public static void init(Servo left, Servo right, TalonSRX talon) {
-        leftServo = left;
-        rightServo = right;
+    public static void init(Servo top, Servo bottom, TalonSRX talon) {
+        topServo = top;
+        bottomServo = bottom;
         ballScrewTalon = talon;
+
+    }
+
+    @Override
+    protected void initDefaultCommand() {
 
     }
 
@@ -43,8 +49,8 @@ public class HatchMech {
     public static double negateServoDegrees(double degrees) { return 170 - degrees; }
 
     // Get hardware objects
-    public static Servo getLeftServo() { return leftServo; }
-    public static Servo getRightServo() { return rightServo; }
+    public static Servo getTopServo() { return topServo; }
+    public static Servo getBottomServo() { return bottomServo; }
     public static TalonSRX getBallScrewTalon() { return ballScrewTalon; }
 
 

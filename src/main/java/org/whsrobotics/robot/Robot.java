@@ -1,10 +1,8 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.subsystems.HatchMech;
 
@@ -24,7 +22,7 @@ public class Robot extends TimedRobot {
 
         Actuators.configureActuators();
 
-        HatchMech.init(MotorControllers.lS, MotorControllers.rS, MotorControllers.ballScrewTalon);
+        HatchMech.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 
         SmartDashboard.putNumber("LS", 0.0);
         SmartDashboard.putNumber("RS", 0.0);
@@ -71,8 +69,8 @@ public class Robot extends TimedRobot {
 //
 //        new Drive().start();
 
-        HatchMech.getLeftServo().set(SmartDashboard.getNumber("LS", 0.0));
-        HatchMech.getRightServo().set(SmartDashboard.getNumber("RS", 0.0));
+        HatchMech.getTopServo().set(SmartDashboard.getNumber("LS", 0.0));
+        HatchMech.getBottomServo().set(SmartDashboard.getNumber("RS", 0.0));
 
         // Scheduler.getInstance().run();
 

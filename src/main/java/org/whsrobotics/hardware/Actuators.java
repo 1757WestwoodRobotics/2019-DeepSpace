@@ -8,8 +8,8 @@ public class Actuators {
 
     public static class MotorControllers {
         public static TalonSRX ballScrewTalon;
-        public static Servo lS; //top
-        public static Servo rS; // bottom
+        public static Servo topServo; //top
+        public static Servo bottomServo; // bottom
     }
 
     public static class Pneumatics {
@@ -20,12 +20,18 @@ public class Actuators {
 
         // TODO: Error handling and reporting (try/catch)
 
-//        MotorControllers.ballScrewTalon = new TalonSRX(7);
-//        MotorControllers.ballScrewTalon.configFactoryDefault();
-//        MotorControllers.ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+        try {
+            MotorControllers.ballScrewTalon = new TalonSRX(7);
+            MotorControllers.ballScrewTalon.configFactoryDefault();
+            MotorControllers.ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+        } catch (NullPointerException ex) {
 
-        MotorControllers.lS = new Servo(0);
-        MotorControllers.rS = new Servo(1);
+        }
+
+
+
+        MotorControllers.topServo = new Servo(0);
+        MotorControllers.bottomServo = new Servo(1);
 
     }
 
