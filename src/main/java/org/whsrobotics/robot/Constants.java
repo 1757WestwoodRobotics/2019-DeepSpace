@@ -9,4 +9,9 @@ public class Constants {
     public static final int rightBPort = 4;
     public static final int rightCPort = 5;
 
+    public static final int pcm1 = 10;
+    public static final int pcm2 = 11;
+
+
+
 }

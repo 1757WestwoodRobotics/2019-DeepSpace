@@ -38,7 +38,7 @@ public class Actuators {
 
     public static void configureActuators() {
 
-        //Pneumatics.superstructureSolenoid = new DoubleSolenoid()
+        Pneumatics.superstructureSolenoid = new DoubleSolenoid();
 
         MotorControllers.leftA = new CANSparkMax(leftAPort, kBrushless);
         MotorControllers.leftB = new CANSparkMax(leftBPort, kBrushless);
