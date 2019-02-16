@@ -12,24 +12,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Drivetrain extends Subsystem {
 
-    private static CANSparkMax LeftA;
-    private static CANSparkMax LeftB;
-    private static CANSparkMax LeftC;
-    private static CANSparkMax RightA;
-    private static CANSparkMax RightB;
-    private static CANSparkMax RightC;
+    private static CANSparkMax leftA;
+    private static CANSparkMax leftB;
+    private static CANSparkMax leftC;
+    private static CANSparkMax rightA;
+    private static CANSparkMax rightB;
+    private static CANSparkMax rightC;
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
 
     private static DifferentialDrive differentialDrive;
 
-    public Drivetrain(CANSparkMax LeftA, CANSparkMax LeftB, CANSparkMax LeftC, CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    public Drivetrain(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
-        //leftA = new CANSparkMax(1, MotorType.kBrushless);
-
-        leftDrive = new SpeedControllerGroup(LeftA, LeftB, LeftC);
-        rightDrive = new SpeedControllerGroup(RightA, RightB, RightC);
+        leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
+        rightDrive = new SpeedControllerGroup(leftA, rightB, rightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
