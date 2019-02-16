@@ -135,7 +135,7 @@ def distance_to_ball_meters(ball_object_info):
 # this takes the information from the object list and reports the information for each object in the
 # list to the network table
 
-def report_object_list_to_table(object_list, count, parent_table, sub_table):
+def report_object_list_to_table(object_list, count, parent_table, sub_table,robot_execution):
 
     # post the loop count to the table even if nothing is found, this lets the
     # listening code know we still exist
@@ -166,14 +166,15 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table):
         value_list = [str(count), object_type, index, alt, azimuth, distance_m]
         publish_network_value(value_table_tag, value_list, parent_table)
 
-        string_to_print="Object Type: " + str(object_type)
-        string_to_print=string_to_print + " Azimuth: " + str(round(azimuth,2))
-        string_to_print=string_to_print + " Alt: " + str(round(alt,2))
-        string_to_print=string_to_print + " Rel. Area: " + str(round(area,5))
-        string_to_print=string_to_print + " Aspect Ratio: " + str(round(aspect_ratio,2))
-        string_to_print=string_to_print + " Perimeter: " + str(perimeter)
-        string_to_print=string_to_print + " Distance, m: " + str(round(distance_m,3))
-        string_to_print=string_to_print + " Fit: " + str(round(fit,3))
+        if (robot_execution==False):
+            string_to_print="Object Type: " + str(object_type)
+            string_to_print=string_to_print + " Azimuth: " + str(round(azimuth,2))
+            string_to_print=string_to_print + " Alt: " + str(round(alt,2))
+            string_to_print=string_to_print + " Rel. Area: " + str(round(area,5))
+            string_to_print=string_to_print + " Aspect Ratio: " + str(round(aspect_ratio,2))
+            string_to_print=string_to_print + " Perimeter: " + str(perimeter)
+            string_to_print=string_to_print + " Distance, m: " + str(round(distance_m,3))
+            string_to_print=string_to_print + " Fit: " + str(round(fit,3))
 
         print (string_to_print)
 
@@ -369,7 +370,7 @@ def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution)
 
     # if not using a test picture, configure the camera
     #if (test_picture!=None):
-    cap=configure_camera(camera_number)
+    cap=configure_camera(camera_number,robot_execution)
 
     start_time = time.time()
     while True:
@@ -394,7 +395,7 @@ def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution)
 
         # post the object information to the network table, this is how the code communicates
         # with the robot
-        report_object_list_to_table(object_list,count,parent_table,sub_table)
+        report_object_list_to_table(object_list,count,parent_table,sub_table,robot_execution)
 
         #   print(time.time()-start_time)/(count+1)
 

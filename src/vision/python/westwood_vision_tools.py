@@ -3,7 +3,7 @@ import numpy
 import cv2
 import time
 import copy
-#import PyWinMouse
+import PyWinMouse
 import math
 
 
@@ -44,7 +44,7 @@ constant=constant_class()
 ###################################################################################################
 # given a USB camera number, this configures the camera
 
-def configure_camera(camera_number):
+def configure_camera(camera_number, robot_execution):
 
 #exposure code, time ? just got this from the web......
 # -1    640 ms
@@ -65,25 +65,27 @@ def configure_camera(camera_number):
 
     cap = cv2.VideoCapture(camera_number)
 
-    # this code works for the cv3 version installed on the PC used to develop the code
-    cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
-    cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
-    cap.set(cv2.CAP_PROP_EXPOSURE, -7)
-    cap.set(cv2.CAP_PROP_CONTRAST, 5)
-    cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-#   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
-    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+    # this code works for the Jetson TX 2 running Unbuntu
+    if robot_execution:
+    # PROP_SETTINGS may not exist in Unbuntu
+    #   cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
+    #   cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
+    #   cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
+    #   cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
+    #   cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
+        cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 160)
+     #   cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
+    else:   # this code works for the cv3 version installed on the PC used to develop the code
+        cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
+        cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
+        cap.set(cv2.CAP_PROP_EXPOSURE, -7)
+        cap.set(cv2.CAP_PROP_CONTRAST, 5)
+        cap.set(cv2.CAP_PROP_SATURATION, 83)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
+    #   cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    #   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
+        cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
 
-# this code works for the Jetson TX 2 running Unbuntu
-#    cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
-#    cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
-#    cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
-#    cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
-#    cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
-#    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 240)
-#    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
 
     return cap
 
