@@ -2,6 +2,8 @@ package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -10,26 +12,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Drivetrain extends Subsystem {
 
-    private static CANSparkMax LeftA;
-    private static CANSparkMax LeftB;
-    private static CANSparkMax RightA;
-    private static CANSparkMax RightB;
+    private static CANSparkMax leftA;
+    private static CANSparkMax leftB;
+    private static CANSparkMax leftC;
+    private static CANSparkMax rightA;
+    private static CANSparkMax rightB;
+    private static CANSparkMax rightC;
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
 
     private static DifferentialDrive differentialDrive;
 
-    public Drivetrain() {
+    public Drivetrain(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
-        //TODO: Tune Spark IDs
-        LeftA = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
-        LeftB = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
-        RightA = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
-        RightB = new CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless);
-
-        leftDrive = new SpeedControllerGroup(LeftA, LeftB);
-        rightDrive = new SpeedControllerGroup(RightA, RightB);
+        leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
+        rightDrive = new SpeedControllerGroup(leftA, rightB, rightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
