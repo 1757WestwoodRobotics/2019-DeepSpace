@@ -2,6 +2,14 @@ package org.whsrobotics.robot;
 
 public class Constants {
 
+    public enum canIDs {
+        leftA(0), leftB(1);
+
+        canIDs(int id) {
+
+        }
+    }
+
     public static final int leftAPort = 0;
     public static final int leftBPort = 1;
     public static final int leftCPort = 2;
