@@ -1,12 +1,9 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.whsrobotics.commands.Drive;
-import org.whsrobotics.subsystems.Actuators;
-import org.whsrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;
+import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.subsystems.HatchMech;
 
 import static org.whsrobotics.hardware.Actuators.*;

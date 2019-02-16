@@ -2,9 +2,9 @@ package org.whsrobotics.subsystems;
 
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class ElectronicsSystem extends WolverinesSubsystem{
+public class ElectronicsSystem extends WolverinesSubsystem {
 
-    public ElectronicsSystem(){
+    public ElectronicsSystem() {
 
     }
 
