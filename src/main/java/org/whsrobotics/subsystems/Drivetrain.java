@@ -45,7 +45,7 @@ public class Drivetrain extends Subsystem {
         FULLAUTO
     }
 
-    public enum DrivetrainSpeedState {
+    public enum DrivetrainSpeedMode {
         SLOW,
         FAST
     }
@@ -63,7 +63,7 @@ public class Drivetrain extends Subsystem {
     @Override
     protected void initDefaultCommand() {
         
-        setDefaultCommand(new Drive());
+        //setDefaultCommand(new Drive());
 
     }
  

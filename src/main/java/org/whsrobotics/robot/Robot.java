@@ -1,20 +1,17 @@
 package org.whsrobotics.robot;
 
-import org.whsrobotics.commands.Drive;
-import org.whsrobotics.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;
+import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.subsystems.HatchMech;
 
-import static org.whsrobotics.subsystems.Actuators.*;
+import static org.whsrobotics.hardware.Actuators.*;
 
 /**
  *
  */
 public class Robot extends TimedRobot {
-
-    HatchMech hatchMech;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -23,7 +20,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        hatchMech = new HatchMech(MotorControllers.lS, MotorControllers.rS, MotorControllers.ballScrewTalon);
+        Actuators.configureActuators();
+
+        HatchMech.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
+
+        SmartDashboard.putNumber("LS", 0.0);
+        SmartDashboard.putNumber("RS", 0.0);
 
 
     }
@@ -64,10 +66,13 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
+//
+//        new Drive().start();
 
-        new Drive().start();
+        HatchMech.getTopServo().set(SmartDashboard.getNumber("LS", 0.0));
+        HatchMech.getBottomServo().set(SmartDashboard.getNumber("RS", 0.0));
 
-        Scheduler.getInstance().run();
+        // Scheduler.getInstance().run();
 
     }
 
