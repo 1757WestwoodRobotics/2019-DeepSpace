@@ -204,10 +204,13 @@ def read_object_list_from_table(Network_table):
 # given a picture and a list of objects to look for, this searches the picture comparing the pixel values against
 # the "color" table for each object
 
-def search_for_objects(picture_in, acceleration, animate, objects_to_find):
+def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot_execution):
 
     # use HSV for the image search
-    working_picture=cv2.cvtColor(picture_in, cv2.COLOR_BGR2HSV)
+    if (robot_execution):
+        working_picture = cv2.cvtColor(picture_in, cv2.cv.CV_BGR2HSV)
+    else:
+        working_picture=cv2.cvtColor(picture_in, cv2.COLOR_BGR2HSV)
 
     #show_picture("HSV", working_picture, 10)
 
@@ -388,7 +391,7 @@ def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution)
             objects_to_find = [constant.TYPE_REFLECTIVE_TAPE, constant.TYPE_FLOOR_TAPE]
 
         # search the picture for objects
-        object_list=search_for_objects(picture, acceleration_factor, False, objects_to_find)
+        object_list=search_for_objects(picture, acceleration_factor, False, objects_to_find,robot_execution)
 
         # superimpose boxes around the found objects in the picture
         processed_picture= outline_objects(picture,object_list)
