@@ -7,10 +7,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class Drivetrain extends WolverinesSubsystem {
+public class Drivetrain extends Subsystem {    
 
     private static CANSparkMax leftA;
     private static CANSparkMax leftB;
@@ -24,11 +24,11 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    public Drivetrain(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
-                      CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    public void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, 
+    CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
         leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
-        rightDrive = new SpeedControllerGroup(rightA, rightB, rightC);
+        rightDrive = new SpeedControllerGroup(leftA, rightB, rightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 

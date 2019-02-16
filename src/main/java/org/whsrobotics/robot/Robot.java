@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
 
         HatchMech.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 
+
         SmartDashboard.putNumber("LS", 0.0);
         SmartDashboard.putNumber("RS", 0.0);
 

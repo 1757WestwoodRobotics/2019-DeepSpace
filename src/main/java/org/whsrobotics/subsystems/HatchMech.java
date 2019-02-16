@@ -14,7 +14,6 @@ public class HatchMech extends WolverinesSubsystem {
         topServo = top;
         bottomServo = bottom;
         ballScrewTalon = talon;
-
     }
 
     @Override
