@@ -3,6 +3,7 @@ package org.whsrobotics.hardware;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -28,10 +29,16 @@ public class Actuators {
 
     public static class Pneumatics {
 
+        public static DoubleSolenoid superstructureSolenoid;
+        public static DoubleSolenoid hatchMechSliderSolenoid;
+        public static DoubleSolenoid SolenoidA;
+        public static DoubleSolenoid SolenoidB;
+
     }
 
     public static void configureActuators() {
 
+        //Pneumatics.superstructureSolenoid = new DoubleSolenoid()
 
         MotorControllers.leftA = new CANSparkMax(leftAPort, kBrushless);
         MotorControllers.leftB = new CANSparkMax(leftBPort, kBrushless);
