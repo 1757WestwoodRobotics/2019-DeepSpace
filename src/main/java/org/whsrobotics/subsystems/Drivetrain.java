@@ -20,11 +20,11 @@ public class Drivetrain extends Subsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    public void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, 
-    CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
+                     CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
         leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
-        rightDrive = new SpeedControllerGroup(leftA, rightB, rightC);
+        rightDrive = new SpeedControllerGroup(rightA, rightB, rightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 

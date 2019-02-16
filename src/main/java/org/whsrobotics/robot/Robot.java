@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.hardware.Actuators;
+import org.whsrobotics.subsystems.Drivetrain;
 import org.whsrobotics.subsystems.HatchMech;
 
 import static org.whsrobotics.hardware.Actuators.*;
@@ -21,6 +22,9 @@ public class Robot extends TimedRobot {
     public void robotInit() {
 
         Actuators.configureActuators();
+
+        Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
+                MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
 
         HatchMech.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 
