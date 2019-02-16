@@ -71,6 +71,8 @@ public class XboxController extends Joystick {
 
     /**
      * Enum of QDriverStation Mapping of XboxController axes.
+	 *
+	 * @deprecated
      */
 	public enum QDriverStationAxes implements XboxControllerAxes {
         LEFT_X(0), LEFT_Y(1), LEFT_TRIGGER(4), RIGHT_TRIGGER(5), RIGHT_X(2), RIGHT_Y(3);
