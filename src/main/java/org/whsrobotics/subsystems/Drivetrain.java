@@ -27,7 +27,7 @@ public class Drivetrain extends Subsystem {
     public Drivetrain(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
         leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
-        rightDrive = new SpeedControllerGroup(leftA, rightB, rightC);
+        rightDrive = new SpeedControllerGroup(rightA, rightB, rightC);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 

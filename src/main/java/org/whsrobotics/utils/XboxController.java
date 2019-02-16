@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  */
 public class XboxController extends Joystick {
 
-	private final static double DEADBAND = 0.15;
+	private final static double DEADBAND = 0.1;
 
 	public enum Buttons {
 		A(1), B(2), X(3), Y(4), LEFT_BUMPER(5), RIGHT_BUMPER(6), 
