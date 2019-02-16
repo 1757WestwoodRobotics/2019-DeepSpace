@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
 
         hatchMech = new HatchMech(MotorControllers.lS, MotorControllers.rS, MotorControllers.ballScrewTalon);
-        drivetrain = new Drivetrain(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC, MotorControllers.rightA, MotorControllers.rightB, MotorControllers.rightB);
+        drivetrain = new Drivetrain(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC, MotorControllers.rightA, MotorControllers.rightB, MotorControllers.rightC);
 
     }
 
