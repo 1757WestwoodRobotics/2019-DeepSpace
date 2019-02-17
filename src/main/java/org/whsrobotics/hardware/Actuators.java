@@ -3,6 +3,7 @@ package org.whsrobotics.hardware;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
 import org.whsrobotics.robot.Constants;
@@ -30,6 +31,8 @@ public class Actuators {
 
     public static class Pneumatics {
 
+        public static Compressor compressor;
+
         public static DoubleSolenoid superstructureSolenoid;
         public static DoubleSolenoid hatchMechSliderSolenoid;
         public static DoubleSolenoid hatchMechLeftDropSolenoid;
@@ -39,9 +42,7 @@ public class Actuators {
 
     public static void configureActuators() {
 
-        Pneumatics.superstructureSolenoid = new DoubleSolenoid();
-
-        MotorControllers.leftA = new CANSparkMax(canIDs.leftA, kBrushless);
+        MotorControllers.leftA = new CANSparkMax(leftAPort, kBrushless);
         MotorControllers.leftB = new CANSparkMax(leftBPort, kBrushless);
         MotorControllers.leftC = new CANSparkMax(leftCPort, kBrushless);
         MotorControllers.rightA = new CANSparkMax(rightAPort, kBrushless);
@@ -61,6 +62,12 @@ public class Actuators {
 
         MotorControllers.topServo = new Servo(0);
         MotorControllers.bottomServo = new Servo(1);
+
+        Pneumatics.compressor = new Compressor(0);
+        Pneumatics.compressor.clearAllPCMStickyFaults();
+        Pneumatics.compressor.setClosedLoopControl(true);
+
+        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0, 1, 1);
 
     }
 
