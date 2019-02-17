@@ -4,8 +4,10 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.hardware.Actuators;
+import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.Drivetrain;
 import org.whsrobotics.subsystems.HatchMechScott;
+import org.whsrobotics.subsystems.PneumaticsBase;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
@@ -28,6 +30,7 @@ public class Robot extends TimedRobot {
 
         HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 
+        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
 
 //        SmartDashboard.putNumber("LS", 0.0);
 //        SmartDashboard.putNumber("RS", 0.0);
