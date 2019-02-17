@@ -3,13 +3,14 @@ package org.whsrobotics.hardware;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+
+import org.whsrobotics.robot.Constants.canID;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
-import org.whsrobotics.robot.Constants;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 import static org.whsrobotics.robot.Constants.*;
-import static org.whsrobotics.robot.Constants.rightCPort;
 
 public class Actuators {
 
@@ -32,21 +33,21 @@ public class Actuators {
 
         public static DoubleSolenoid superstructureSolenoid;
         public static DoubleSolenoid hatchMechSliderSolenoid;
-        public static DoubleSolenoid hatchMechLeftDropSolenoid;
-        public static DoubleSolenoid hatchMechRightDropSolenoid;
+        public static DoubleSolenoid SolenoidA;
+        public static DoubleSolenoid SolenoidB;
 
     }
 
     public static void configureActuators() {
 
-        Pneumatics.superstructureSolenoid = new DoubleSolenoid();
+        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
 
-        MotorControllers.leftA = new CANSparkMax(canIDs.leftA, kBrushless);
-        MotorControllers.leftB = new CANSparkMax(leftBPort, kBrushless);
-        MotorControllers.leftC = new CANSparkMax(leftCPort, kBrushless);
-        MotorControllers.rightA = new CANSparkMax(rightAPort, kBrushless);
-        MotorControllers.rightB = new CANSparkMax(rightBPort, kBrushless);
-        MotorControllers.rightC = new CANSparkMax(rightCPort, kBrushless);
+        MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);
+        MotorControllers.leftB = new CANSparkMax(canID.leftB.id, kBrushless);
+        MotorControllers.leftC = new CANSparkMax(canID.leftC.id, kBrushless);
+        MotorControllers.rightA = new CANSparkMax(canID.rightA.id, kBrushless);
+        MotorControllers.rightB = new CANSparkMax(canID.rightB.id, kBrushless);
+        MotorControllers.rightC = new CANSparkMax(canID.rightC.id, kBrushless);
 
 
         // TODO: Error handling and reporting (try/catch)
@@ -63,5 +64,6 @@ public class Actuators {
         MotorControllers.bottomServo = new Servo(1);
 
     }
+
 
 }

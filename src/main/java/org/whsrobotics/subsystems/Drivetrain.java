@@ -20,6 +20,9 @@ public class Drivetrain extends Subsystem {
 
     private static DifferentialDrive differentialDrive;
 
+    // HashMap<String, Double> encoderPositions
+    // HashMap<String, Double> encoderVelocities
+
     public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
                      CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
@@ -50,6 +53,8 @@ public class Drivetrain extends Subsystem {
     public static void tankDrive (double leftSpeed, double rightSpeed){
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
+
+    // method that goes through all the CANSparkMaxs and adds the encoder positions and velocities to the proper HashMaps
 
     @Override
     protected void initDefaultCommand() {
