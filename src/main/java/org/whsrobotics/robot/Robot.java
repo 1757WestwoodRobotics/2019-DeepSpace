@@ -1,11 +1,11 @@
 package org.whsrobotics.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.subsystems.Drivetrain;
-import org.whsrobotics.subsystems.HatchMech;
+import org.whsrobotics.subsystems.HatchMechScott;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
@@ -26,11 +26,11 @@ public class Robot extends TimedRobot {
         Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
                 MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
 
-        HatchMech.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
+        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 
 
-        SmartDashboard.putNumber("LS", 0.0);
-        SmartDashboard.putNumber("RS", 0.0);
+//        SmartDashboard.putNumber("LS", 0.0);
+//        SmartDashboard.putNumber("RS", 0.0);
 
 
     }
@@ -46,11 +46,6 @@ public class Robot extends TimedRobot {
     }
 
     /**
-     * This autonomous (along with the chooser code above) shows how to select
-     * between different autonomous modes using the dashboard. The sendable
-     * chooser code works with the Java SmartDashboard. If you prefer the
-     * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-     * getString line to get the auto name from the text box below the Gyro
      *
      */
     @Override
@@ -71,13 +66,11 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
-//
-//        new Drive().start();
 
-        HatchMech.getTopServo().set(SmartDashboard.getNumber("LS", 0.0));
-        HatchMech.getBottomServo().set(SmartDashboard.getNumber("RS", 0.0));
+//        HatchMechScott.getTopServo().set(SmartDashboard.getNumber("LS", 0.0));
+//        HatchMechScott.getBottomServo().set(SmartDashboard.getNumber("RS", 0.0));
 
-        // Scheduler.getInstance().run();
+        Scheduler.getInstance().run();
 
     }
 
@@ -86,5 +79,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void testPeriodic() {
+
     }
 }

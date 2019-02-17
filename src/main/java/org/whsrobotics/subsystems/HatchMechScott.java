@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Servo;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class HatchMech extends WolverinesSubsystem {
+public class HatchMechScott extends WolverinesSubsystem {
 
     private static Servo topServo;
     private static Servo bottomServo;
