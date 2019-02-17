@@ -7,6 +7,8 @@ import PyWinMouse
 import math
 
 
+# OpenCV version 3.4.3.18
+
 class constant_class():
     TYPE_BALL =            int(70)
     TYPE_FLOOR_TAPE =      int(90)
@@ -31,10 +33,10 @@ class constant_class():
 
     # height above the floor of reflective tape for cargo bay
     REFLECTIVE_TAPE_HEIGHT_M    = 0.76
-    # height above the floor of camera
+    # camera height above the floor in meters
     CAMERA_HEIGHT_M = 0.55
 
-    # how far to searchfor adjacent pixels
+    # how far to search for adjacent pixels
     # used when tracing the outline of an object
     SEARCH_RADIUS  = 3
 
@@ -73,8 +75,8 @@ def configure_camera(camera_number, robot_execution):
     #   cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
     #   cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
     #   cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
-        cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 160)
-     #   cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
+        cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+        cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
     else:   # this code works for the cv3 version installed on the PC used to develop the code
         cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
         cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
@@ -131,7 +133,7 @@ def take_picture2(stream):
 def closest(row, col, coordinates_list):
 
     close_index=-1
-    closest_so_far=999999999999999999999999
+    closest_so_far=1e6
 
     for list_index in range (0,len(coordinates_list),1):
 # the logic of the lines below is implemented in the single distance line
@@ -747,6 +749,36 @@ def get_pixel_values(picture):
             cv2.imshow("location", working)
             cv2.waitKey(100)
             print(picture[row, col])
+
+
+#######################################################################################################################
+# if you can figure out how to get the mouse location in Unbuntu great.  Until then, just loop through each
+# pixel
+
+def get_pixel_values_unbuntu(picture):
+
+    [rows, cols, depth] = picture.shape
+
+    run_again=True
+
+    # if I could figure out how to get the window coordinates automatically I would just
+    # read them, but the python module that interacts with the operating system to get the
+    # coordinates won't install
+
+    working = copy.copy(picture)
+    cv2.imshow("location", working)
+    cv2.waitKey(10)
+
+    while run_again:
+
+        for row in range(0,rows):
+            for col in range(0,cols):
+
+                working = copy.copy(picture)
+                cv2.circle(working, (col, row), 3, (255, 0, 0), 1)
+                cv2.imshow("location", working)
+                cv2.waitKey(100)
+                print(picture[row, col])
 
 
 #######################################################################################################################
