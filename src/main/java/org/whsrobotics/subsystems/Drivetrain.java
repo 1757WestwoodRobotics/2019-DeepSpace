@@ -1,16 +1,12 @@
 package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import org.whsrobotics.commands.Drive;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class Drivetrain extends Subsystem {
+public class Drivetrain extends WolverinesSubsystem {
 
     private static CANSparkMax leftA;
     private static CANSparkMax leftB;
@@ -24,7 +20,11 @@ public class Drivetrain extends Subsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    public Drivetrain(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC, CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    // HashMap<String, Double> encoderPositions
+    // HashMap<String, Double> encoderVelocities
+
+    public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
+                     CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
         leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
         rightDrive = new SpeedControllerGroup(rightA, rightB, rightC);
@@ -53,6 +53,8 @@ public class Drivetrain extends Subsystem {
     public static void tankDrive (double leftSpeed, double rightSpeed){
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
+
+    // method that goes through all the CANSparkMaxs and adds the encoder positions and velocities to the proper HashMaps
 
     @Override
     protected void initDefaultCommand() {

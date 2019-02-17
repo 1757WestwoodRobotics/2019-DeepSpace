@@ -1,13 +1,19 @@
 package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class Superstructure {
+public class Superstructure extends WolverinesSubsystem {
 
     private static Solenoid extensionSolenoid;
 
     public Superstructure(Solenoid solenoid) {
         extensionSolenoid = solenoid;
+    }
+
+    @Override
+    protected void initDefaultCommand() {
+
     }
 
     public enum SuperstructureState {
