@@ -28,11 +28,11 @@ def generate_color_table(object_type):
             color_1 = int(index * 0.0237 + 86.6)
             color_2 = int(index)
             color_3 = int(index * 0 + 255)
-        elif (object_type == constant.TYPE_HATCH_COVER):
-            # for a hatch cover the primary color is 2
-            color_1 = int(index * 0.0 + 17)
-            color_2 = int(index)
-            color_3 = int(index * 0.0 + 156)
+        else:
+            print("Unknown object type in generate_color_table.")
+            color_1 = int(0.0)
+            color_2 = int(0.0)
+            color_3 = int(0.0)
 
         color_table.append([color_1,color_2,color_3])
         index=index+1
@@ -52,11 +52,6 @@ def match_pixel_to_object(color,object_type):
             target=reflective_tape_color_table[color[1]]
             if ((abs(color[0] - target[0]) < 60) and (abs(color[2] - target[2]) < 10)):
                 fit_distance = euclidian_distance(color, target)
-
-    elif (object_type == constant.TYPE_HATCH_COVER):
-        if ((color[0] > 14) and color[0] < 25 and color[1] > 130 and color[1] < 215 and color[2] > 110 and color[2] < 200):
-            target=hatch_cover_color_table[color[1]]
-            fit_distance = euclidian_distance(color, target)
 
     elif (object_type==constant.TYPE_FLOOR_TAPE):
         if ((color[0] > 60) and color[0] < 110 and color[1] > 20 and color[1] < 60 and color[2] > 130 and color[2] < 190):
@@ -158,10 +153,12 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table,robo
         else:
             distance_m = 0
 
+
         if (index==0):
             descriptor_list = ["count", "object", "number", "elevation_angle", "azimuth", "distance_m"]
             publish_network_value("attributes", descriptor_list, parent_table)
 
+        # send the object information
         value_table_tag = "object_" + str(index)
         value_list = [str(count), object_type, index, alt, azimuth, distance_m]
         publish_network_value(value_table_tag, value_list, parent_table)
@@ -175,8 +172,7 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table,robo
             string_to_print=string_to_print + " Perimeter: " + str(perimeter)
             string_to_print=string_to_print + " Distance, m: " + str(round(distance_m,3))
             string_to_print=string_to_print + " Fit: " + str(round(fit,3))
-
-        print (string_to_print)
+            print (string_to_print)
 
 
 ######################################################################################################################
@@ -249,37 +245,35 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot
         # keep track of how well each pixel fits an object, -1 means no object
         goodness_of_fit = numpy.full((working_rows, working_cols), -1, numpy.float)
 
-        #check each pixel and determine if its color profile is that of an object
+        # check each pixel and determine if its color profile is that of an object
+        # since this searches for multiple objects, you have to keep track of
+        # what object is the best fit, so compare the current fit of the against
+        # the best so far
+        best_fit=1e6
 
         # don't search the edges of the image, having "true" pixels along the
         # edge messes up the routines extract the blobs from the picture
         for row in range (constant.SEARCH_RADIUS, working_rows-constant.SEARCH_RADIUS, 1):
             for col in range (constant.SEARCH_RADIUS, working_cols-constant.SEARCH_RADIUS, 1):
-                # get the current pixel
-                color=working_picture[row,col]
-
-                # since this searches for multiple objects, you have to keep track of
-                # what object is the best fit, so compare the current fit of the against
-                # the best so far
-                best_fit      = 99999999
 
                 # searh for reflective tape
                 if (constant.TYPE_REFLECTIVE_TAPE in objects_to_find):
-                    current_fit=match_pixel_to_object(color,constant.TYPE_REFLECTIVE_TAPE)
+                    current_fit=match_pixel_to_object(working_picture[row,col],constant.TYPE_REFLECTIVE_TAPE)
                     if (0<=current_fit< best_fit):
                         best_type=int(constant.TYPE_REFLECTIVE_TAPE)
                         best_fit=current_fit
 
                 if (constant.TYPE_FLOOR_TAPE in objects_to_find):
-                    current_fit=match_pixel_to_object(color,constant.TYPE_FLOOR_TAPE)
+                    current_fit=match_pixel_to_object(working_picture[row,col],constant.TYPE_FLOOR_TAPE)
                     if (0<=current_fit<best_fit):
                         best_type=int(constant.TYPE_FLOOR_TAPE)
                         best_fit=current_fit
 
                 # if there has been a match, set the mask to the best fit
-                if (best_fit<9999999):
+                if (best_fit<1e6):
                     mask[row, col] = int(best_type)
                     goodness_of_fit[row,col]=best_fit
+                    best_fit=1e6
 
     # show_picture("HSV", mask, 10)
 
@@ -347,7 +341,7 @@ def outline_objects(picture_in, object_list):
             max_row=int(object.relative_max_row()*original_rows)
             max_col=int(object.relative_max_col()*original_cols)
 
-            cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), color, 2)
+            cv2.rectangle(picture_out, (min_col, min_row), (max_col, max_row), color, 1)
 
     return (picture_out)
 
@@ -413,9 +407,7 @@ def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution)
 
 
 # generate the color tables for each object
-ball_color_table            = generate_color_table(constant.TYPE_BALL)
 floor_tape_color_table      = generate_color_table(constant.TYPE_FLOOR_TAPE)
-hatch_cover_color_table     = generate_color_table(constant.TYPE_HATCH_COVER)
 reflective_tape_color_table = generate_color_table(constant.TYPE_REFLECTIVE_TAPE)
 
 
@@ -423,4 +415,4 @@ reflective_tape_color_table = generate_color_table(constant.TYPE_REFLECTIVE_TAPE
 # camera number
 # acceleration factor, 1== no acceleration
 # robot execution True or False
-this_is_it(None,1,4,False)
+this_is_it(None,1,1,False)
