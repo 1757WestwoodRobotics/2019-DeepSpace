@@ -11,4 +11,8 @@ public abstract class WolverinesSubsystem extends Subsystem {
         return true;
     }
 
+    protected static void init() {
+        // Override me!
+    }
+
 }

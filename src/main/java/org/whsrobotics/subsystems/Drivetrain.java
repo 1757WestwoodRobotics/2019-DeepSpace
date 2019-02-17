@@ -3,10 +3,10 @@ package org.whsrobotics.subsystems;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class Drivetrain extends Subsystem {    
+public class Drivetrain extends WolverinesSubsystem {
 
     private static CANSparkMax leftA;
     private static CANSparkMax leftB;

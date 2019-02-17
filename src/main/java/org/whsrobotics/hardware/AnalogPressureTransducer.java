@@ -3,21 +3,21 @@ package org.whsrobotics.hardware;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
- * Class to access data from an analog Pressure Sensor (SSI Technologies - P51-200-G-A-I36-4.5V-000-000)
+ * Class to access data from an analog Pressure Transducer (sensor) (SSI Technologies - P51-200-G-A-I36-4.5V-000-000)
  * Uses WPILib's AnalogInput to access sensor data.
  *
  * @version 1.1 - Fixed the conversion between Volts and PSI.
  *
  * @author Larry Tseng
  */
-public class AnalogPressureSensor {
+public class AnalogPressureTransducer {
 
     private static final double MIN_VOLT = 0.5;
     private static final double MAX_VOLT = 4.5;
 
     private AnalogInput sensor;
 
-    public AnalogPressureSensor(int channel) {
+    public AnalogPressureTransducer(int channel) {
         this.sensor = new AnalogInput(channel);
     }
 
