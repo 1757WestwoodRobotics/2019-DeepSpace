@@ -1,6 +1,6 @@
 package org.whsrobotics.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
+import org.whsrobotics.utils.XboxController;
 
 public class OI {
 

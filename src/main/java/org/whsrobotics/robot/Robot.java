@@ -3,6 +3,7 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import org.whsrobotics.commands.Drive;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.Drivetrain;
@@ -28,13 +29,9 @@ public class Robot extends TimedRobot {
         Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
                 MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
 
-        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
-
-        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
-
-//        SmartDashboard.putNumber("LS", 0.0);
-//        SmartDashboard.putNumber("RS", 0.0);
-
+//        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
+//
+//        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
 
     }
 
@@ -46,6 +43,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
+
     }
 
     /**
@@ -64,15 +62,15 @@ public class Robot extends TimedRobot {
 
     }
 
+    public void teleopInit() {
+        (new Drive()).start();
+    }
+
     /**
      * This function is called periodically during operator control.
      */
     @Override
     public void teleopPeriodic() {
-
-//        HatchMechScott.getTopServo().set(SmartDashboard.getNumber("LS", 0.0));
-//        HatchMechScott.getBottomServo().set(SmartDashboard.getNumber("RS", 0.0));
-
         Scheduler.getInstance().run();
 
     }

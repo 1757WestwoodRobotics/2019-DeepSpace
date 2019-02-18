@@ -2,19 +2,19 @@ package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import org.whsrobotics.commands.Drive;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 public class Drivetrain extends WolverinesSubsystem {
 
-    private static CANSparkMax leftA;
-    private static CANSparkMax leftB;
-    private static CANSparkMax leftC;
-    private static CANSparkMax rightA;
-    private static CANSparkMax rightB;
-    private static CANSparkMax rightC;
+    private static CANSparkMax leftASpark;
+    private static CANSparkMax leftBSpark;
+    private static CANSparkMax leftCSpark;
+    private static CANSparkMax rightASpark;
+    private static CANSparkMax rightBSpark;
+    private static CANSparkMax rightCSpark;
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
@@ -27,8 +27,15 @@ public class Drivetrain extends WolverinesSubsystem {
     public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
                      CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
-        leftDrive = new SpeedControllerGroup(leftA, leftB, leftC);
-        rightDrive = new SpeedControllerGroup(rightA, rightB, rightC);
+        leftASpark = leftA;
+        leftBSpark = leftB;
+        leftCSpark = leftC;
+        rightASpark = rightA;
+        rightBSpark = rightB;
+        rightCSpark = rightC;
+
+        leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
+        rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
@@ -54,7 +61,7 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.arcadeDrive(xSpeed, zRotation);
     }
 
-    public static void tankDrive (double leftSpeed, double rightSpeed){
+    public static void tankDrive(double leftSpeed, double rightSpeed){
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
 
@@ -72,12 +79,12 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     protected void initDefaultCommand() {
         
-        //setDefaultCommand(new Drive());
+        setDefaultCommand(new Drive());
 
     }
  
     public static void stopDrive() {
-        
+        differentialDrive.stopMotor();
     }
 
 }

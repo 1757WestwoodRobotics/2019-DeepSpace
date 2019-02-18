@@ -5,6 +5,7 @@ import org.whsrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.command.Command;
+import org.whsrobotics.utils.XboxController;
 
 public class Drive extends Command {
 
@@ -16,14 +17,18 @@ public class Drive extends Command {
     @Override
     protected void execute() {
 
-        // Drivetrain.arcadeDrive(-OI.getXboxController().getY(Hand.kLeft), OI.getXboxController().getX(Hand.kRight));
+//        Drivetrain.tankDrive(-OI.getXboxController().getRawAxis(XboxController.Axes.LEFT_Y),
+//                -OI.getXboxController().getRawAxis(XboxController.Axes.RIGHT_Y));
+
+        Drivetrain.arcadeDrive(-OI.getXboxController().getRawAxis(XboxController.Axes.LEFT_Y),
+                OI.getXboxController().getRawAxis(XboxController.Axes.RIGHT_X));
 
     }
 
     @Override
     protected void initialize() {
 
-        System.out.println("Initialized");
+        System.out.println("Initialized Drive");
 
     }
 

@@ -44,7 +44,7 @@ public class Actuators {
 
     public static void configureActuators() {
 
-        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
+//        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
 
         MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);
         MotorControllers.leftB = new CANSparkMax(canID.leftB.id, kBrushless);
@@ -53,24 +53,24 @@ public class Actuators {
         MotorControllers.rightB = new CANSparkMax(canID.rightB.id, kBrushless);
         MotorControllers.rightC = new CANSparkMax(canID.rightC.id, kBrushless);
 
-        // TODO: Error handling and reporting (try/catch)
-
-        try {
-            MotorControllers.ballScrewTalon = new TalonSRX(7);
-            MotorControllers.ballScrewTalon.configFactoryDefault();
-            MotorControllers.ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-        } catch (NullPointerException ex) {
-
-        }
-
-        MotorControllers.topServo = new Servo(0);
-        MotorControllers.bottomServo = new Servo(1);
-
-        Pneumatics.compressor = new Compressor(0);
-        Pneumatics.compressor.clearAllPCMStickyFaults();
-        Pneumatics.compressor.setClosedLoopControl(true);
-
-        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0, 1, 1);
+//        // TODO: Error handling and reporting (try/catch)
+//
+//        try {
+//            MotorControllers.ballScrewTalon = new TalonSRX(7);
+//            MotorControllers.ballScrewTalon.configFactoryDefault();
+//            MotorControllers.ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+//        } catch (NullPointerException ex) {
+//
+//        }
+//
+//        MotorControllers.topServo = new Servo(0);
+//        MotorControllers.bottomServo = new Servo(1);
+//
+//        Pneumatics.compressor = new Compressor(0);
+//        Pneumatics.compressor.clearAllPCMStickyFaults();
+//        Pneumatics.compressor.setClosedLoopControl(true);
+//
+//        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0, 1, 1);
 
     }
 
