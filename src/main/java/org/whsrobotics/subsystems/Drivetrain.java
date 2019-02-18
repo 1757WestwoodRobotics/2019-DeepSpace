@@ -24,6 +24,12 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double[] encoderPosition;
     private static double[] encoderVelocity;
 
+    public static Drivetrain instance;
+
+    private Drivetrain() {
+
+    }
+
     public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
                      CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
 
@@ -41,6 +47,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
         encoderPosition = new double[6];
         encoderVelocity = new double[6];
+
+        instance = new Drivetrain();
 
     }
 

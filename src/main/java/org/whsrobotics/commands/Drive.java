@@ -9,6 +9,10 @@ import org.whsrobotics.utils.XboxController;
 
 public class Drive extends Command {
 
+    public Drive() {
+        requires(Drivetrain.instance);
+    }
+
     @Override
     protected boolean isFinished() {
         return false;

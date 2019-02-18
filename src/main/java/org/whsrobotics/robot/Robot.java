@@ -63,7 +63,7 @@ public class Robot extends TimedRobot {
     }
 
     public void teleopInit() {
-        (new Drive()).start();
+
     }
 
     /**
