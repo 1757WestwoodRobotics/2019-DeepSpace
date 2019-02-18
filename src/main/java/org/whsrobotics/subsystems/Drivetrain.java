@@ -26,6 +26,7 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double[] rawEncoderVelocities;
 
     public static Drivetrain instance;
+    
 
     private Drivetrain() {
 
@@ -93,7 +94,23 @@ public class Drivetrain extends WolverinesSubsystem {
 
     // Unit Conversion from rawEncoderPositions to meters
 
+    public static double rawPositionsToMeters(double rawEncoderPosition) {
+
+        double meters = (rawEncoderPosition / 1.9);
+
+        return meters;
+    }
+    
+    
     // Unit conversion from rawEncoderVelocities to meters/second
+
+    public static double rawVelocitiesToMetersPerSec(double rawEncoderVelocities) {
+        
+        double MPS = (rawEncoderVelocities / 1);
+        //Find the vlaue above (not 1)
+    
+        return MPS;
+    }
 
     @Override
     public void periodic() {
@@ -101,6 +118,8 @@ public class Drivetrain extends WolverinesSubsystem {
         getEncoderTelemetry();
         SmartDashboard.putNumberArray("Raw Encoder Positions", rawEncoderPositions);
         SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
+
+        rawPositionsToMeters(rawEncoderPositions[0]);
     }
 
     @Override

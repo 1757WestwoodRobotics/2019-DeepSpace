@@ -12,4 +12,16 @@ public class Constants {
             this.id = id;
         }
     }
+
+    public enum Math {
+        pi(3.1415926535897932384626502),
+        circumference(12.5663706144);
+
+
+        public double value;
+
+        Math(double value){
+            this.value = value;
+        }
+    }
 }
