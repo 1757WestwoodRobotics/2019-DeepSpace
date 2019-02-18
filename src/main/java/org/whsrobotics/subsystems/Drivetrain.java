@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Drive;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
@@ -21,8 +22,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    private static double[] encoderPosition;
-    private static double[] encoderVelocity;
+    private static double[] rawEncoderPositions;
+    private static double[] rawEncoderVelocities;
 
     public static Drivetrain instance;
 
@@ -45,8 +46,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
-        encoderPosition = new double[6];
-        encoderVelocity = new double[6];
+        rawEncoderPositions = new double[6];
+        rawEncoderVelocities = new double[6];
 
         instance = new Drivetrain();
 
@@ -73,16 +74,34 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
 
-    // method that goes through all the CANSparkMaxs and adds the encoder positions and velocities to the proper array
-    // void function header
-    //      leftA.getEncoderPosition()
-    //      leftB....
-    //      ...
-    //      rightC....
-    //      leftA.getEncoderVelocity()
-    //      ...
-    //      rightC.getEncoderVelocity()
-    //
+    public static void getEncoderTelemetry() {
+
+        rawEncoderPositions[0] = leftASpark.getEncoder().getPosition();
+        rawEncoderPositions[1] = leftBSpark.getEncoder().getPosition();
+        rawEncoderPositions[2] = leftCSpark.getEncoder().getPosition();
+        rawEncoderPositions[3] = rightASpark.getEncoder().getPosition();
+        rawEncoderPositions[4] = rightBSpark.getEncoder().getPosition();
+        rawEncoderPositions[5] = rightCSpark.getEncoder().getPosition();
+
+        rawEncoderVelocities[0] = leftASpark.getEncoder().getVelocity();
+        rawEncoderVelocities[1] = leftBSpark.getEncoder().getVelocity();
+        rawEncoderVelocities[2] = leftCSpark.getEncoder().getVelocity();
+        rawEncoderVelocities[3] = rightASpark.getEncoder().getVelocity();
+        rawEncoderVelocities[4] = rightBSpark.getEncoder().getVelocity();
+        rawEncoderVelocities[5] = rightCSpark.getEncoder().getVelocity();
+    }
+
+    // Unit Conversion from rawEncoderPositions to meters
+
+    // Unit conversion from rawEncoderVelocities to meters/second
+
+    @Override
+    public void periodic() {
+
+        getEncoderTelemetry();
+        SmartDashboard.putNumberArray("Raw Encoder Positions", rawEncoderPositions);
+        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
+    }
 
     @Override
     protected void initDefaultCommand() {
