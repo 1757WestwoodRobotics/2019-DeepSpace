@@ -50,23 +50,21 @@ void setup() {
 
   //For testing
   pinMode(13, OUTPUT);
- 
+
   FastLED.delay(3000); // Sanity delay
   FastLED.addLeds<CHIPSET, RING_LIGHT_PIN, COLOR_ORDER>(leds, MAX_LEDS); // Initializes Ring leds
 
+  if (debug) {
+    ledCommands(RingLEDsGreen);
+  }
 }
 
 void loop() {
+
   // Read  Serial PORT to see if you received a command
   if (Serial.available()) {
     // read the byte
     ledCommands(Serial.read());
-  }
-  else {
-    if(debug) {
-     ledCommands(RingLEDsGreen);
-     debug = false;
-    }
   }
   delay(200);
 }

@@ -20,6 +20,6 @@ class ringLight():
         def __init__(self, port, baud):
                 self._port=serial.Serial(port, baud)
       
-        def color(self, ringColor color):
-	        self.port.write(color)
+        def color(self, color):
+	        self._port.write(color)
 
