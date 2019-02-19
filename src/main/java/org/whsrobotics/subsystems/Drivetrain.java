@@ -27,7 +27,6 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double[] rawEncoderVelocities;
 
     public static Drivetrain instance;
-    
 
     private Drivetrain() {
     }
@@ -85,7 +84,7 @@ public class Drivetrain extends WolverinesSubsystem {
 
     }
 
-    /* 
+    /*
     Unit conversion from rawEncoderPositions to meters
     y = 1.9x/42
     y = meters, x = # of ticks
@@ -113,7 +112,7 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     public void periodic() {
 
-        SmartDashboard.putNumber("Enocder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
+       // SmartDashboard.putNumber("Enocder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
 
         // System.out.println("Running Drivetrain periodic");
 
