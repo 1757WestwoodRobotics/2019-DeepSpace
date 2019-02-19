@@ -1,6 +1,6 @@
 import ledControl
 
-# Teensy or Arduino is connect to the following port on my Mac
+# Teensy or Arduino is connected to the following port on my Mac
 led = ledControl.ringLight('/dev/cu.usbmodem52640001', 9800)
 
 while 1:
