@@ -2,6 +2,9 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.command.Command;
+
+import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
@@ -27,6 +30,10 @@ public class PneumaticsBase extends WolverinesSubsystem {
         }
     }
 
+    public static Compressor getCompressor(){
+        return compressor;
+    }
+
     public static void init(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
         compressor = comp;
         pressureTransducer = pressureTransducerSensor;
@@ -36,7 +43,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     @Override
     protected void initDefaultCommand() {
-
+        setDefaultCommand(new Compress());
     }
 
     public static boolean getCompressorState() {
@@ -47,7 +54,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
         return compressor.getCompressorCurrent();
     }
 
-    public static void startCompression() {
+    public static void startCompression(Compressor compressor) {
         compressor.start();
     }
 
@@ -62,4 +69,5 @@ public class PneumaticsBase extends WolverinesSubsystem {
     public static double getPressureSensor() {
         return pressureTransducer.getPSI();
     }
+   
 }

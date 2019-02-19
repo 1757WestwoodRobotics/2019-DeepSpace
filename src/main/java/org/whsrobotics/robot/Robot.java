@@ -13,9 +13,6 @@ import org.whsrobotics.subsystems.PneumaticsBase;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
-/**
- *
- */
 public class Robot extends TimedRobot {
 
     private boolean onTestRobot = false;

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Drive;
+import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 public class Drivetrain extends WolverinesSubsystem {
@@ -29,7 +30,6 @@ public class Drivetrain extends WolverinesSubsystem {
     
 
     private Drivetrain() {
-
     }
 
     public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
@@ -80,25 +80,21 @@ public class Drivetrain extends WolverinesSubsystem {
     public static void getEncoderTelemetry() {
 
         rawEncoderPositions[0] = leftASpark.getEncoder().getPosition();
-        rawEncoderPositions[1] = leftBSpark.getEncoder().getPosition();
-        rawEncoderPositions[2] = leftCSpark.getEncoder().getPosition();
-        rawEncoderPositions[3] = rightASpark.getEncoder().getPosition();
-        rawEncoderPositions[4] = rightBSpark.getEncoder().getPosition();
-        rawEncoderPositions[5] = rightCSpark.getEncoder().getPosition();
 
         rawEncoderVelocities[0] = leftASpark.getEncoder().getVelocity();
-        rawEncoderVelocities[1] = leftBSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[2] = leftCSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[3] = rightASpark.getEncoder().getVelocity();
-        rawEncoderVelocities[4] = rightBSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[5] = rightCSpark.getEncoder().getVelocity();
+
     }
 
-    // Unit Conversion from rawEncoderPositions to meters
+    /* 
+    Unit conversion from rawEncoderPositions to meters
+    y = 1.9x/42
+    y = meters, x = # of ticks
+    1.9/42 = kConversionConstant (see Constants.java)
+    */
 
     public static double rawPositionsToMeters(double rawEncoderPosition) {
 
-        double meters = (rawEncoderPosition / 1.9);
+        double meters = (rawEncoderPosition * Math.kConversionConstant.value);
 
         return meters;
     }
@@ -116,6 +112,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("Enocder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
 
         // System.out.println("Running Drivetrain periodic");
 
