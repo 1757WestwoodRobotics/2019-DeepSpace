@@ -38,9 +38,6 @@ const CHSV OFF(0, 0, 0);
 
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-double distance;
-char  led_command =  RingLEDsOff;
-boolean do_led_command = false;
 boolean debug = true;
 
 void setup() {
@@ -63,32 +60,13 @@ void loop() {
   // Read  Serial PORT to see if you received a command
   if (Serial.available()) {
     // read the byte
-    led_command = Serial.read();
-    do_led_command = true;
-    
-    switch (led_command) {
-      case '0' : digitalWrite (13, LOW);
-                 led_command = RingLEDsOff;
-                 break;
-      
-      case '1' : digitalWrite(13, HIGH);
-                 led_command = RingLEDsOff;
-                 break;
-                 
-      default: break ; // do nothing
-     
-    }    
+    ledCommands(Serial.read());
   }
-
-  if(debug) {
-    do_led_command = true;
-    led_command = RingLEDsGreen;
-  }
-
-  // If we received an LED command event, then process the LED command.
-  if (do_led_command) {
-    ledCommands(led_command);
-    do_led_command = false;
+  else {
+    if(debug) {
+     ledCommands(RingLEDsGreen);
+     debug = false;
+    }
   }
   delay(200);
 }
@@ -132,7 +110,7 @@ void ledCommands(char cmd)
     default:
       // Do nothing for invalid commands
       if (debug) {
-        Serial.print("Invalid command: ");
+        Serial.print("Invalid LED command: ");
         Serial.println(cmd);
       }
       break;
