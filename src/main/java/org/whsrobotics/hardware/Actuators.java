@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import org.whsrobotics.robot.Constants.canID;
 
 
@@ -37,21 +38,31 @@ public class Actuators {
 
         public static DoubleSolenoid superstructureSolenoid;
         public static DoubleSolenoid hatchMechSliderSolenoid;
-        public static DoubleSolenoid SolenoidA;
-        public static DoubleSolenoid SolenoidB;
+        public static DoubleSolenoid leftDropSolenoid;
+        public static DoubleSolenoid rightDropSolenoid;
+
 
     }
 
-    public static void configureActuators() {
+    public static void configureActuators(boolean onTestRobot) {
 
-//        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
+        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
 
-        MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);
-        MotorControllers.leftB = new CANSparkMax(canID.leftB.id, kBrushless);
-        MotorControllers.leftC = new CANSparkMax(canID.leftC.id, kBrushless);
-        MotorControllers.rightA = new CANSparkMax(canID.rightA.id, kBrushless);
-        MotorControllers.rightB = new CANSparkMax(canID.rightB.id, kBrushless);
-        MotorControllers.rightC = new CANSparkMax(canID.rightC.id, kBrushless);
+        try {
+            MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);
+            MotorControllers.leftB = new CANSparkMax(canID.leftB.id, kBrushless);
+            MotorControllers.leftC = new CANSparkMax(canID.leftC.id, kBrushless);
+            MotorControllers.rightA = new CANSparkMax(canID.rightA.id, kBrushless);
+            MotorControllers.rightB = new CANSparkMax(canID.rightB.id, kBrushless);
+            MotorControllers.rightC = new CANSparkMax(canID.rightC.id, kBrushless);
+
+            MotorControllers.rightA.setInverted(true);
+            MotorControllers.rightB.setInverted(true);
+            MotorControllers.rightC.setInverted(true);
+
+        } catch (NullPointerException ex) {
+
+        }
 
 //        // TODO: Error handling and reporting (try/catch)
 //

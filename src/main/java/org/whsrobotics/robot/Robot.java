@@ -7,6 +7,7 @@ import org.whsrobotics.commands.Drive;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.Drivetrain;
+import org.whsrobotics.subsystems.ElectronicsSystem;
 import org.whsrobotics.subsystems.HatchMechScott;
 import org.whsrobotics.subsystems.PneumaticsBase;
 
@@ -17,6 +18,8 @@ import static org.whsrobotics.hardware.Actuators.*;
  */
 public class Robot extends TimedRobot {
 
+    private boolean onTestRobot = false;
+
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -24,7 +27,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        Actuators.configureActuators();
+        Actuators.configureActuators(onTestRobot);  // If fails, don't initialize subsystem
+        Sensors.configureSensors();
+
+//        ElectronicsSystem.init();
 
         Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
                 MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
@@ -43,7 +49,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-
+//        (new ElectronicsSystem()).periodic();
     }
 
     /**

@@ -8,12 +8,12 @@ public class ElectronicsSystem extends WolverinesSubsystem {
 
     private static PowerDistributionPanel pdp;
 
-
     private static double[] pdpCurrents;
 
-    public ElectronicsSystem() {
-
+    public static void init() {
+        pdp = new PowerDistributionPanel();
         pdpCurrents = new double[16];
+
     }
 
     @Override

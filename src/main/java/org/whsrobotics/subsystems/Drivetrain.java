@@ -45,6 +45,8 @@ public class Drivetrain extends WolverinesSubsystem {
         leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
         rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
 
+        rightDrive.setInverted(true);
+
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
         rawEncoderPositions = new double[6];
@@ -115,11 +117,13 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     public void periodic() {
 
-        getEncoderTelemetry();
-        SmartDashboard.putNumberArray("Raw Encoder Positions", rawEncoderPositions);
-        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
+        // System.out.println("Running Drivetrain periodic");
 
-        rawPositionsToMeters(rawEncoderPositions[0]);
+//        getEncoderTelemetry();
+//        SmartDashboard.putNumberArray("Raw Encoder Positions", rawEncoderPositions);
+//        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
+//
+//        rawPositionsToMeters(rawEncoderPositions[0]);
     }
 
     @Override
@@ -132,5 +136,10 @@ public class Drivetrain extends WolverinesSubsystem {
     public static void stopDrive() {
         differentialDrive.stopMotor();
     }
+
+
+    // ------------ ENCODER PID ------------- //
+
+
 
 }
