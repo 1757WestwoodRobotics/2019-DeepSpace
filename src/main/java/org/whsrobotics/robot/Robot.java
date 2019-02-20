@@ -6,10 +6,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.commands.Drive;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.hardware.Sensors;
-import org.whsrobotics.subsystems.Drivetrain;
-import org.whsrobotics.subsystems.ElectronicsSystem;
-import org.whsrobotics.subsystems.HatchMechScott;
-import org.whsrobotics.subsystems.PneumaticsBase;
+import org.whsrobotics.subsystems.*;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
@@ -34,7 +31,8 @@ public class Robot extends TimedRobot {
 
 //        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 //
-//        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
+        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
+        Superstructure.init(Pneumatics.superstructureSolenoid);
 
     }
 

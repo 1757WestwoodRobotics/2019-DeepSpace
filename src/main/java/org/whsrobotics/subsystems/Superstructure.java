@@ -1,13 +1,15 @@
 package org.whsrobotics.subsystems;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.whsrobotics.utils.WolverinesSubsystem;
+
+import static org.whsrobotics.subsystems.PneumaticsBase.*;
 
 public class Superstructure extends WolverinesSubsystem {
 
-    private static Solenoid extensionSolenoid;
+    private static DoubleSolenoid extensionSolenoid;
 
-    public Superstructure(Solenoid solenoid) {
+    public static void init(DoubleSolenoid solenoid) {
         extensionSolenoid = solenoid;
     }
 
@@ -16,28 +18,11 @@ public class Superstructure extends WolverinesSubsystem {
 
     }
 
-    public enum SuperstructureState {
-        EXTENDED,
-        RETRACTED
+    public static void setSuperstructurePosition(DoubleSolenoidModes mode) {
+        extensionSolenoid.set(mode.value);
     }
 
-    public static void setSuperstructurePosition(SuperstructureState state) {
-
-        switch (state) {
-            case EXTENDED:
-                setExtensionSolenoid(true);
-                break;
-            case RETRACTED:
-                setExtensionSolenoid(false);
-                break;
-        }
-    }
-
-    private static void setExtensionSolenoid(boolean on) {
-        extensionSolenoid.set(on);
-    }
-
-    public static SuperstructureState getSuperstructurePosition() {
+    public static DoubleSolenoidModes getSuperstructurePosition() {
         return null;    // TODO: Return based on state of the solenoid... either sensor or local variable
     }
 
