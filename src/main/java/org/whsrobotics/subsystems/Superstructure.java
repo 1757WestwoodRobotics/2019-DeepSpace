@@ -18,10 +18,6 @@ public class Superstructure extends WolverinesSubsystem {
 
     }
 
-    public static void setSuperstructurePosition(DoubleSolenoidModes mode) {
-        extensionSolenoid.set(mode.value);
-    }
-
     public static DoubleSolenoidModes getSuperstructurePosition() {
         return null;    // TODO: Return based on state of the solenoid... either sensor or local variable
     }

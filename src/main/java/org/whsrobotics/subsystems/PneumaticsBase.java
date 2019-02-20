@@ -51,6 +51,10 @@ public class PneumaticsBase extends WolverinesSubsystem {
         setDefaultCommand(new Compress());
     }
 
+    public static void setSolenoidPosition(DoubleSolenoid solenoid, DoubleSolenoidModes mode) {
+        solenoid.set(mode.value);
+    }
+
     public static boolean getCompressorState() {
         return compressor.enabled();
     }
