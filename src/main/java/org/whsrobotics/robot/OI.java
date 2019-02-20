@@ -3,6 +3,7 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
+import org.whsrobotics.commands.CompressStop;
 import org.whsrobotics.commands.SetDoubleSolenoid;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.subsystems.HatchMechJack;
@@ -16,12 +17,12 @@ public class OI {
 
     private static XboxController xboxController;
 
-    static {
+    public static void init() {
         xboxController = new XboxController(0);
 
         SmartDashboard.putData("Compress", new Compress());
-        
-        
+        SmartDashboard.putData("Stop Compress", new CompressStop());
+
         SmartDashboard.putData("Superstructure Extended", new SetDoubleSolenoid(
             Superstructure.instance, Actuators.Pneumatics.superstructureSolenoid, DoubleSolenoidModes.EXTENDED));
 
@@ -55,7 +56,7 @@ public class OI {
         SmartDashboard.putData("Right Drop Neutral", new SetDoubleSolenoid(
             HatchMechJack.instance, Actuators.Pneumatics.rightDropSolenoid, DoubleSolenoidModes.NEUTRAL));
             
-        SmartDashboard.putData("Right Drop Extended", new SetDoubleSolenoid(
+        SmartDashboard.putData("Right Drop Retracted", new SetDoubleSolenoid(
             HatchMechJack.instance, Actuators.Pneumatics.rightDropSolenoid, DoubleSolenoidModes.RETRACTED)); 
                    
     }

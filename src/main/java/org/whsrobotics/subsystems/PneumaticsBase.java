@@ -44,6 +44,8 @@ public class PneumaticsBase extends WolverinesSubsystem {
         pressureTransducer = pressureTransducerSensor;
 
         doubleSolenoids = solenoids;
+
+        instance = new PneumaticsBase();
     }
 
     @Override
@@ -67,7 +69,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
         compressor.start();
     }
 
-    public static void stopCompression() {
+    public static void stopCompression(Compressor compressor) {
         compressor.stop();
     }
 

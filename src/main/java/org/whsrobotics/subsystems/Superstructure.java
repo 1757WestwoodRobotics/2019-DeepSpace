@@ -11,8 +11,12 @@ public class Superstructure extends WolverinesSubsystem {
 
     private static DoubleSolenoid extensionSolenoid;
 
+    private Superstructure() {
+    }
+
     public static void init(DoubleSolenoid solenoid) {
         extensionSolenoid = solenoid;
+        instance = new Superstructure();
     }
 
     @Override

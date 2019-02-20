@@ -22,12 +22,13 @@ public class SetDoubleSolenoid extends InstantCommand{
     
     @Override
     protected void initialize() {
+        System.out.println("Moving " + solenoid.toString() + " to Solenoid to " + mode.toString());
         PneumaticsBase.setSolenoidPosition(solenoid, mode);
     }
     
     @Override
     protected boolean isFinished() {
-        return super.isFinished();
+        return true;
     }
     
     

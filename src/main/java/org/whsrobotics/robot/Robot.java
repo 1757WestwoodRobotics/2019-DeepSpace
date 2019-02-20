@@ -31,8 +31,17 @@ public class Robot extends TimedRobot {
 
 //        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 //
-        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
+        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer,
+                Pneumatics.superstructureSolenoid,
+                Pneumatics.hatchMechSliderSolenoid,
+                Pneumatics.leftDropSolenoid,
+                Pneumatics.rightDropSolenoid);
+
+        HatchMechJack.init();
+
         Superstructure.init(Pneumatics.superstructureSolenoid);
+
+        OI.init();
 
     }
 
