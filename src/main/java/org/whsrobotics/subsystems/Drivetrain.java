@@ -23,8 +23,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    private static double[] rawEncoderPositions;
-    private static double[] rawEncoderVelocities;
+    private static double rawEncoderPositions;
+    private static double rawEncoderVelocities;
 
     public static Drivetrain instance;
 
@@ -47,9 +47,6 @@ public class Drivetrain extends WolverinesSubsystem {
         rightDrive.setInverted(true);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
-
-        rawEncoderPositions = new double[6];    // TODO: Sean, just use a single double, no need for an array
-        rawEncoderVelocities = new double[6];
 
         instance = new Drivetrain();
 
@@ -78,9 +75,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public static void getEncoderTelemetry() {
 
-        rawEncoderPositions[0] = leftASpark.getEncoder().getPosition();
-
-        rawEncoderVelocities[0] = leftASpark.getEncoder().getVelocity();
+        rawEncoderPositions = leftASpark.getEncoder().getPosition();
+        rawEncoderVelocities = leftASpark.getEncoder().getVelocity();
 
     }
 
