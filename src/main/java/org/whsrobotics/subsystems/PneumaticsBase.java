@@ -17,6 +17,8 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     private static DoubleSolenoid[] doubleSolenoids;
 
+    
+
     public enum DoubleSolenoidModes {
         EXTENDED(kForward),
         RETRACTED(kReverse),

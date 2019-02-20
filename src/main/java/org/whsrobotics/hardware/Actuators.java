@@ -11,6 +11,7 @@ import org.whsrobotics.robot.Constants.canID;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Solenoid;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 import static org.whsrobotics.robot.Constants.*;
@@ -40,6 +41,8 @@ public class Actuators {
         public static DoubleSolenoid hatchMechSliderSolenoid;
         public static DoubleSolenoid leftDropSolenoid;
         public static DoubleSolenoid rightDropSolenoid;
+		public static void SetDoubleSolenoid(Solenoid solenoid, boolean state) {
+		}
 
 
     }
