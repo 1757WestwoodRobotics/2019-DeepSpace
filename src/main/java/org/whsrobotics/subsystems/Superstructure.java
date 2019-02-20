@@ -7,6 +7,8 @@ import static org.whsrobotics.subsystems.PneumaticsBase.*;
 
 public class Superstructure extends WolverinesSubsystem {
 
+    public static Superstructure instance;
+
     private static DoubleSolenoid extensionSolenoid;
 
     public static void init(DoubleSolenoid solenoid) {
