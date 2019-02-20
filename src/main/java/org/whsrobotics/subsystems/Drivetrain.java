@@ -48,7 +48,7 @@ public class Drivetrain extends WolverinesSubsystem {
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
-        rawEncoderPositions = new double[6];
+        rawEncoderPositions = new double[6];    // TODO: Sean, just use a single double, no need for an array
         rawEncoderVelocities = new double[6];
 
         instance = new Drivetrain();

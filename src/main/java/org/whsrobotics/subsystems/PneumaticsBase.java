@@ -27,7 +27,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
         RETRACTED(kReverse),
         NEUTRAL(kOff);
 
-        private DoubleSolenoid.Value value;
+        public DoubleSolenoid.Value value;
 
         DoubleSolenoidModes(DoubleSolenoid.Value value) {
 
@@ -71,7 +71,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
         return compressor.getPressureSwitchValue();
     }
 
-    public static double getPressureSensor() {
+    public static double getPressureTransducer() {
         return pressureTransducer.getPSI();
     }
    
