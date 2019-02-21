@@ -19,7 +19,26 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     public static PneumaticsBase instance;
 
+    public static PneumaticsBase getInstance() {
+        if (instance == null) {
+            instance = new PneumaticsBase();
+        }
+        return instance;
+    }
+
     private PneumaticsBase() {
+        super(true);
+    }
+
+    public static void loadHardwareReferences(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
+        compressor = comp;
+        pressureTransducer = pressureTransducerSensor;
+        doubleSolenoids = solenoids;
+    }
+
+    @Override
+    protected void init(boolean onTestRobot) {
+        // configure
     }
 
     public enum DoubleSolenoidModes {
@@ -37,15 +56,6 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     public static Compressor getCompressor(){
         return compressor;
-    }
-
-    public static void init(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
-        compressor = comp;
-        pressureTransducer = pressureTransducerSensor;
-
-        doubleSolenoids = solenoids;
-
-        instance = new PneumaticsBase();
     }
 
     @Override

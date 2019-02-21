@@ -4,10 +4,11 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Drive;
 import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.utils.WolverinesSubsystem;
+
+import static org.whsrobotics.hardware.Actuators.*;
 
 public class Drivetrain extends WolverinesSubsystem {
 
@@ -26,20 +27,27 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double rawEncoderPositions;
     private static double rawEncoderVelocities;
 
-    public static Drivetrain instance;
+    private static Drivetrain instance;
 
-    private Drivetrain() {
+    public static Drivetrain getInstance() {
+        if (instance == null) {
+            instance = new Drivetrain();
+        }
+        return instance;
     }
 
-    public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
-                     CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    private Drivetrain() {
+        super(true);
+    }
 
-        leftASpark = leftA;
-        leftBSpark = leftB;
-        leftCSpark = leftC;
-        rightASpark = rightA;
-        rightBSpark = rightB;
-        rightCSpark = rightC;
+    public void init(boolean onTestRobot) {
+
+        leftASpark = MotorControllers.leftA;
+        leftBSpark = MotorControllers.leftB;
+        leftCSpark = MotorControllers.leftC;
+        rightASpark = MotorControllers.rightA;
+        rightBSpark = MotorControllers.rightB;
+        rightCSpark = MotorControllers.rightC;
 
         leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
         rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
@@ -117,6 +125,10 @@ public class Drivetrain extends WolverinesSubsystem {
 //        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
 //
 //        rawPositionsToMeters(rawEncoderPositions[0]);
+
+
+        // TODO: Sean – report Spark Max currents and temperature (individually)
+
     }
 
     @Override

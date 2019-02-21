@@ -3,10 +3,10 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import org.whsrobotics.commands.Drive;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.*;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
@@ -24,18 +24,20 @@ public class Robot extends TimedRobot {
         Actuators.configureActuators(onTestRobot);  // If fails, don't initialize subsystem
         Sensors.configureSensors();
 
-//        ElectronicsSystem.init();
-
-        Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
-                MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
-
-//        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
-//
-        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer,
+        PneumaticsBase.loadHardwareReferences(Pneumatics.compressor, Sensors.pressureTransducer,
                 Pneumatics.superstructureSolenoid,
                 Pneumatics.hatchMechSliderSolenoid,
                 Pneumatics.leftDropSolenoid,
                 Pneumatics.rightDropSolenoid);
+
+
+        WolverinesSubsystem.initSubsystems(onTestRobot,
+                ElectronicsSystem.getInstance(),
+                Drivetrain.getInstance(),
+                PneumaticsBase.getInstance());
+
+//        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
+//
 
         HatchMechJack.init();
 
