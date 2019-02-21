@@ -56,8 +56,6 @@ public class Drivetrain extends WolverinesSubsystem {
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
-        instance = new Drivetrain();
-
     }
 
     public enum DrivetrainAutoState {
@@ -80,6 +78,8 @@ public class Drivetrain extends WolverinesSubsystem {
     public static void tankDrive(double leftSpeed, double rightSpeed){
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
+
+    // BRAKE MODE TODO: SEAN
 
     public static void getEncoderTelemetry() {
 
