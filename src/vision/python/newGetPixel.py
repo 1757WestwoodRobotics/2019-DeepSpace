@@ -7,10 +7,21 @@ from westwood_vision_tools import *
 
 ###################################################################################################
 
-cap = configure_camera(1)
+robot_execution=True
+
+cap = configure_camera(0,robot_execution)
 
 picture =take_picture2(cap)
-picture = cv2.cvtColor(picture, cv2.COLOR_BGR2HSV)
+
+if (robot_execution):
+        picture = cv2.cvtColor(picture, cv2.cv.CV_BGR2HSV)
+else:
+	picture = cv2.cvtColor(picture, cv2.COLOR_BGR2HSV)
+
 picture =cv2.bilateralFilter(picture,5,50,50)
-#show_picture("Picture ",picture,1000)
-get_pixel_values(picture)
+
+
+if robot_execution:
+	get_pixel_values_unbuntu(picture)
+else:
+	get_pixel_values(picture)
