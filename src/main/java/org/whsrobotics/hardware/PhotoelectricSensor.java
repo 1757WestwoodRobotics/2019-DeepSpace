@@ -4,4 +4,7 @@ public class PhotoelectricSensor {
 
 
 
+    public PhotoelectricSensor() {
+
+    }
 }

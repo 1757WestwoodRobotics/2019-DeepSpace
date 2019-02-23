@@ -9,11 +9,17 @@ public class HatchMechScott extends WolverinesSubsystem {
     private static Servo topServo;
     private static Servo bottomServo;
     private static TalonSRX ballScrewTalon;
+    private static HatchMechScott instance;
+
+    private HatchMechScott() {
+    }
 
     public static void init(Servo top, Servo bottom, TalonSRX talon) {
         topServo = top;
         bottomServo = bottom;
         ballScrewTalon = talon;
+
+        instance = new HatchMechScott();
     }
 
     @Override

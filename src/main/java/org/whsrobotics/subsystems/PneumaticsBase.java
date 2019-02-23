@@ -2,6 +2,9 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.command.Command;
+
+import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
@@ -14,12 +17,36 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     private static DoubleSolenoid[] doubleSolenoids;
 
+    public static PneumaticsBase instance;
+
+    public static PneumaticsBase getInstance() {
+        if (instance == null) {
+            instance = new PneumaticsBase();
+        }
+        return instance;
+    }
+
+    private PneumaticsBase() {
+        super(true);
+    }
+
+    public static void loadHardwareReferences(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
+        compressor = comp;
+        pressureTransducer = pressureTransducerSensor;
+        doubleSolenoids = solenoids;
+    }
+
+    @Override
+    protected void init(boolean onTestRobot) {
+        // configure
+    }
+
     public enum DoubleSolenoidModes {
         EXTENDED(kForward),
         RETRACTED(kReverse),
         NEUTRAL(kOff);
 
-        private DoubleSolenoid.Value value;
+        public DoubleSolenoid.Value value;
 
         DoubleSolenoidModes(DoubleSolenoid.Value value) {
 
@@ -27,16 +54,17 @@ public class PneumaticsBase extends WolverinesSubsystem {
         }
     }
 
-    public static void init(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
-        compressor = comp;
-        pressureTransducer = pressureTransducerSensor;
-
-        doubleSolenoids = solenoids;
+    public static Compressor getCompressor(){
+        return compressor;
     }
 
     @Override
     protected void initDefaultCommand() {
+        setDefaultCommand(new Compress());
+    }
 
+    public static void setSolenoidPosition(DoubleSolenoid solenoid, DoubleSolenoidModes mode) {
+        solenoid.set(mode.value);
     }
 
     public static boolean getCompressorState() {
@@ -47,11 +75,11 @@ public class PneumaticsBase extends WolverinesSubsystem {
         return compressor.getCompressorCurrent();
     }
 
-    public static void startCompression() {
+    public static void startCompression(Compressor compressor) {
         compressor.start();
     }
 
-    public static void stopCompression() {
+    public static void stopCompression(Compressor compressor) {
         compressor.stop();
     }
 
@@ -59,7 +87,8 @@ public class PneumaticsBase extends WolverinesSubsystem {
         return compressor.getPressureSwitchValue();
     }
 
-    public static double getPressureSensor() {
+    public static double getPressureTransducer() {
         return pressureTransducer.getPSI();
     }
+   
 }

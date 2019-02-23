@@ -17,7 +17,8 @@ public class Constants {
 
     public enum Math {
         pi(3.1415926535897932384626502),
-        circumference(12.5663706144);
+        circumference(12.5663706144),
+        kConversionConstant(0.0452381);
 
 
         public double value;
@@ -29,10 +30,10 @@ public class Constants {
 
     // TODO: Ensure accuracy of Solenoid ports
     public enum SolenoidPorts {
-        SUPERSTRUCTURE(canID.pcmA, 1, 2),
-        HATCH_MECH_SLIDER(canID.pcmA, 3, 4),
-        LEFT_DROP(canID.pcmA, 5, 6),
-        RIGHT_DROP(canID.pcmA, 7, 8);
+        SUPERSTRUCTURE(canID.pcmA, 0, 1),
+        HATCH_MECH_SLIDER(canID.pcmA, 2, 3),
+        LEFT_DROP(canID.pcmA, 4, 5),
+        RIGHT_DROP(canID.pcmA, 6, 7);
 
         public int module;
         public int a;

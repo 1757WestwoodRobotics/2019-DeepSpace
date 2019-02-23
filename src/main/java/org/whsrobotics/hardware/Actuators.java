@@ -11,9 +11,11 @@ import org.whsrobotics.robot.Constants.canID;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Solenoid;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 import static org.whsrobotics.robot.Constants.*;
+import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 
 public class Actuators {
 
@@ -41,12 +43,14 @@ public class Actuators {
         public static DoubleSolenoid leftDropSolenoid;
         public static DoubleSolenoid rightDropSolenoid;
 
-
     }
 
     public static void configureActuators(boolean onTestRobot) {
 
-        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0,1);
+        Pneumatics.superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
+        Pneumatics.hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
+        Pneumatics.leftDropSolenoid = new DoubleSolenoid(LEFT_DROP.module, LEFT_DROP.a, LEFT_DROP.b);
+        Pneumatics.rightDropSolenoid = new DoubleSolenoid(RIGHT_DROP.module, RIGHT_DROP.a, RIGHT_DROP.b);
 
         try {
             MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);
@@ -77,11 +81,9 @@ public class Actuators {
 //        MotorControllers.topServo = new Servo(0);
 //        MotorControllers.bottomServo = new Servo(1);
 //
-//        Pneumatics.compressor = new Compressor(0);
-//        Pneumatics.compressor.clearAllPCMStickyFaults();
-//        Pneumatics.compressor.setClosedLoopControl(true);
-//
-//        Pneumatics.superstructureSolenoid = new DoubleSolenoid(0, 1, 1);
+        Pneumatics.compressor = new Compressor(11);
+        Pneumatics.compressor.clearAllPCMStickyFaults();
+        Pneumatics.compressor.setClosedLoopControl(true);
 
     }
 

@@ -4,9 +4,11 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Drive;
+import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.utils.WolverinesSubsystem;
+
+import static org.whsrobotics.hardware.Actuators.*;
 
 public class Drivetrain extends WolverinesSubsystem {
 
@@ -22,25 +24,30 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static DifferentialDrive differentialDrive;
 
-    private static double[] rawEncoderPositions;
-    private static double[] rawEncoderVelocities;
+    private static double rawEncoderPositions;
+    private static double rawEncoderVelocities;
 
-    public static Drivetrain instance;
-    
+    private static Drivetrain instance;
 
-    private Drivetrain() {
-
+    public static Drivetrain getInstance() {
+        if (instance == null) {
+            instance = new Drivetrain();
+        }
+        return instance;
     }
 
-    public static void init(CANSparkMax leftA, CANSparkMax leftB, CANSparkMax leftC,
-                     CANSparkMax rightA, CANSparkMax rightB, CANSparkMax rightC) {
+    private Drivetrain() {
+        super(true);
+    }
 
-        leftASpark = leftA;
-        leftBSpark = leftB;
-        leftCSpark = leftC;
-        rightASpark = rightA;
-        rightBSpark = rightB;
-        rightCSpark = rightC;
+    public void init(boolean onTestRobot) {
+
+        leftASpark = MotorControllers.leftA;
+        leftBSpark = MotorControllers.leftB;
+        leftCSpark = MotorControllers.leftC;
+        rightASpark = MotorControllers.rightA;
+        rightBSpark = MotorControllers.rightB;
+        rightCSpark = MotorControllers.rightC;
 
         leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
         rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
@@ -48,11 +55,6 @@ public class Drivetrain extends WolverinesSubsystem {
         rightDrive.setInverted(true);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
-
-        rawEncoderPositions = new double[6];
-        rawEncoderVelocities = new double[6];
-
-        instance = new Drivetrain();
 
     }
 
@@ -77,28 +79,25 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
 
+    // BRAKE MODE TODO: SEAN
+
     public static void getEncoderTelemetry() {
 
-        rawEncoderPositions[0] = leftASpark.getEncoder().getPosition();
-        rawEncoderPositions[1] = leftBSpark.getEncoder().getPosition();
-        rawEncoderPositions[2] = leftCSpark.getEncoder().getPosition();
-        rawEncoderPositions[3] = rightASpark.getEncoder().getPosition();
-        rawEncoderPositions[4] = rightBSpark.getEncoder().getPosition();
-        rawEncoderPositions[5] = rightCSpark.getEncoder().getPosition();
+        rawEncoderPositions = leftASpark.getEncoder().getPosition();
+        rawEncoderVelocities = leftASpark.getEncoder().getVelocity();
 
-        rawEncoderVelocities[0] = leftASpark.getEncoder().getVelocity();
-        rawEncoderVelocities[1] = leftBSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[2] = leftCSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[3] = rightASpark.getEncoder().getVelocity();
-        rawEncoderVelocities[4] = rightBSpark.getEncoder().getVelocity();
-        rawEncoderVelocities[5] = rightCSpark.getEncoder().getVelocity();
     }
 
-    // Unit Conversion from rawEncoderPositions to meters
+    /*
+    Unit conversion from rawEncoderPositions to meters
+    y = 1.9x/42
+    y = meters, x = # of ticks
+    1.9/42 = kConversionConstant (see Constants.java)
+    */
 
     public static double rawPositionsToMeters(double rawEncoderPosition) {
 
-        double meters = (rawEncoderPosition / 1.9);
+        double meters = (rawEncoderPosition * Math.kConversionConstant.value);
 
         return meters;
     }
@@ -117,6 +116,8 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     public void periodic() {
 
+       // SmartDashboard.putNumber("Enocder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
+
         // System.out.println("Running Drivetrain periodic");
 
 //        getEncoderTelemetry();
@@ -124,6 +125,10 @@ public class Drivetrain extends WolverinesSubsystem {
 //        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
 //
 //        rawPositionsToMeters(rawEncoderPositions[0]);
+
+
+        // TODO: Sean – report Spark Max currents and temperature (individually)
+
     }
 
     @Override

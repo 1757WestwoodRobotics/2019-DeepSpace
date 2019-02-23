@@ -3,19 +3,13 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import org.whsrobotics.commands.Drive;
 import org.whsrobotics.hardware.Actuators;
 import org.whsrobotics.hardware.Sensors;
-import org.whsrobotics.subsystems.Drivetrain;
-import org.whsrobotics.subsystems.ElectronicsSystem;
-import org.whsrobotics.subsystems.HatchMechScott;
-import org.whsrobotics.subsystems.PneumaticsBase;
+import org.whsrobotics.subsystems.*;
+import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.hardware.Actuators.*;
 
-/**
- *
- */
 public class Robot extends TimedRobot {
 
     private boolean onTestRobot = false;
@@ -30,14 +24,26 @@ public class Robot extends TimedRobot {
         Actuators.configureActuators(onTestRobot);  // If fails, don't initialize subsystem
         Sensors.configureSensors();
 
-//        ElectronicsSystem.init();
+        PneumaticsBase.loadHardwareReferences(Pneumatics.compressor, Sensors.pressureTransducer,
+                Pneumatics.superstructureSolenoid,
+                Pneumatics.hatchMechSliderSolenoid,
+                Pneumatics.leftDropSolenoid,
+                Pneumatics.rightDropSolenoid);
 
-        Drivetrain.init(MotorControllers.leftA, MotorControllers.leftB, MotorControllers.leftC,
-                MotorControllers.rightA,MotorControllers.rightB, MotorControllers.rightC);
+
+        WolverinesSubsystem.initSubsystems(onTestRobot,
+                ElectronicsSystem.getInstance(),
+                Drivetrain.getInstance(),
+                PneumaticsBase.getInstance());
 
 //        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
 //
-//        PneumaticsBase.init(Pneumatics.compressor, Sensors.pressureTransducer);
+
+        HatchMechJack.init();
+
+        Superstructure.init(Pneumatics.superstructureSolenoid);
+
+        OI.init();
 
     }
 
@@ -49,7 +55,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-//        (new ElectronicsSystem()).periodic();
+        WolverinesSubsystem.beginReducedPeriodic();
     }
 
     /**

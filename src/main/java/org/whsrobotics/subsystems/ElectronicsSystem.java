@@ -10,10 +10,23 @@ public class ElectronicsSystem extends WolverinesSubsystem {
 
     private static double[] pdpCurrents;
 
-    public static void init() {
+    private static ElectronicsSystem instance;
+
+    public static ElectronicsSystem getInstance() {
+        if (instance == null) {
+            instance = new ElectronicsSystem();
+        }
+        return instance;
+    }
+
+    private ElectronicsSystem() {
+        super(false);
+    }
+
+    @Override
+    protected void init(boolean onTestRobot) {
         pdp = new PowerDistributionPanel();
         pdpCurrents = new double[16];
-
     }
 
     @Override

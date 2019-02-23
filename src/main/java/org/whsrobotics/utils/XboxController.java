@@ -6,13 +6,17 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 /**
  * Implementation of the WPILIB Joystick class. Provides similar functionality to the WPILIB XboxController class.
  *
+ * @version 1.1 – Added the getNormalizedAxis() method to account for DEADBAND.
  * @author Larry Tseng 
  *
  */
 public class XboxController extends Joystick {
 
-	private final static double DEADBAND = 0.1;
+	private final static double DEADBAND = 0.05;
 
+	/**
+	 * Enum of XboxController buttons.
+	 */
 	public enum Buttons {
 		A(1), B(2), X(3), Y(4), LEFT_BUMPER(5), RIGHT_BUMPER(6), 
 		BACK(7), START(8), LEFT_STICK_BUTTON(9), RIGHT_STICK_BUTTON(10);
@@ -47,6 +51,9 @@ public class XboxController extends Joystick {
 		
 	}
 
+	/**
+	 * An interface to switch between Axes and QDriverStationAxes. DO NOT USE!
+	 */
 	public interface XboxControllerAxes {
         int getValue();
     }
@@ -96,7 +103,6 @@ public class XboxController extends Joystick {
 	 */
 	public XboxController(int port) {
 		super(port);
-
 	}
 	
 	/**
@@ -118,7 +124,6 @@ public class XboxController extends Joystick {
 	 */
 	public boolean getRawButton(Buttons button) {
 		return super.getRawButton(button.getValue());
-		
 	}
 	
 	/**
@@ -129,17 +134,27 @@ public class XboxController extends Joystick {
 	 */
 	public double getRawAxis(XboxControllerAxes axis) {
 	  return super.getRawAxis(axis.getValue());
-
 	}
 
-    /**
+	/**
+	 * Get the normalized (accounted for DEADBAND) value of the axis.
+	 *
+	 * @param axis The axis to read.
+	 * @return The normalized value of the axis.
+	 */
+	public double getNormalizedAxis(XboxControllerAxes axis) {
+		double value = getRawAxis(axis.getValue());
+		return value > DEADBAND ? value : 0.0;
+	}
+
+
+	/**
      *
      * @param pov The DirectionalPad button to read.
      * @return The value of the POV button.
      */
     public boolean getPOV(DirectionalPad pov) {
         return super.getPOV(pov.getValue()) == pov.getValue();
-
     }
 
 	/**
@@ -150,7 +165,6 @@ public class XboxController extends Joystick {
 	 */
 	public void setRumble(RumbleType type, double value) {
 		super.setRumble(type, value);
-		
 	}
 
 }
