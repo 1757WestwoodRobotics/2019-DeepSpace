@@ -11,7 +11,7 @@ Example Lidar JSON:
 
 {
   "sensor": "Lidar",
-  "command": 0
+  "read": 1
 }
 
 
@@ -19,7 +19,7 @@ Example Lidar Ring LED:
 
 {
   "sensor": "ringLight",
-  "command": 0 # values from ringColor()
+  "color": 0 
 }
 
 '''
@@ -36,18 +36,21 @@ class ringColor():
         White   = 6
 
 # Arduino controls via Serial Port
-class arduino():
-        # Set up the serial port and ensure it is non-blocking
-        def __init__(self, port, baud):
-                self._port=serial.Serial(port, baud=9800, timeout=0.5)
+class Arduino():
+    # Set up the serial port and ensure it is non-blocking
+	def __init__(self, port):
+		self._port=serial.Serial(port, baudrate=115200, timeout=1)
 
-        # returns number of bytes sent over serial
-        def write(self, buffer):
-                return self._port.write(buffer)
+    # returns number of bytes sent over serial
+	def write(self, cmd):
+		return self._port.write(cmd)
 
-        # returns a JSON object read from the serial port
-        def read():
-                return json.dumps(self._port.readline())
+    # returns a JSON object read from the serial port
+	def read(self):
+		return json.loads(self._port.readline())
+				
+	def close(self):
+		self._port.close()
 
 
                 

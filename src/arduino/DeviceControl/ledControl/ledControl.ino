@@ -4,15 +4,16 @@
    Tested with Arduino Leonardo++ (16Hertz) from FRC.
 **/
 #include <FastLED.h>          // Includes the FastLED library
+#include <ArduinoJson.h>
 
 // Device control commands
-#define RingLEDsOff       '0'
-#define RingLEDsRed       '1'
-#define RingLEDsGreen     '2'
-#define RingLEDsYellow    '3'
-#define RingLEDsOrange    '4'
-#define RingLEDsBlue      '5'
-#define RingLEDsWhite     '6'
+#define RingLEDsOff       0
+#define RingLEDsRed       1
+#define RingLEDsGreen     2
+#define RingLEDsYellow    3
+#define RingLEDsOrange    4
+#define RingLEDsBlue      5
+#define RingLEDsWhite     6
 
 
 #define RING_LIGHT_PIN     6    // Ring Light control
@@ -40,10 +41,23 @@ const CHSV OFF(0, 0, 0);
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 boolean debug = true;
 
+
+/*
+    JSON Section for creating JSON output to Serial.
+*/
+
+const size_t capacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(3) + 90;
+DynamicJsonBuffer jsonBuffer(capacity);
+
+
+
 void setup() {
 
   // set up console baud rate.
-  Serial.begin(9600);
+  Serial.begin(115200);
+
+  // Built in LED pin 13 as output
+  pinMode (LED_BUILTIN, OUTPUT);
 
   // Set up LED Control PIN
   pinMode (RING_LIGHT_PIN, OUTPUT);
@@ -57,52 +71,71 @@ void setup() {
   if (debug) {
     ledCommands(RingLEDsGreen);
   }
+
+  // wait until serial port opens for native USB devices
+  while (! Serial) {
+    delay(1);
+  }
 }
 
 void loop() {
 
   // Read  Serial PORT to see if you received a command
   if (Serial.available()) {
-    // read the byte
-    ledCommands(Serial.read());
+    JsonObject& cmdObj = jsonBuffer.parse(Serial);
+
+    // Only if JSON Parse succeds do something or ignore the command
+    if (cmdObj.success()) {
+      const char *sensor = cmdObj["sensor"];
+
+      if (String(sensor) == "ringLight") {
+        ledCommands(cmdObj["color"]);
+      }
+      else {
+        writeSerial();
+      }
+    }
+    delay(200);
   }
-  delay(200);
 }
 
 // LED Control Section
-void ledCommands(char cmd)
+void ledCommands(int cmd)
 {
-  if (debug) {
-    Serial.print("Led Command -");
-    Serial.println(cmd);
-  }
   switch (cmd) {
     case RingLEDsOff:
       setRingLEDsColor(OFF);
+      digitalWrite(LED_BUILTIN, LOW);
       break;
 
     case RingLEDsRed:
       setRingLEDsColor(RED);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsGreen:
       setRingLEDsColor(GREEN);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsOrange:
       setRingLEDsColor(ORANGE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsYellow:
       setRingLEDsColor(YELLOW);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsBlue:
       setRingLEDsColor(BLUE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsWhite:
       setRingLEDsColor(WHITE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     default:
@@ -111,6 +144,7 @@ void ledCommands(char cmd)
         Serial.print("Invalid LED command: ");
         Serial.println(cmd);
       }
+      digitalWrite(LED_BUILTIN, LOW);
       break;
 
   }
@@ -122,4 +156,19 @@ void setRingLEDsColor(CHSV color) {
   fill_solid(leds, MAX_LEDS, color);
   FastLED.show();
   FastLED.delay(30);
+}
+
+// Sends JSON output to serial port:
+void writeSerial() {
+  JsonObject& root = jsonBuffer.createObject();
+  root["sensor"] = "lidar";
+  root["time"] = millis();
+
+  JsonArray& objects = root.createNestedArray("objects");
+  objects.add(0);
+  objects.add(0);
+  objects.add(0);
+  objects.add(0);
+  root.printTo(Serial);
+  Serial.println(); // Always send a CR at the end so reciever does not block.
 }
