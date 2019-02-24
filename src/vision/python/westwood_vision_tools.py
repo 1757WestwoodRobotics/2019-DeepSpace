@@ -75,7 +75,10 @@ def configure_camera(camera_number, robot_execution):
     if robot_execution:
        # d is the device number, under Unbuntu from terminal type v4l2-ctl --list-devices
        # to see properties avaialbe type v4l2-ctl --all
-       subprocess.call("v4l2-ctl -d 1 --set-ctrl brightness=19", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl brightness=30", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl saturation=83", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl exposure_absolute=5", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl contrast=5", shell=True)
     else:
        # this code works for the cv3 version installed on the Windows PC used to develop the code
        # CAP_PROP_SETTINGS is not supported under Unbuntu
