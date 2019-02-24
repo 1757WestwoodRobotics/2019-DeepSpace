@@ -67,28 +67,27 @@ def configure_camera(camera_number, robot_execution):
 
     cap = cv2.VideoCapture(camera_number)
 
-    # this code works for the Jetson TX 2 running Unbuntu
-    if robot_execution:
-    # PROP_SETTINGS may not exist in Unbuntu
-    #   cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
-    #   cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
-    #   cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
-    #   cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
-    #   cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
-        cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
-        cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
-    else:   # this code works for the cv3 version installed on the PC used to develop the code
-        # CAP_PROP_SETTINGS is not supported under Unbuntu
-        cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
-        cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
-        cap.set(cv2.CAP_PROP_EXPOSURE, -7)
-        cap.set(cv2.CAP_PROP_CONTRAST, 5)
-        cap.set(cv2.CAP_PROP_SATURATION, 83)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
+    # the camera configuration code below works for Windows OS
+    # if you are running under Unbuntu you have to run v4L2-ctl commands from the OS
+    # for the V4L2-ctl settings
+    # brightness 50
+    # saturation 83
+
+
+     # this code works for the cv3 version installed on the PC used to develop the code
+    # CAP_PROP_SETTINGS is not supported under Unbuntu
+    # CAP_PROP_SETTINGS causes the parameters dialog to pop up when set to 1
+    cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
+    cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
+    cap.set(cv2.CAP_PROP_EXPOSURE, -7)
+    cap.set(cv2.CAP_PROP_CONTRAST, 5)
+    cap.set(cv2.CAP_PROP_SATURATION, 83)
+    cap.set(cv2.CAP_PROP_SHARPNESS, 25)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 180)
       # CAP_PROP_FOURCC is not supported under Unbuntu
     #   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
-        cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
 
 
     return cap
@@ -285,6 +284,8 @@ def hollow_outX(picture):
     working = copy.copy(picture)
 
     #    this doesn't work if you encode the object values in the image, it changes the values
+    #    you can get it to work if you compare the edge values agaisnt the original picture
+    # and change the values in the hollowd out picture
     #    kernel=numpy.ones((2,2),numpy.uint8)
     #    working=cv2.morphologyEx(working,cv2.MORPH_GRADIENT,kernel)
 
