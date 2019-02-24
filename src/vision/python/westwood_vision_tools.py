@@ -5,6 +5,7 @@ import time
 import copy
 import PyWinMouse
 import math
+import subprocess
 
 
 # OpenCV version 3.4.3.18
@@ -63,8 +64,6 @@ def configure_camera(camera_number, robot_execution):
 # -12	312 us
 # -13	150 us
 
-    # for opencv2 the settings format is cap.set(cv2.cv.CV_CAP_PROP_XXXXXX)
-
     cap = cv2.VideoCapture(camera_number)
 
     # the camera configuration code below works for Windows OS
@@ -73,21 +72,25 @@ def configure_camera(camera_number, robot_execution):
     # brightness 50
     # saturation 83
 
-
-     # this code works for the cv3 version installed on the PC used to develop the code
-    # CAP_PROP_SETTINGS is not supported under Unbuntu
-    # CAP_PROP_SETTINGS causes the parameters dialog to pop up when set to 1
-    cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
-    cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
-    cap.set(cv2.CAP_PROP_EXPOSURE, -7)
-    cap.set(cv2.CAP_PROP_CONTRAST, 5)
-    cap.set(cv2.CAP_PROP_SATURATION, 83)
-    cap.set(cv2.CAP_PROP_SHARPNESS, 25)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 180)
+    if robot_execution:
+       # d is the device number, under Unbuntu from terminal type v4l2-ctl --list-devices
+       # to see properties avaialbe type v4l2-ctl --all
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl brightness=19", shell=True)
+    else:
+       # this code works for the cv3 version installed on the Windows PC used to develop the code
+       # CAP_PROP_SETTINGS is not supported under Unbuntu
+       # CAP_PROP_SETTINGS causes the parameters dialog to pop up when set to 1
+       cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
+       cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
+       cap.set(cv2.CAP_PROP_EXPOSURE, -7)
+       cap.set(cv2.CAP_PROP_CONTRAST, 5)
+       cap.set(cv2.CAP_PROP_SATURATION, 83)
+       cap.set(cv2.CAP_PROP_SHARPNESS, 25)
+       cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+       cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 180)
       # CAP_PROP_FOURCC is not supported under Unbuntu
-    #   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
-    cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+      # cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
+       cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
 
 
     return cap
@@ -98,7 +101,6 @@ def show_picture(title, picture, time_msec):
 
     cv2.imshow(title, picture)
     cv2.waitKey(time_msec)
-
 
 #######################################################################################################################
 
