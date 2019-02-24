@@ -78,13 +78,15 @@ def configure_camera(camera_number, robot_execution):
         cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
         cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
     else:   # this code works for the cv3 version installed on the PC used to develop the code
+        # CAP_PROP_SETTINGS is not supported under Unbuntu
         cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
         cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
         cap.set(cv2.CAP_PROP_EXPOSURE, -7)
         cap.set(cv2.CAP_PROP_CONTRAST, 5)
         cap.set(cv2.CAP_PROP_SATURATION, 83)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-    #   cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
+      # CAP_PROP_FOURCC is not supported under Unbuntu
     #   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
         cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
 
