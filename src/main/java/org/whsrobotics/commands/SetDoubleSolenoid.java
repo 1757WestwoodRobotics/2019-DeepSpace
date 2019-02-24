@@ -22,7 +22,7 @@ public class SetDoubleSolenoid extends InstantCommand{
     
     @Override
     protected void initialize() {
-        System.out.println("Moving " + solenoid.toString() + " to Solenoid to " + mode.toString());
+        System.out.println("Moving " + solenoid.toString() + " to " + mode.toString());
         PneumaticsBase.setSolenoidPosition(solenoid, mode);
     }
     

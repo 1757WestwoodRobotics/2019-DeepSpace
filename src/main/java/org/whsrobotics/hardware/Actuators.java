@@ -48,6 +48,8 @@ public class Actuators {
     public static void configureActuators(boolean onTestRobot) {
 
         Pneumatics.superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
+        Pneumatics.superstructureSolenoid.setName("Superstructure Solenoid");
+
         Pneumatics.hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
         Pneumatics.leftDropSolenoid = new DoubleSolenoid(LEFT_DROP.module, LEFT_DROP.a, LEFT_DROP.b);
         Pneumatics.rightDropSolenoid = new DoubleSolenoid(RIGHT_DROP.module, RIGHT_DROP.a, RIGHT_DROP.b);
