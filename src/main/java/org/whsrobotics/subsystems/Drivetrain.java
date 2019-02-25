@@ -1,6 +1,7 @@
 package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -79,7 +80,23 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
 
-    // BRAKE MODE TODO: SEAN
+    public static void setCoastMode(){
+        leftASpark.setIdleMode(IdleMode.kCoast);
+        leftBSpark.setIdleMode(IdleMode.kCoast);
+        leftCSpark.setIdleMode(IdleMode.kCoast);
+        rightASpark.setIdleMode(IdleMode.kCoast);
+        rightBSpark.setIdleMode(IdleMode.kCoast);
+        rightCSpark.setIdleMode(IdleMode.kCoast);
+    }
+
+    public static void setBrakeMode(){
+        leftASpark.setIdleMode(IdleMode.kBrake);
+        leftBSpark.setIdleMode(IdleMode.kBrake);
+        leftCSpark.setIdleMode(IdleMode.kBrake);
+        rightASpark.setIdleMode(IdleMode.kBrake);
+        rightBSpark.setIdleMode(IdleMode.kBrake);
+        rightCSpark.setIdleMode(IdleMode.kBrake);
+    }
 
     public static void getEncoderTelemetry() {
 
