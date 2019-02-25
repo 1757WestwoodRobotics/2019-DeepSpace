@@ -142,8 +142,9 @@ void setup() {
   // set up console baud rate.
   Serial.begin(115200);
 
+  
   // Built in LED pin 13 as output
-  pinMode (13, OUTPUT);
+  pinMode (LED_BUILTIN, OUTPUT);
 
   // Set up LED Control PIN
   pinMode (RING_LIGHT_PIN, OUTPUT);
@@ -173,14 +174,9 @@ void loop() {
 
     // Only if JSON Parse succeds do something or ignore the command
     if (cmdObj.success()) {
-
-      const char *sensor = cmdObj["sensor"];
-      int cmd;
-
-      cmd = cmdObj["command"];
-
+      const char *sensor = cmdObj["sensor"]; // Look up which sensor
       if (String(sensor) == "ringLight") {
-        ledCommands(cmd);
+        ledCommands(cmdObj["color"]);
       }
       else if (String(sensor) == "Lidar") {
         // Process Command for LIDARs
@@ -202,37 +198,40 @@ void loop() {
 */
 void ledCommands(int cmd)
 {
-  if (debug) {
-    Serial.print("Led Command -");
-    Serial.println(cmd);
-  }
   switch (cmd) {
     case RingLEDsOff:
       setRingLEDsColor(OFF);
+      digitalWrite(LED_BUILTIN, LOW);
       break;
 
     case RingLEDsRed:
       setRingLEDsColor(RED);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsGreen:
       setRingLEDsColor(GREEN);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsOrange:
       setRingLEDsColor(ORANGE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsYellow:
       setRingLEDsColor(YELLOW);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsBlue:
       setRingLEDsColor(BLUE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     case RingLEDsWhite:
       setRingLEDsColor(WHITE);
+      digitalWrite(LED_BUILTIN, HIGH);
       break;
 
     default:
@@ -241,6 +240,7 @@ void ledCommands(int cmd)
         Serial.print("Invalid LED command: ");
         Serial.println(cmd);
       }
+      digitalWrite(LED_BUILTIN, LOW);
       break;
 
   }
@@ -380,13 +380,13 @@ void readLidars() {
 void writeLidar() {
   JsonObject& root = jsonBuffer.createObject();
   root["sensor"] = "lidar";
-  root["time"] = millis();
+  root["time"] = millis(); // current Arduino time elapsed since reboot.
 
   JsonArray& objects = root.createNestedArray("objects");
   objects.add(distances[0]);
   objects.add(distances[1]);
   objects.add(distances[2]);
   objects.add(distances[3]);
-  root.prettyPrintTo(Serial);
+  root.printTo(Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
 }

@@ -13,12 +13,7 @@ def generate_color_table(object_type):
     color_table=[]
     while (index<256):
 
-        if (object_type == constant.TYPE_BALL):
-            # for a ball the primary color is 3
-            color_1 = int(index * 0.383 - 40.9)
-            color_2 = int(index * 0.505 - 28.6)
-            color_3 = int(index)
-        elif (object_type == constant.TYPE_FLOOR_TAPE):
+        if (object_type == constant.TYPE_FLOOR_TAPE):
             # for floor tape the primary color is ?
             color_1 = int(index)
             color_2 = int(index * -1.42 + 140)
@@ -40,7 +35,32 @@ def generate_color_table(object_type):
     return color_table
 
 ###################################################################################################
-# given the there "color" pixel value and object_type, this returns a "goodness of fit" for the pixel
+# given the three "color" pixel value and object_type, this returns a "goodness of fit" for the pixel
+# where the lower the value the better the fit expect -1 means no fit
+
+def match_pixel_to_objectX(color,object_type):
+
+    fit_distance=-1
+
+    if (object_type==constant.TYPE_REFLECTIVE_TAPE):
+        if (color[2]>250):
+            target = reflective_tape_color_table[color[1]]
+            fit_distance = euclidian_distance(color, target)
+            if (fit_distance>50):
+                fit_distance=-1
+
+    elif (object_type==constant.TYPE_FLOOR_TAPE):
+        target = floor_tape_color_table[color[1]]
+        fit_distance = euclidian_distance(color, target)
+        if (fit_distance>60):
+            fit_distance=-1
+    else:
+        fit_distance=-1
+
+    return fit_distance
+
+###################################################################################################
+# given the three "color" pixel value and object_type, this returns a "goodness of fit" for the pixel
 # where the lower the value the better the fit expect -1 means no fit
 
 def match_pixel_to_object(color,object_type):
@@ -48,15 +68,17 @@ def match_pixel_to_object(color,object_type):
     fit_distance = float(-1)
 
     if (object_type==constant.TYPE_REFLECTIVE_TAPE):
-        if ((color[1]>30 and color[1])<120):
+        if (color[2]>250):
             target=reflective_tape_color_table[color[1]]
             if ((abs(color[0] - target[0]) < 60) and (abs(color[2] - target[2]) < 10)):
-                fit_distance = euclidian_distance(color, target)
+#                fit_distance = euclidian_distance(color, target) # the Euclidean distance calcuation is slow
+                fit_distance = 10
 
     elif (object_type==constant.TYPE_FLOOR_TAPE):
         if ((color[0] > 60) and color[0] < 110 and color[1] > 20 and color[1] < 60 and color[2] > 130 and color[2] < 190):
             target=floor_tape_color_table[color[1]]
-            fit_distance = euclidian_distance(color, target)
+    #            fit_distance = euclidian_distance(color, target)
+            fit_distance = 10
 
     return fit_distance
 
@@ -138,7 +160,7 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table,robo
 
     for index in range(0, len(object_list)):
         object_info=object_list[index]
-        x, y = object_info.normalized_center()
+     #  x, y = object_info.normalized_center()
         alt, azimuth = object_info.altitude_and_azimuth()
         area = object_info.relative_area()
         aspect_ratio = object_info.aspect_ratio()
@@ -148,11 +170,8 @@ def report_object_list_to_table(object_list, count, parent_table, sub_table,robo
 
         if (object_type==constant.TYPE_REFLECTIVE_TAPE):
             distance_m, x=distance_from_elevation(alt,constant.REFLECTIVE_TAPE_HEIGHT_M-constant.CAMERA_HEIGHT_M)
-        elif (object_type==constant.TYPE_BALL):
-            distance_m = distance_to_ball_meters(object_info)
         else:
             distance_m = 0
-
 
         if (index==0):
             descriptor_list = ["count", "object", "number", "elevation_angle", "azimuth", "distance_m"]
@@ -203,7 +222,7 @@ def read_object_list_from_table(Network_table):
 def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot_execution):
 
     # use HSV for the image search
-    if (robot_execution):
+    if (robot_execution and False):
         working_picture = cv2.cvtColor(picture_in, cv2.cv.CV_BGR2HSV)
     else:
         working_picture=cv2.cvtColor(picture_in, cv2.COLOR_BGR2HSV)
@@ -234,6 +253,9 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot
 
     working_rows, working_cols, layers = working_picture.shape
 
+    # keep track of the middle point of the image (horizontal)
+    center_row=int(working_rows/2)
+
     run_fast=False
 
     if run_fast:
@@ -257,13 +279,12 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot
             for col in range (constant.SEARCH_RADIUS, working_cols-constant.SEARCH_RADIUS, 1):
 
                 # searh for reflective tape
-                if (constant.TYPE_REFLECTIVE_TAPE in objects_to_find):
+                if (row<center_row):
                     current_fit=match_pixel_to_object(working_picture[row,col],constant.TYPE_REFLECTIVE_TAPE)
                     if (0<=current_fit< best_fit):
                         best_type=int(constant.TYPE_REFLECTIVE_TAPE)
                         best_fit=current_fit
-
-                if (constant.TYPE_FLOOR_TAPE in objects_to_find):
+                else:
                     current_fit=match_pixel_to_object(working_picture[row,col],constant.TYPE_FLOOR_TAPE)
                     if (0<=current_fit<best_fit):
                         best_type=int(constant.TYPE_FLOOR_TAPE)
@@ -272,7 +293,7 @@ def search_for_objects(picture_in, acceleration, animate, objects_to_find, robot
                 # if there has been a match, set the mask to the best fit
                 if (best_fit<1e6):
                     mask[row, col] = int(best_type)
-                    goodness_of_fit[row,col]=best_fit
+              #      goodness_of_fit[row,col]=best_fit
                     best_fit=1e6
 
     # show_picture("HSV", mask, 10)
@@ -373,7 +394,7 @@ def this_is_it(test_picture, camera_number,acceleration_factor, robot_execution)
     while True:
 
         if (test_picture==None):
-            picture = take_picture2(cap)
+          picture = take_picture2(cap)
         else:
             picture=test_picture
 

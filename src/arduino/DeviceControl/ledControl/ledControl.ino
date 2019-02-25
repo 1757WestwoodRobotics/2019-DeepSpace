@@ -158,7 +158,7 @@ void setRingLEDsColor(CHSV color) {
   FastLED.delay(30);
 }
 
-// Sends JSON output to serial port:
+// Sends JSON output to serial port: For testing only
 void writeSerial() {
   JsonObject& root = jsonBuffer.createObject();
   root["sensor"] = "lidar";
