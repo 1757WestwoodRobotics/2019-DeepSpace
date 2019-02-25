@@ -41,23 +41,23 @@ public class OI {
         SmartDashboard.putData("Hatch Mech Retracted", new SetDoubleSolenoid(
             HatchMechJack.instance, Actuators.Pneumatics.hatchMechSliderSolenoid, DoubleSolenoidModes.RETRACTED));
             
-        SmartDashboard.putData("Left Drop Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.leftDropSolenoid, DoubleSolenoidModes.EXTENDED));
+        SmartDashboard.putData("Drop Arms Extended", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.dropArmsSolenoid, DoubleSolenoidModes.EXTENDED));
 
-        SmartDashboard.putData("Left Drop Mech Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.leftDropSolenoid, DoubleSolenoidModes.NEUTRAL));
+        SmartDashboard.putData("Drop Arms Neutral", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.dropArmsSolenoid, DoubleSolenoidModes.NEUTRAL));
 
-        SmartDashboard.putData("Left Drop Mech Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.leftDropSolenoid, DoubleSolenoidModes.RETRACTED));
+        SmartDashboard.putData("Drop Arms Retracted", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.dropArmsSolenoid, DoubleSolenoidModes.RETRACTED));
 
-        SmartDashboard.putData("Right Drop Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.rightDropSolenoid, DoubleSolenoidModes.EXTENDED));  
+        SmartDashboard.putData("Floor Drop Extended", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.floorHatchMechSolenoid, DoubleSolenoidModes.EXTENDED));
             
-        SmartDashboard.putData("Right Drop Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.rightDropSolenoid, DoubleSolenoidModes.NEUTRAL));
+        SmartDashboard.putData("Floor Drop Neutral", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.floorHatchMechSolenoid, DoubleSolenoidModes.NEUTRAL));
             
-        SmartDashboard.putData("Right Drop Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, Actuators.Pneumatics.rightDropSolenoid, DoubleSolenoidModes.RETRACTED)); 
+        SmartDashboard.putData("Floor Drop Retracted", new SetDoubleSolenoid(
+            HatchMechJack.instance, Actuators.Pneumatics.floorHatchMechSolenoid, DoubleSolenoidModes.RETRACTED));
                    
     }
 

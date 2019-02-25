@@ -1,20 +1,16 @@
 package org.whsrobotics.hardware;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import org.whsrobotics.robot.Constants.canID;
 
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Solenoid;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
-import static org.whsrobotics.robot.Constants.*;
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 
 public class Actuators {
@@ -40,8 +36,8 @@ public class Actuators {
 
         public static DoubleSolenoid superstructureSolenoid;
         public static DoubleSolenoid hatchMechSliderSolenoid;
-        public static DoubleSolenoid leftDropSolenoid;
-        public static DoubleSolenoid rightDropSolenoid;
+        public static DoubleSolenoid dropArmsSolenoid;
+        public static DoubleSolenoid floorHatchMechSolenoid;
 
     }
 
@@ -51,8 +47,8 @@ public class Actuators {
         Pneumatics.superstructureSolenoid.setName("Superstructure Solenoid");
 
         Pneumatics.hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
-        Pneumatics.leftDropSolenoid = new DoubleSolenoid(LEFT_DROP.module, LEFT_DROP.a, LEFT_DROP.b);
-        Pneumatics.rightDropSolenoid = new DoubleSolenoid(RIGHT_DROP.module, RIGHT_DROP.a, RIGHT_DROP.b);
+        Pneumatics.dropArmsSolenoid = new DoubleSolenoid(LEFT_DROP.module, LEFT_DROP.a, LEFT_DROP.b);
+        Pneumatics.floorHatchMechSolenoid = new DoubleSolenoid(RIGHT_DROP.module, RIGHT_DROP.a, RIGHT_DROP.b);
 
         try {
             MotorControllers.leftA = new CANSparkMax(canID.leftA.id, kBrushless);

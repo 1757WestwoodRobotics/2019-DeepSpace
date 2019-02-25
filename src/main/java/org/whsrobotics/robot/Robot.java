@@ -12,7 +12,7 @@ import static org.whsrobotics.hardware.Actuators.*;
 
 public class Robot extends TimedRobot {
 
-    private boolean onTestRobot = false;
+    private static final boolean isTestRobot = false;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -21,17 +21,17 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        Actuators.configureActuators(onTestRobot);  // If fails, don't initialize subsystem
+        Actuators.configureActuators(isTestRobot);  // If fails, don't initialize subsystem
         Sensors.configureSensors();
 
         PneumaticsBase.loadHardwareReferences(Pneumatics.compressor, Sensors.pressureTransducer,
                 Pneumatics.superstructureSolenoid,
                 Pneumatics.hatchMechSliderSolenoid,
-                Pneumatics.leftDropSolenoid,
-                Pneumatics.rightDropSolenoid);
+                Pneumatics.dropArmsSolenoid,
+                Pneumatics.floorHatchMechSolenoid);
 
 
-        WolverinesSubsystem.initSubsystems(onTestRobot,
+        WolverinesSubsystem.initSubsystems(isTestRobot,
                 ElectronicsSystem.getInstance(),
                 Drivetrain.getInstance(),
                 PneumaticsBase.getInstance());

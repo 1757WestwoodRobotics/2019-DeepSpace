@@ -7,6 +7,7 @@ public class HatchMechJack extends WolverinesSubsystem {
     public static HatchMechJack instance;
 
     private HatchMechJack() {
+        super(true);
     }
 
     public static void init() {
@@ -15,6 +16,11 @@ public class HatchMechJack extends WolverinesSubsystem {
 
     @Override
     protected void initDefaultCommand() {
+
+    }
+
+    @Override
+    protected void init(boolean onTestRobot) {
 
     }
 }

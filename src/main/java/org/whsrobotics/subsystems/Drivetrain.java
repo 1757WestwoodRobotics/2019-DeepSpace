@@ -15,10 +15,10 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static CANSparkMax leftASpark;
     private static CANSparkMax leftBSpark;
-    private static CANSparkMax leftCSpark;
+    private static CANSparkMax leftCSpark;  // not on the test robot
     private static CANSparkMax rightASpark;
     private static CANSparkMax rightBSpark;
-    private static CANSparkMax rightCSpark;
+    private static CANSparkMax rightCSpark; // not on the test robot
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
@@ -43,15 +43,29 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public void init(boolean onTestRobot) {
 
-        leftASpark = MotorControllers.leftA;
-        leftBSpark = MotorControllers.leftB;
-        leftCSpark = MotorControllers.leftC;
-        rightASpark = MotorControllers.rightA;
-        rightBSpark = MotorControllers.rightB;
-        rightCSpark = MotorControllers.rightC;
+        if (onTestRobot) {
 
-        leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
-        rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
+            leftASpark = MotorControllers.leftA;
+            leftBSpark = MotorControllers.leftB;
+            rightASpark = MotorControllers.rightA;
+            rightBSpark = MotorControllers.rightB;
+
+            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
+            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
+
+        } else {
+
+            leftASpark = MotorControllers.leftA;
+            leftBSpark = MotorControllers.leftB;
+            leftCSpark = MotorControllers.leftC;
+            rightASpark = MotorControllers.rightA;
+            rightBSpark = MotorControllers.rightB;
+            rightCSpark = MotorControllers.rightC;
+
+            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
+            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
+
+        }
 
         rightDrive.setInverted(true);
 

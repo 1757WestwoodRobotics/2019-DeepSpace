@@ -9,49 +9,85 @@ import java.util.HashSet;
 
 public abstract class WolverinesSubsystem extends Subsystem {
 
-    private static final double PERIODIC_TIME = 0.5;
+    /**
+     * The reduced periodic loop time in seconds. Reduces processing and network congestion.
+     */
+    private static final double PERIODIC_TIME = 0.5;        // seconds
 
+    // Collections for the subsystem references
     private static HashSet<WolverinesSubsystem> subsystems;
     private static HashSet<WolverinesSubsystem> failedSubsystems;
+
+    // The class that feeds the loop and keeps track of the time between loops
     private static Notifier notifier;
+
+    private static boolean isTestRobot;
+
     private boolean isMissionCritical;
 
+    // Initialize the collections with empty HashSets
     static {
         subsystems = new HashSet<>();
         failedSubsystems = new HashSet<>();
     }
 
+    /**
+     * Default constructor for a WolverinesSubsystem subclass. Only sets the flag for whether a subsystem
+     * is mission critical or not.
+     *
+     * @param isMissionCritical
+     */
     protected WolverinesSubsystem(boolean isMissionCritical) {
         this.isMissionCritical = isMissionCritical;
     }
 
+    /**
+     * Abstract method that is defined per each subsystem. Connect/define all hardware references here!
+     *
+     * @param onTestRobot
+     */
     protected abstract void init(boolean onTestRobot);
 
-    public static void initSubsystems(boolean onTestRobot, WolverinesSubsystem... subsystems) {
-        _initSubsystems(onTestRobot, subsystems);
+    /**
+     *
+     * @param isTestRobotHardware
+     * @param subsystems
+     */
+    public static void initSubsystems(boolean isTestRobotHardware, WolverinesSubsystem... subsystems)
+    {
+        isTestRobot = isTestRobotHardware;
+        _initSubsystems(subsystems);
 
         if (notifier == null)
             notifier = new Notifier(WolverinesSubsystem::defineReducedPeriodic);
     }
 
-    public static void reInitSubsystem(boolean onTestRobot, WolverinesSubsystem subsystem) {
+    /**
+     *
+     * @param subsystem
+     */
+    public static void reInitSubsystem(WolverinesSubsystem subsystem) {
         failedSubsystems.remove(subsystem);
 
         if (subsystem.getCurrentCommand() != null)
             subsystem.getCurrentCommand().cancel();     // TODO: Does this actually cancel the command?
 
-        _initSubsystems(onTestRobot, subsystem);
+        _initSubsystems(subsystem);
 
         notifier.stop();
         notifier = new Notifier(WolverinesSubsystem::defineReducedPeriodic);
         beginReducedPeriodic();
     }
 
-    private static void _initSubsystems(boolean onTestRobot, WolverinesSubsystem... subsystems) {
+    /**
+     *
+     * @param subsystems
+     */
+    private static void _initSubsystems(WolverinesSubsystem... subsystems) {
 
         for (WolverinesSubsystem ws : subsystems) {
             try {
-                ws.init(onTestRobot);
+                ws.init(isTestRobot);
                 WolverinesSubsystem.subsystems.add(ws);
 
             } catch (Exception ex) {
@@ -85,15 +121,25 @@ public abstract class WolverinesSubsystem extends Subsystem {
 
     }
 
+    /**
+     *
+     * @return
+     */
     protected boolean testSubsystem() {
         // Override me!
         return true;
     }
 
+    /**
+     *
+     */
     public static void beginReducedPeriodic() {
         notifier.startPeriodic(PERIODIC_TIME);
     }
 
+    /**
+     *
+     */
     private static void defineReducedPeriodic() {
         try {
             for (WolverinesSubsystem ws : subsystems) {
@@ -104,6 +150,9 @@ public abstract class WolverinesSubsystem extends Subsystem {
         }
     }
 
+    /**
+     *
+     */
     protected void reducedPeriodic() {
         // Override me!
     }
