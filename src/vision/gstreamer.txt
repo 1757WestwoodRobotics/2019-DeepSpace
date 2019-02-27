@@ -1,3 +1,8 @@
 gst-launch-1.0 v4l2src device=/dev/video0 ! 'video/x-raw, width=(int)640, height=(int)480, format=(string)I420' ! x264enc ! rtph264pay mtu=1400 ! udpsink host=10.17.57.115 port=5000
 
 gst-launch udpsrc port=5000 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! xvimagesink sync=false
+
+
+
+FOR MAC OS (client):
+gst-launch-1.0 udpsrc port=5000 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! glimagesink sync=false
