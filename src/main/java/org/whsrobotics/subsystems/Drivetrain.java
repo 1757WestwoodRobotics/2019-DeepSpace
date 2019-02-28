@@ -54,6 +54,9 @@ public class Drivetrain extends WolverinesSubsystem {
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
             rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
 
+            leftDrive.setInverted(true);
+            rightDrive.setInverted(true);
+
         } else {
 
             leftCSpark = new CANSparkMax(Constants.canID.leftC.id, kBrushless);
