@@ -1,5 +1,6 @@
 package org.whsrobotics.subsystems;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Servo;
 import org.whsrobotics.utils.WolverinesSubsystem;
@@ -11,15 +12,27 @@ public class HatchMechScott extends WolverinesSubsystem {
     private static TalonSRX ballScrewTalon;
     private static HatchMechScott instance;
 
-    private HatchMechScott() {
+    public static HatchMechScott getInstance() {
+        if (instance == null) {
+            instance = new HatchMechScott();
+        }
+        return instance;
     }
 
-    public static void init(Servo top, Servo bottom, TalonSRX talon) {
-        topServo = top;
-        bottomServo = bottom;
-        ballScrewTalon = talon;
+    private HatchMechScott() {
+        super(false);
+    }
 
-        instance = new HatchMechScott();
+    @Override
+    protected void init(boolean onTestRobot) {
+
+        topServo = new Servo(0);
+        bottomServo = new Servo(1);
+
+        ballScrewTalon = new TalonSRX(7);
+        ballScrewTalon.configFactoryDefault();
+        ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+
     }
 
     @Override

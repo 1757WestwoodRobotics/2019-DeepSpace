@@ -6,10 +6,11 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import org.whsrobotics.commands.Drive;
+import org.whsrobotics.robot.Constants;
 import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-import static org.whsrobotics.hardware.Actuators.*;
+import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Drivetrain extends WolverinesSubsystem {
 
@@ -43,31 +44,25 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public void init(boolean onTestRobot) {
 
-        if (onTestRobot) {
+        leftASpark = new CANSparkMax(Constants.canID.leftA.id, kBrushless);
+        leftBSpark = new CANSparkMax(Constants.canID.leftB.id, kBrushless);
+        rightASpark = new CANSparkMax(Constants.canID.rightA.id, kBrushless);
+        rightBSpark = new CANSparkMax(Constants.canID.rightB.id, kBrushless);
 
-            leftASpark = MotorControllers.leftA;
-            leftBSpark = MotorControllers.leftB;
-            rightASpark = MotorControllers.rightA;
-            rightBSpark = MotorControllers.rightB;
+        if (onTestRobot) {
 
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
             rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
 
         } else {
 
-            leftASpark = MotorControllers.leftA;
-            leftBSpark = MotorControllers.leftB;
-            leftCSpark = MotorControllers.leftC;
-            rightASpark = MotorControllers.rightA;
-            rightBSpark = MotorControllers.rightB;
-            rightCSpark = MotorControllers.rightC;
+            leftCSpark = new CANSparkMax(Constants.canID.leftC.id, kBrushless);
+            rightCSpark = new CANSparkMax(Constants.canID.rightC.id, kBrushless);
 
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
             rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
 
         }
-
-        rightDrive.setInverted(true);
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
