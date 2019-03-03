@@ -2,10 +2,10 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.command.Command;
 
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
+import org.whsrobotics.robot.Constants;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
@@ -27,18 +27,16 @@ public class PneumaticsBase extends WolverinesSubsystem {
     }
 
     private PneumaticsBase() {
-        super(true);
-    }
-
-    public static void loadHardwareReferences(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
-        compressor = comp;
-        pressureTransducer = pressureTransducerSensor;
-        doubleSolenoids = solenoids;
+        super(false);
     }
 
     @Override
     protected void init(boolean onTestRobot) {
-        // configure
+        compressor = new Compressor(Constants.canID.pcmB.id);
+        compressor.clearAllPCMStickyFaults();
+        compressor.setClosedLoopControl(true);
+
+        pressureTransducer = new AnalogPressureTransducer(0);
     }
 
     public enum DoubleSolenoidModes {

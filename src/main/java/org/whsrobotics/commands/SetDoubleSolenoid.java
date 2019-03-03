@@ -1,13 +1,10 @@
 package org.whsrobotics.commands;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-import org.whsrobotics.hardware.Actuators.Pneumatics;
 import org.whsrobotics.subsystems.PneumaticsBase;
-import org.whsrobotics.subsystems.Superstructure;
 
 public class SetDoubleSolenoid extends InstantCommand{
 

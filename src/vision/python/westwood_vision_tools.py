@@ -5,6 +5,7 @@ import time
 import copy
 import PyWinMouse
 import math
+import subprocess
 
 
 # OpenCV version 3.4.3.18
@@ -63,30 +64,36 @@ def configure_camera(camera_number, robot_execution):
 # -12	312 us
 # -13	150 us
 
-    # for opencv2 the settings format is cap.set(cv2.cv.CV_CAP_PROP_XXXXXX)
-
     cap = cv2.VideoCapture(camera_number)
 
-    # this code works for the Jetson TX 2 running Unbuntu
+    # the camera configuration code below works for Windows OS
+    # if you are running under Unbuntu you have to run v4L2-ctl commands from the OS
+    # for the V4L2-ctl settings
+    # brightness 50
+    # saturation 83
+
     if robot_execution:
-    # PROP_SETTINGS may not exist in Unbuntu
-    #   cap.set(cv2.cv.CV_CAP_PROP_SETTINGS, 1)  # to fix things
-    #   cap.set(cv2.cv.CV_CAP_PROP_BRIGHTNESS, 30)
-    #   cap.set(cv2.cv.CV_CAP_PROP_EXPOSURE, -7)
-    #   cap.set(cv2.cv.CV_CAP_PROP_CONTRAST, 5)
-    #   cap.set(cv2.cv.CV_CAP_PROP_SATURATION, 83)
-        cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
-        cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
-    else:   # this code works for the cv3 version installed on the PC used to develop the code
-        cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
-        cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
-        cap.set(cv2.CAP_PROP_EXPOSURE, -7)
-        cap.set(cv2.CAP_PROP_CONTRAST, 5)
-        cap.set(cv2.CAP_PROP_SATURATION, 83)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
-    #   cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    #   cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
-        cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
+       # d is the device number, under Unbuntu from terminal type v4l2-ctl --list-devices
+       # to see properties avaialbe type v4l2-ctl --all
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl brightness=30", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl saturation=83", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl exposure_absolute=5", shell=True)
+       subprocess.call("v4l2-ctl -d 1 --set-ctrl contrast=5", shell=True)
+    else:
+       # this code works for the cv3 version installed on the Windows PC used to develop the code
+       # CAP_PROP_SETTINGS is not supported under Unbuntu
+       # CAP_PROP_SETTINGS causes the parameters dialog to pop up when set to 1
+       cap.set(cv2.CAP_PROP_SETTINGS, 1)  # to fix things
+       cap.set(cv2.CAP_PROP_BRIGHTNESS, 30)
+       cap.set(cv2.CAP_PROP_EXPOSURE, -7)
+       cap.set(cv2.CAP_PROP_CONTRAST, 5)
+       cap.set(cv2.CAP_PROP_SATURATION, 83)
+       cap.set(cv2.CAP_PROP_SHARPNESS, 25)
+       cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+       cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 180)
+      # CAP_PROP_FOURCC is not supported under Unbuntu
+      # cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('M','J','P','G')) # jpg compression, poorer image
+       cap.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc('Y','U','Y','V')) # no compression, better image
 
 
     return cap
@@ -97,7 +104,6 @@ def show_picture(title, picture, time_msec):
 
     cv2.imshow(title, picture)
     cv2.waitKey(time_msec)
-
 
 #######################################################################################################################
 
@@ -283,6 +289,8 @@ def hollow_outX(picture):
     working = copy.copy(picture)
 
     #    this doesn't work if you encode the object values in the image, it changes the values
+    #    you can get it to work if you compare the edge values agaisnt the original picture
+    # and change the values in the hollowd out picture
     #    kernel=numpy.ones((2,2),numpy.uint8)
     #    working=cv2.morphologyEx(working,cv2.MORPH_GRADIENT,kernel)
 

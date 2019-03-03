@@ -1,23 +1,25 @@
 package org.whsrobotics.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import org.whsrobotics.commands.Drive;
+import org.whsrobotics.robot.Constants;
 import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-import static org.whsrobotics.hardware.Actuators.*;
+import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Drivetrain extends WolverinesSubsystem {
 
     private static CANSparkMax leftASpark;
     private static CANSparkMax leftBSpark;
-    private static CANSparkMax leftCSpark;
+    private static CANSparkMax leftCSpark;  // not on the test robot
     private static CANSparkMax rightASpark;
     private static CANSparkMax rightBSpark;
-    private static CANSparkMax rightCSpark;
+    private static CANSparkMax rightCSpark; // not on the test robot
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
@@ -42,17 +44,28 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public void init(boolean onTestRobot) {
 
-        leftASpark = MotorControllers.leftA;
-        leftBSpark = MotorControllers.leftB;
-        leftCSpark = MotorControllers.leftC;
-        rightASpark = MotorControllers.rightA;
-        rightBSpark = MotorControllers.rightB;
-        rightCSpark = MotorControllers.rightC;
+        leftASpark = new CANSparkMax(Constants.canID.leftA.id, kBrushless);
+        leftBSpark = new CANSparkMax(Constants.canID.leftB.id, kBrushless);
+        rightASpark = new CANSparkMax(Constants.canID.rightA.id, kBrushless);
+        rightBSpark = new CANSparkMax(Constants.canID.rightB.id, kBrushless);
 
-        leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
-        rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
+        if (onTestRobot) {
 
-        rightDrive.setInverted(true);
+            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
+            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
+
+            leftDrive.setInverted(true);
+            rightDrive.setInverted(true);
+
+        } else {
+
+            leftCSpark = new CANSparkMax(Constants.canID.leftC.id, kBrushless);
+            rightCSpark = new CANSparkMax(Constants.canID.rightC.id, kBrushless);
+
+            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
+            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
+
+        }
 
         differentialDrive = new DifferentialDrive(leftDrive, rightDrive);
 
@@ -79,7 +92,23 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.tankDrive(leftSpeed, rightSpeed);
     }
 
-    // BRAKE MODE TODO: SEAN
+    public static void setCoastMode(){
+        leftASpark.setIdleMode(IdleMode.kCoast);
+        leftBSpark.setIdleMode(IdleMode.kCoast);
+        leftCSpark.setIdleMode(IdleMode.kCoast);
+        rightASpark.setIdleMode(IdleMode.kCoast);
+        rightBSpark.setIdleMode(IdleMode.kCoast);
+        rightCSpark.setIdleMode(IdleMode.kCoast);
+    }
+
+    public static void setBrakeMode(){
+        leftASpark.setIdleMode(IdleMode.kBrake);
+        leftBSpark.setIdleMode(IdleMode.kBrake);
+        leftCSpark.setIdleMode(IdleMode.kBrake);
+        rightASpark.setIdleMode(IdleMode.kBrake);
+        rightBSpark.setIdleMode(IdleMode.kBrake);
+        rightCSpark.setIdleMode(IdleMode.kBrake);
+    }
 
     public static void getEncoderTelemetry() {
 

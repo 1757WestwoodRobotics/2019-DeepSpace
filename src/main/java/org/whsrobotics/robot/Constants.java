@@ -16,10 +16,9 @@ public class Constants {
     }
 
     public enum Math {
-        pi(3.1415926535897932384626502),
+        pi(3.141592653589793238462643383279502),
         circumference(12.5663706144),
         kConversionConstant(0.0452381);
-
 
         public double value;
 
