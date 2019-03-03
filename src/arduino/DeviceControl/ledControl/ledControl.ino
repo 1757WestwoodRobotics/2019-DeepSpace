@@ -95,6 +95,8 @@ void loop() {
         writeSerial();
       }
     }
+    // free up jsonBuffer
+    jsonBuffer.clear();
     delay(200);
   }
 }
