@@ -1,6 +1,6 @@
 gst-launch-1.0 v4l2src device=/dev/video0 ! 'video/x-raw, width=(int)640, height=(int)480, format=(string)I420' ! x264enc tune=zerolatency ! rtph264pay mtu=1400 ! udpsink host=10.17.57.113 port=554
 
-gst-launch-1.0 udpsrc port=554 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! xvimagesink sync=false
+gst-launch-1.0 udpsrc port=554 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! glimagesink
 
 
 
