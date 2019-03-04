@@ -12,7 +12,7 @@ public class Sensors {
     public static void configureSensors() {
         navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
 
-        pressureTransducer = new AnalogPressureTransducer(0);
+//        pressureTransducer = new AnalogPressureTransducer(0);
     }
 
 }

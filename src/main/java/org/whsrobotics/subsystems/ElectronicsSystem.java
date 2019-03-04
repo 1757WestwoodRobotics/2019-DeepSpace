@@ -30,7 +30,7 @@ public class ElectronicsSystem extends WolverinesSubsystem {
     }
 
     @Override
-    public void periodic() {
+    public void reducedPeriodic() {
 
         SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
         SmartDashboard.putNumber("PDP Total Current", pdp.getTotalCurrent());

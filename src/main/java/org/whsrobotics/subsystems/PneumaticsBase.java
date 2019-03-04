@@ -3,6 +3,7 @@ package org.whsrobotics.subsystems;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
 import org.whsrobotics.robot.Constants;
@@ -27,7 +28,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
     }
 
     private PneumaticsBase() {
-        super(false);
+        super(true);
     }
 
     @Override
@@ -47,9 +48,13 @@ public class PneumaticsBase extends WolverinesSubsystem {
         public DoubleSolenoid.Value value;
 
         DoubleSolenoidModes(DoubleSolenoid.Value value) {
-
             this.value = value;
         }
+    }
+
+    @Override
+    protected void reducedPeriodic() {
+        SmartDashboard.putNumber("Pressure (psi)", pressureTransducer.getPSI());
     }
 
     public static Compressor getCompressor(){
@@ -88,5 +93,5 @@ public class PneumaticsBase extends WolverinesSubsystem {
     public static double getPressureTransducer() {
         return pressureTransducer.getPSI();
     }
-   
+
 }

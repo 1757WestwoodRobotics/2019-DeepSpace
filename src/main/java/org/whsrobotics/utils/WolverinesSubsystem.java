@@ -110,9 +110,9 @@ public abstract class WolverinesSubsystem extends Subsystem {
                 }).start();
 
                 if (ws.isMissionCritical)
-                    throw new RuntimeException("**** ERROR: Unable to initialize mission-critical " + ws.getName() + " ****");
+                    throw new RuntimeException("**** ERROR: Unable to initialize mission-critical " + ws.getName() + ex.getMessage() + " ****");
                 else
-                    DriverStation.reportWarning("* WARNING: Unable to initialize non-mission-critical " + ws.getName() + " *", false);
+                    DriverStation.reportWarning("* WARNING: Unable to initialize non-mission-critical " + ws.getName() + ex.getMessage() + " *", false);
 
             }
         }

@@ -30,6 +30,7 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double rawEncoderVelocities;
 
     private static Drivetrain instance;
+    private static boolean testRobot;
 
     public static Drivetrain getInstance() {
         if (instance == null) {
@@ -44,21 +45,23 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public void init(boolean onTestRobot) {
 
+        testRobot = onTestRobot;
+
         leftASpark = new CANSparkMax(Constants.canID.leftA.id, kBrushless);
         leftBSpark = new CANSparkMax(Constants.canID.leftB.id, kBrushless);
         rightASpark = new CANSparkMax(Constants.canID.rightA.id, kBrushless);
         rightBSpark = new CANSparkMax(Constants.canID.rightB.id, kBrushless);
 
         if (onTestRobot) {
-
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
             rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
 
-            leftDrive.setInverted(true);
-            rightDrive.setInverted(true);
+            leftASpark.setInverted(true);
+            leftBSpark.setInverted(true);
+            rightASpark.setInverted(true);
+            rightBSpark.setInverted(true);
 
         } else {
-
             leftCSpark = new CANSparkMax(Constants.canID.leftC.id, kBrushless);
             rightCSpark = new CANSparkMax(Constants.canID.rightC.id, kBrushless);
 
@@ -84,37 +87,54 @@ public class Drivetrain extends WolverinesSubsystem {
 
     // -----Drivetrain Methods----- //
 
-    public static void arcadeDrive(double xSpeed, double zRotation){
-        differentialDrive.arcadeDrive(xSpeed, zRotation);
+    public static void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
+        differentialDrive.arcadeDrive(xSpeed, zRotation, squaredInputs);
     }
 
-    public static void tankDrive(double leftSpeed, double rightSpeed){
-        differentialDrive.tankDrive(leftSpeed, rightSpeed);
+    public static void arcadeDrive(DrivetrainSpeedMode mode, double xSpeed, double zRotation) {
+        if (mode == DrivetrainSpeedMode.FAST)
+            arcadeDrive(xSpeed, zRotation, false);
+        else if (mode == DrivetrainSpeedMode.SLOW) {
+            arcadeDrive(xSpeed * Constants.MAX_SLOW_DRIVETRAIN,
+                    zRotation * Constants.MAX_SLOW_DRIVETRAIN * 0.75,
+                    false);
+        }
     }
 
-    public static void setCoastMode(){
-        leftASpark.setIdleMode(IdleMode.kCoast);
-        leftBSpark.setIdleMode(IdleMode.kCoast);
-        leftCSpark.setIdleMode(IdleMode.kCoast);
-        rightASpark.setIdleMode(IdleMode.kCoast);
-        rightBSpark.setIdleMode(IdleMode.kCoast);
-        rightCSpark.setIdleMode(IdleMode.kCoast);
+//    public static void tankDrive(double leftSpeed, double rightSpeed) {
+//        differentialDrive.tankDrive(leftSpeed, rightSpeed);
+//    }
+
+    public static void setIdleMode(IdleMode idleMode){
+        leftASpark.setIdleMode(idleMode);
+        leftBSpark.setIdleMode(idleMode);
+        rightASpark.setIdleMode(idleMode);
+        rightBSpark.setIdleMode(idleMode);
+
+        if (!testRobot) {
+            leftCSpark.setIdleMode(idleMode);
+            rightCSpark.setIdleMode(idleMode);
+        }
+
     }
 
-    public static void setBrakeMode(){
-        leftASpark.setIdleMode(IdleMode.kBrake);
-        leftBSpark.setIdleMode(IdleMode.kBrake);
-        leftCSpark.setIdleMode(IdleMode.kBrake);
-        rightASpark.setIdleMode(IdleMode.kBrake);
-        rightBSpark.setIdleMode(IdleMode.kBrake);
-        rightCSpark.setIdleMode(IdleMode.kBrake);
+
+    public static void setSparkMaxSmartCurrentLimit(int amps) {
+        leftASpark.setSmartCurrentLimit(amps);
+        leftBSpark.setSmartCurrentLimit(amps);
+        rightASpark.setSmartCurrentLimit(amps);
+        rightBSpark.setSmartCurrentLimit(amps);
+
+        if (!testRobot) {
+            leftCSpark.setSmartCurrentLimit(amps);
+            rightCSpark.setSmartCurrentLimit(amps);
+        }
+
     }
 
     public static void getEncoderTelemetry() {
-
         rawEncoderPositions = leftASpark.getEncoder().getPosition();
         rawEncoderVelocities = leftASpark.getEncoder().getVelocity();
-
     }
 
     /*
@@ -137,15 +157,15 @@ public class Drivetrain extends WolverinesSubsystem {
     public static double rawVelocitiesToMetersPerSec(double rawEncoderVelocities) {
         
         double MPS = (rawEncoderVelocities / 1);
-        //Find the vlaue above (not 1)
+        //Find the value above (not 1)
     
         return MPS;
     }
 
     @Override
-    public void periodic() {
+    public void reducedPeriodic() {
 
-       // SmartDashboard.putNumber("Enocder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
+       // SmartDashboard.putNumber("Encoder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
 
         // System.out.println("Running Drivetrain periodic");
 
@@ -162,15 +182,12 @@ public class Drivetrain extends WolverinesSubsystem {
 
     @Override
     protected void initDefaultCommand() {
-        
         setDefaultCommand(new Drive());
-
     }
  
     public static void stopDrive() {
         differentialDrive.stopMotor();
     }
-
 
     // ------------ ENCODER PID ------------- //
 
