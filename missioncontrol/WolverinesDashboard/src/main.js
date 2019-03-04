@@ -43,7 +43,7 @@ let clientDataListener = (key, val, valType, mesgType, id, flags) => {
     });
 };
 function createWindow() {
-    fixPath()
+    fixPath();
     // Attempt to connect to the localhost
     client.start((con, err) => {
 
