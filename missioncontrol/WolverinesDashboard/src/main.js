@@ -4,6 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const electron = require('electron');
 const wpilib_NT = require('wpilib-nt-client');
 const client = new wpilib_NT.Client();
+const exec = require('child_process').exec;
+const fixPath = require('fix-path');
 
 // The client will try to reconnect after 1 second
 client.setReconnectDelay(1000)
@@ -41,6 +43,7 @@ let clientDataListener = (key, val, valType, mesgType, id, flags) => {
     });
 };
 function createWindow() {
+    fixPath()
     // Attempt to connect to the localhost
     client.start((con, err) => {
 
@@ -101,6 +104,7 @@ function createWindow() {
         // It's best if the dashboard takes up as much space as possible without covering the DriverStation application.
         // The window is closed until the python server is ready
         show: false,
+        transparent: true,
         icon: __dirname + '/../images/icon.png'
     });
     // Move window to top (left) of screen.
@@ -111,6 +115,11 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         console.log('main window is ready to be shown');
         mainWindow.show();
+
+        // Run the camera streaming! TODO: change the command
+        exec('gst-launch-1.0 videotestsrc ! glimagesink', () => {
+           console.log("Done");
+        });
     });
 
     // Remove menu
