@@ -2,7 +2,7 @@
 #include <ArduinoJson.h>
 #include <CapacitiveSensor.h>
 
-#define POT_PIN         A0    // Ring Light control
+#define POT_PIN         A0    // Analog pot readings via this pin.
 #define MIN_POT_VALUE   0   // Minimum analog read value read from A0
 #define MAX_POT_VALUE   1023 // Maximum analog read value read from A0
 #define MIN_ANGLE       0
