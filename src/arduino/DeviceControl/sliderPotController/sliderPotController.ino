@@ -5,15 +5,17 @@
 #define POT_PIN         A0    // Analog pot readings via this pin.
 #define MIN_POT_VALUE   0   // Minimum analog read value read from A0
 #define MAX_POT_VALUE   1023 // Maximum analog read value read from A0
-#define MIN_ANGLE       0
-#define MAX_ANGLE       180
+#define MIN_RANGE       0
+#define MAX_RANGE       1023
 #define POT_SPEED       150 // How fast to move the POT
 #define POT_FWD_PIN     9
 #define POT_REV_PIN     10
+#define TOUCH_PIN_WRITE 3
+#define TOUCH_PIN_READ  2
 #define TOUCH_THRESHOLD 200  // Will have to tune this appropriately
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-boolean debug = true;
+boolean debug = false;
 boolean stp = false;
 
 /*
@@ -27,12 +29,12 @@ DynamicJsonBuffer writeBuffer(capacity);
 
 // Testing Capacitive Touch
 
-CapacitiveSensor   cs_4_2 = CapacitiveSensor(4, 2);
+CapacitiveSensor   cs = CapacitiveSensor(TOUCH_PIN_WRITE, TOUCH_PIN_READ);
 
 
 void setup() {
 
-  cs_4_2.set_CS_AutocaL_Millis(0xFFFFFFFF);
+  cs.set_CS_AutocaL_Millis(0xFFFFFFFF);
 
   // set up console baud rate.
   Serial.begin(115200);
@@ -55,8 +57,11 @@ void loop() {
 
   // Read  Serial PORT to see if you received a command
   if (Serial.available()) {
+    Serial.print(millis());
+    Serial.print(": Before jason buffer parse ......\n");
     JsonObject& cmdObj = readBuffer.parse(Serial);
-
+    Serial.print(millis());
+    Serial.print(": After jason buffer parse...\n");
     // Only if JSON Parse succeds do something or ignore the command
     if (cmdObj.success()) {
       const char *sensor = cmdObj["sensor"];
@@ -65,57 +70,68 @@ void loop() {
         movePot(cmdObj["position"]);
       }
     }
+    readBuffer.clear(); // Free up read buffer.
   }
   else {
-    JsonObject &writeObj = writeBuffer.createObject();
+    if (Serial.availableForWrite()) {
+      JsonObject &writeObj = writeBuffer.createObject();
 
-    readPot(writeObj);
-    writeSerial(writeObj);
-    writeBuffer.clear();
+      readPot(writeObj);
+      writeSerial(writeObj);
+      writeBuffer.clear();
+    }
   }
-  stp = touch();
-  if (!stp) {
+  /*
+      For testing only
+    stp = touch();
+    if (!stp) {
     movePot(90);
     stp = true;
-  }
-  delay(1000);
+    } */
 }
 
 
 // Chekc if the slider was touched and return true if touched
-boolean touch() {
-  long touch_val =  cs_4_2.capacitiveSensor(30);
+int touch() {
 
-  return (touch_val > TOUCH_THRESHOLD);
+  if (debug) Serial.print(" ---- Entering touch ----\n");
+
+  long touch_val =  cs.capacitiveSensor(30);
+  boolean touched = (touch_val > TOUCH_THRESHOLD);
+
+  if (touched)
+    digitalWrite(LED_BUILTIN, HIGH);
+  else
+    digitalWrite(LED_BUILTIN, LOW);
+
+  if (debug) Serial.print(" ---- Exiting touch ----\n");
+
+  return (touched);
+
+
 }
 
 // Port Command Processor for moving Pot by a certain position.
-void movePot(int angle)
+void movePot(int pos)
 {
+  if (debug) Serial.print(" ---- Entering Move Pot ----\n");
   // Check for Bounds
-  if (angle > MAX_ANGLE)
-    angle = MAX_ANGLE;
+  if (pos >= MAX_RANGE)
+    pos = MAX_RANGE;
   else  {
-    if (angle < MIN_ANGLE)
-      angle = MIN_ANGLE;
+    if (pos <= MIN_RANGE)
+      pos = MIN_RANGE;
   }
   // Translate Angle to Resistnace Values
-  int new_pos = map(angle, MIN_ANGLE, MAX_ANGLE, MIN_POT_VALUE, MAX_POT_VALUE);
+  int new_pos = pos;
 
   // Check which direction to move
-  int cur_pos = analogRead(POT_PIN);
+  int cur_pos = map(analogRead(POT_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
 
-  if (debug) {
-    Serial.print("Current pos =");
-    Serial.print (cur_pos);
-    Serial.print("  New pos =");
-    Serial.print (new_pos);
-    Serial.println();
-  }
   // Move the motor if the postions is not the same
   while (new_pos != cur_pos) {
     // Power the Motor PINS
-    // turn Motor # 2 in one direction
+    // turn Motor # 1 in one direction
     if (new_pos > cur_pos) {
       analogWrite(POT_FWD_PIN, POT_SPEED);
       analogWrite(POT_REV_PIN, 0);
@@ -127,7 +143,8 @@ void movePot(int angle)
       }
     }
     // read the currtent postion
-    cur_pos = analogRead(POT_PIN);
+    cur_pos = map(analogRead(POT_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+
     if (debug) {
       Serial.print("Current pos =");
       Serial.print (cur_pos);
@@ -139,7 +156,9 @@ void movePot(int angle)
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);
   analogWrite(POT_REV_PIN, 0);
-  delay(100);
+
+  if (debug) Serial.print(" ---- Exiting Move Pot ----\n");
+
 }
 
 
@@ -150,8 +169,8 @@ int readPot(JsonObject& root)
 
   root["sensor"] = "sliderPot";
   root["time"] = millis();
-  root["touch"] = touch();  // Will toggle with tocuh of the slider
-  root["degrees"] = map(val, MIN_POT_VALUE, MAX_POT_VALUE, MIN_ANGLE, MAX_ANGLE); // Postition will be in degrees
+  root["auto"] = touch();  // Will toggle with tocuh of the slider
+  root["position"] = map(val, MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE); // Postition will be in degrees
 
   return val;
 }
@@ -160,4 +179,5 @@ int readPot(JsonObject& root)
 void writeSerial(JsonObject& root) {
   root.printTo(Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
+  Serial.flush(); // Empty the buffer..
 }
