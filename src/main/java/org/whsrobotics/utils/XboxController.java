@@ -147,7 +147,6 @@ public class XboxController extends Joystick {
 		return Math.abs(value) > DEADBAND ? value : 0.0;
 	}
 
-
 	/**
      *
      * @param pov The DirectionalPad button to read.

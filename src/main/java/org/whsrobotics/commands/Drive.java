@@ -20,11 +20,16 @@ public class Drive extends Command {
     @Override
     protected void execute() {
 
-//        Drivetrain.tankDrive(-OI.getXboxController().getRawAxis(XboxController.Axes.LEFT_Y),
-//                -OI.getXboxController().getRawAxis(XboxController.Axes.RIGHT_Y));
+        // TODO: Sean
 
-        Drivetrain.arcadeDrive(-OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
-                OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));
+        // Set Brake mode based on button hold
+
+        // If XC has button held, use the FAST parameter and set "Drivetrain.setSparkMaxSmartCurrentLimit(80)"
+        Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
+                -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
+                -OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));    // TODO: Negative only for the Test Robot!!!
+
+        // Otherwise, use SLOW and set "Drivetrain.setSparkMaxSmartCurrentLimit(60)"
 
     }
 

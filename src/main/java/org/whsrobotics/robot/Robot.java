@@ -24,9 +24,12 @@ public class Robot extends TimedRobot {
                 ElectronicsSystem.getInstance(),
                 Drivetrain.getInstance(),
                 PneumaticsBase.getInstance(),
-                Superstructure.getInstance());
+                Superstructure.getInstance(),
+                HatchMechJack.getInstance());
 
         OI.init();
+
+        WolverinesSubsystem.beginReducedPeriodic();
 
     }
 
@@ -38,7 +41,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        WolverinesSubsystem.beginReducedPeriodic();
+
     }
 
     /**
@@ -54,7 +57,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-
+        Scheduler.getInstance().run();
     }
 
     public void teleopInit() {
@@ -67,7 +70,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
-
     }
 
     /**
