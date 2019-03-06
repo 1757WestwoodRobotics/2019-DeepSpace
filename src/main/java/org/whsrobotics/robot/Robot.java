@@ -22,7 +22,7 @@ public class Robot extends TimedRobot {
                 Drivetrain.getInstance(),
                 PneumaticsBase.getInstance(),
                 Superstructure.getInstance(),
-                HatchMechJack.getInstance());
+                HatchMech.getInstance());
 
         OI.init();
 
