@@ -3,7 +3,6 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.*;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
@@ -18,8 +17,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        Sensors.configureSensors();
-
         WolverinesSubsystem.initSubsystems(isTestRobot,
                 ElectronicsSystem.getInstance(),
                 Drivetrain.getInstance(),
@@ -29,7 +26,7 @@ public class Robot extends TimedRobot {
 
         OI.init();
 
-        WolverinesSubsystem.beginReducedPeriodic();
+//        WolverinesSubsystem.beginReducedPeriodic();       // Not needed, already called in WolverinesSubsystem (make sure this works)
 
     }
 
@@ -49,7 +46,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-
+        teleopInit();
     }
 
     /**
@@ -57,7 +54,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        Scheduler.getInstance().run();
+        teleopPeriodic();
     }
 
     public void teleopInit() {

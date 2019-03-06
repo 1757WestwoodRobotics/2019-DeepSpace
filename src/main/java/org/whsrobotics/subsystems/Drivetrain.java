@@ -1,8 +1,10 @@
 package org.whsrobotics.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import org.whsrobotics.commands.Drive;
@@ -26,6 +28,8 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static DifferentialDrive differentialDrive;
 
+    private static AHRS navX;
+
     private static double rawEncoderPositions;
     private static double rawEncoderVelocities;
 
@@ -46,6 +50,8 @@ public class Drivetrain extends WolverinesSubsystem {
     public void init(boolean onTestRobot) {
 
         testRobot = onTestRobot;
+
+        navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
 
         leftASpark = new CANSparkMax(Constants.canID.leftA.id, kBrushless);
         leftBSpark = new CANSparkMax(Constants.canID.leftB.id, kBrushless);
