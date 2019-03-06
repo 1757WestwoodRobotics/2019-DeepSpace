@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  */
 public class XboxController extends Joystick {
 
-	private final static double DEADBAND = 0.05;
+	private final static double DEADBAND = 0.03;
 
 	/**
 	 * Enum of XboxController buttons.
@@ -144,9 +144,8 @@ public class XboxController extends Joystick {
 	 */
 	public double getNormalizedAxis(XboxControllerAxes axis) {
 		double value = getRawAxis(axis.getValue());
-		return value > DEADBAND ? value : 0.0;
+		return Math.abs(value) > DEADBAND ? value : 0.0;
 	}
-
 
 	/**
      *

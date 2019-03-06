@@ -27,12 +27,13 @@ public class Constants {
         }
     }
 
-    // TODO: Ensure accuracy of Solenoid ports
     public enum SolenoidPorts {
-        SUPERSTRUCTURE(canID.pcmA, 0, 1),
-        HATCH_MECH_SLIDER(canID.pcmA, 2, 3),
-        LEFT_DROP(canID.pcmA, 4, 5),
-        RIGHT_DROP(canID.pcmA, 6, 7);
+        SUPERSTRUCTURE(canID.pcmB, 0, 1),
+
+        HATCH_MECH_SLIDER(canID.pcmA, 0, 1),
+        HATCH_FLOOR(canID.pcmA, 2, 3),
+        HATCH_DEPLOY(canID.pcmA, 4, 5),
+        DROP_ARMS(canID.pcmA, 6, 7);
 
         public int module;
         public int a;
@@ -45,5 +46,8 @@ public class Constants {
         }
 
     }
+
+    public static final double MAX_SLOW_DRIVETRAIN = 0.5;
+    public static final double ROTATION_FACTOR = 0.75;
 
 }

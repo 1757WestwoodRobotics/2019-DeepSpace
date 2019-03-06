@@ -3,16 +3,12 @@ package org.whsrobotics.robot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import org.whsrobotics.hardware.Actuators;
-import org.whsrobotics.hardware.Sensors;
 import org.whsrobotics.subsystems.*;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-import static org.whsrobotics.hardware.Actuators.*;
-
 public class Robot extends TimedRobot {
 
-    private static final boolean isTestRobot = false;
+    public static final boolean isTestRobot = true;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -21,29 +17,16 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        Actuators.configureActuators(isTestRobot);  // If fails, don't initialize subsystem
-        Sensors.configureSensors();
-
-        PneumaticsBase.loadHardwareReferences(Pneumatics.compressor, Sensors.pressureTransducer,
-                Pneumatics.superstructureSolenoid,
-                Pneumatics.hatchMechSliderSolenoid,
-                Pneumatics.dropArmsSolenoid,
-                Pneumatics.floorHatchMechSolenoid);
-
-
         WolverinesSubsystem.initSubsystems(isTestRobot,
                 ElectronicsSystem.getInstance(),
                 Drivetrain.getInstance(),
-                PneumaticsBase.getInstance());
-
-//        HatchMechScott.init(MotorControllers.topServo, MotorControllers.bottomServo, MotorControllers.ballScrewTalon);
-//
-
-        HatchMechJack.init();
-
-        Superstructure.init(Pneumatics.superstructureSolenoid);
+                PneumaticsBase.getInstance(),
+                Superstructure.getInstance(),
+                HatchMechJack.getInstance());
 
         OI.init();
+
+//        WolverinesSubsystem.beginReducedPeriodic();       // Not needed, already called in WolverinesSubsystem (make sure this works)
 
     }
 
@@ -55,7 +38,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        WolverinesSubsystem.beginReducedPeriodic();
+
     }
 
     /**
@@ -63,7 +46,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-
+        teleopInit();
     }
 
     /**
@@ -71,7 +54,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-
+        teleopPeriodic();
     }
 
     public void teleopInit() {
@@ -84,7 +67,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
-
     }
 
     /**

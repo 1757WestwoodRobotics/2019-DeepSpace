@@ -2,10 +2,11 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.command.Command;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
+import org.whsrobotics.robot.Constants;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
@@ -30,15 +31,13 @@ public class PneumaticsBase extends WolverinesSubsystem {
         super(true);
     }
 
-    public static void loadHardwareReferences(Compressor comp, AnalogPressureTransducer pressureTransducerSensor, DoubleSolenoid... solenoids) {
-        compressor = comp;
-        pressureTransducer = pressureTransducerSensor;
-        doubleSolenoids = solenoids;
-    }
-
     @Override
     protected void init(boolean onTestRobot) {
-        // configure
+        compressor = new Compressor(Constants.canID.pcmB.id);
+        compressor.clearAllPCMStickyFaults();
+        compressor.setClosedLoopControl(true);
+
+        pressureTransducer = new AnalogPressureTransducer(0);
     }
 
     public enum DoubleSolenoidModes {
@@ -49,9 +48,13 @@ public class PneumaticsBase extends WolverinesSubsystem {
         public DoubleSolenoid.Value value;
 
         DoubleSolenoidModes(DoubleSolenoid.Value value) {
-
             this.value = value;
         }
+    }
+
+    @Override
+    protected void reducedPeriodic() {
+        SmartDashboard.putNumber("Pressure (psi)", pressureTransducer.getPSI());
     }
 
     public static Compressor getCompressor(){
@@ -90,5 +93,5 @@ public class PneumaticsBase extends WolverinesSubsystem {
     public static double getPressureTransducer() {
         return pressureTransducer.getPSI();
     }
-   
+
 }

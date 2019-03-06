@@ -15,8 +15,8 @@ public abstract class WolverinesSubsystem extends Subsystem {
     private static final double PERIODIC_TIME = 0.5;        // seconds
 
     // Collections for the subsystem references
-    private static HashSet<WolverinesSubsystem> subsystems;
-    private static HashSet<WolverinesSubsystem> failedSubsystems;
+    private static volatile HashSet<WolverinesSubsystem> subsystems;
+    private static volatile HashSet<WolverinesSubsystem> failedSubsystems;
 
     // The class that feeds the loop and keeps track of the time between loops
     private static Notifier notifier;
@@ -53,13 +53,9 @@ public abstract class WolverinesSubsystem extends Subsystem {
      * @param isTestRobotHardware
      * @param subsystems
      */
-    public static void initSubsystems(boolean isTestRobotHardware, WolverinesSubsystem... subsystems)
-    {
+    public static void initSubsystems(boolean isTestRobotHardware, WolverinesSubsystem... subsystems) {
         isTestRobot = isTestRobotHardware;
         _initSubsystems(subsystems);
-
-        if (notifier == null)
-            notifier = new Notifier(WolverinesSubsystem::defineReducedPeriodic);
     }
 
     /**
@@ -70,13 +66,14 @@ public abstract class WolverinesSubsystem extends Subsystem {
         failedSubsystems.remove(subsystem);
 
         if (subsystem.getCurrentCommand() != null)
-            subsystem.getCurrentCommand().cancel();     // TODO: Does this actually cancel the command?
+            subsystem.getCurrentCommand().cancel();     // TODO: Does this actually cancel the non-interruptible command?
 
         _initSubsystems(subsystem);
 
-        notifier.stop();
-        notifier = new Notifier(WolverinesSubsystem::defineReducedPeriodic);
-        beginReducedPeriodic();
+        // ENABLE ONLY IF the notifier breaks
+//        notifier.stop();
+//        notifier.setHandler(WolverinesSubsystem::defineReducedPeriodic);
+//        beginReducedPeriodic();
     }
 
     /**
@@ -94,7 +91,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
 
                 failedSubsystems.add(ws);
 
-                // Removes capabilities and sets an un-interruptable command that requires(subsystem) -> locks the Scheduler
+                // Sets an un-interruptible command that requires(subsystem) -> locks the Scheduler
 
                 (new Command() {
 
@@ -102,6 +99,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
                         requires(ws);
                         setInterruptible(false);    // TODO: Check if this actually locks the subsystem
                         setRunWhenDisabled(true);
+                        setName(ws.getName() + "-BLOCKED");
                     }
 
                     @Override
@@ -112,11 +110,17 @@ public abstract class WolverinesSubsystem extends Subsystem {
                 }).start();
 
                 if (ws.isMissionCritical)
-                    throw new RuntimeException("**** ERROR: Unable to initialize mission-critical " + ws.getName() + " ****");
+                    throw new RuntimeException("**** ERROR: Unable to initialize mission-critical " + ws.getName() + ex.getMessage() + " ****");
                 else
-                    DriverStation.reportError("* WARNING: Unable to initialize non-mission-critical " + ws.getName() + " *", false);
+                    DriverStation.reportWarning("* WARNING: Unable to initialize non-mission-critical " + ws.getName() + ex.getMessage() + " *", false);
 
             }
+        }
+
+        if (notifier == null) {
+            notifier = new Notifier(WolverinesSubsystem::defineReducedPeriodic);
+            notifier.setHandler(WolverinesSubsystem::defineReducedPeriodic);
+            beginReducedPeriodic();
         }
 
     }
@@ -141,12 +145,23 @@ public abstract class WolverinesSubsystem extends Subsystem {
      *
      */
     private static void defineReducedPeriodic() {
-        try {
-            for (WolverinesSubsystem ws : subsystems) {
+        for (WolverinesSubsystem ws : subsystems) {
+            try {
                 ws.reducedPeriodic();
+            } catch (Exception ex) {
+
+                subsystems.remove(ws);
+                failedSubsystems.add(ws);
+
+                if (ws.isMissionCritical)
+                    throw new RuntimeException("**** ERROR: The mission-critical" + ws.getName() + " subsystem has stopped working! ****");
+                else
+                    DriverStation.reportWarning("* WARNING: The non-mission-critical" + ws.getName() + " subsystem has stopped working! *", true);
+
+                // TODO: Push an update to Dashboard (for the option to reinit)
+                // TODO: Test if removing a subsystem still calls its reducedPeriodic() method
+
             }
-        } catch (Exception ex) {
-            // TODO: Remove from HashSet and report an error. Give the option to reinitialize
         }
     }
 

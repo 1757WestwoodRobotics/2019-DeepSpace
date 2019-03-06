@@ -186,6 +186,7 @@ void loop() {
   }
   // keep reading Lidars in the background
   readLidars();
+  jsonBuffer.clear(); // free up buffer space.
   delay(1);
 }
 
@@ -389,4 +390,5 @@ void writeLidar() {
   objects.add(distances[3]);
   root.printTo(Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
+  jsonBuffer.clear(); // Free up any objectes we have created
 }

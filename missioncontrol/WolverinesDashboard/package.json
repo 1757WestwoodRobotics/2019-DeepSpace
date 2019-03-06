@@ -1,6 +1,6 @@
 {
   "name": "wolverines-dashboard",
-  "version": "0.1",
+  "version": "1.0.0",
   "description": "Robot control dashboard boilerplate for FRC.",
   "main": "src/main.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "electron-packager": "^13.1.0"
   },
   "dependencies": {
+    "fix-path": "^2.1.0",
     "wpilib-nt-client": "^1.7.1"
   }
 }
