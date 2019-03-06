@@ -1,6 +1,7 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.commands.CompressStop;
@@ -65,7 +66,7 @@ public class OI {
         return xboxController;
     }
 
-
+    XboxController.getButton();
 
     public static DriverStation.Alliance getAlliance() {
         if (alliance == DriverStation.Alliance.Invalid) {
