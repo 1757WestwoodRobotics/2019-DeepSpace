@@ -1,6 +1,7 @@
 package org.whsrobotics.commands;
 
 import org.whsrobotics.robot.OI;
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -24,10 +25,18 @@ public class Drive extends Command {
 
         // Set Brake mode based on button hold
 
+
         // If XC has button held, use the FAST parameter and set "Drivetrain.setSparkMaxSmartCurrentLimit(80)"
-        Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
-                -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
-                -OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));    // TODO: Negative only for the Test Robot!!!
+        if (Robot.isTestRobot) {
+            Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
+                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
+                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));      // Negative only for the Test Robot!!!
+        } else {
+            Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
+                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
+                    OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));
+        }
+
 
         // Otherwise, use SLOW and set "Drivetrain.setSparkMaxSmartCurrentLimit(60)"
 

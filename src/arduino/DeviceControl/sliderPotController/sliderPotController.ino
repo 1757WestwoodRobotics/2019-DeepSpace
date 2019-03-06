@@ -1,5 +1,5 @@
 
-#include <ArduinoJson.h>
+#include <ArduinoJson.h>  // Make sure you use ArduinoJson 6 Libs.
 #include <CapacitiveSensor.h>
 
 #define POT_PIN         A0    // Analog pot readings via this pin.
@@ -16,16 +16,7 @@
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 boolean debug = false;
-boolean stp = false;
-
-/*
-    JSON Section for creating JSON output to Serial.
-*/
-
-const size_t capacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(3) + 90;
-DynamicJsonBuffer readBuffer(capacity);
-DynamicJsonBuffer writeBuffer(capacity);
-
+boolean touched = true;
 
 // Testing Capacitive Touch
 
@@ -54,47 +45,47 @@ void setup() {
 
 
 void loop() {
+  int how_many = 0;
 
   // Read  Serial PORT to see if you received a command
-  if (Serial.available()) {
-    Serial.print(millis());
-    Serial.print(": Before jason buffer parse ......\n");
-    JsonObject& cmdObj = readBuffer.parse(Serial);
-    Serial.print(millis());
-    Serial.print(": After jason buffer parse...\n");
+  if (how_many = Serial.available()) {
+
+    DynamicJsonDocument read_doc(512);
+    DeserializationError error =  deserializeJson(read_doc, Serial);
+
+
     // Only if JSON Parse succeds do something or ignore the command
-    if (cmdObj.success()) {
-      const char *sensor = cmdObj["sensor"];
+    if (!error) {
+      const char *sensor = read_doc["sensor"];
 
       if (String(sensor) == "sliderPot") {
-        movePot(cmdObj["position"]);
+        movePot(read_doc["position"]);
+        //touched = true;
       }
     }
-    readBuffer.clear(); // Free up read buffer.
   }
   else {
     if (Serial.availableForWrite()) {
-      JsonObject &writeObj = writeBuffer.createObject();
+      // Write only if slider is touched else we are in auto mode.
+      DynamicJsonDocument write_doc(512);
+      write_doc = readPot();
 
-      readPot(writeObj);
-      writeSerial(writeObj);
-      writeBuffer.clear();
+      if (touch()) {
+        writeSerial(write_doc);
+        touched = true; // previous state
+      }
+      else if (touched) {
+        writeSerial(write_doc);
+        touched = false;
+      }
     }
   }
-  /*
-      For testing only
-    stp = touch();
-    if (!stp) {
-    movePot(90);
-    stp = true;
-    } */
+  delay(100);
 }
 
 
 // Chekc if the slider was touched and return true if touched
 int touch() {
-
-  if (debug) Serial.print(" ---- Entering touch ----\n");
 
   long touch_val =  cs.capacitiveSensor(30);
   boolean touched = (touch_val > TOUCH_THRESHOLD);
@@ -104,8 +95,6 @@ int touch() {
   else
     digitalWrite(LED_BUILTIN, LOW);
 
-  if (debug) Serial.print(" ---- Exiting touch ----\n");
-
   return (touched);
 
 
@@ -114,7 +103,6 @@ int touch() {
 // Port Command Processor for moving Pot by a certain position.
 void movePot(int pos)
 {
-  if (debug) Serial.print(" ---- Entering Move Pot ----\n");
   // Check for Bounds
   if (pos >= MAX_RANGE)
     pos = MAX_RANGE;
@@ -144,40 +132,32 @@ void movePot(int pos)
     }
     // read the currtent postion
     cur_pos = map(analogRead(POT_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
-
-    if (debug) {
-      Serial.print("Current pos =");
-      Serial.print (cur_pos);
-      Serial.print("  New pos =");
-      Serial.print (new_pos);
-      Serial.println();
-    }
   }
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);
   analogWrite(POT_REV_PIN, 0);
 
-  if (debug) Serial.print(" ---- Exiting Move Pot ----\n");
-
 }
 
 
 // Retunr a reading from 0 toi 180 degrees for driving Motor
-int readPot(JsonObject& root)
+DynamicJsonDocument readPot()
 {
+  DynamicJsonDocument root(512);
+
   int val = analogRead(POT_PIN);
 
   root["sensor"] = "sliderPot";
   root["time"] = millis();
-  root["auto"] = touch();  // Will toggle with tocuh of the slider
+  root["manual"] = touch();  // Will toggle with tocuh of the slider
   root["position"] = map(val, MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE); // Postition will be in degrees
 
-  return val;
+  return root;
 }
 
 // Sends JSON output to serial port: For testing only
-void writeSerial(JsonObject& root) {
-  root.printTo(Serial);
+void writeSerial(DynamicJsonDocument root) {
+  serializeJson(root, Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
   Serial.flush(); // Empty the buffer..
 }

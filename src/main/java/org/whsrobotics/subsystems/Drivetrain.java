@@ -99,10 +99,12 @@ public class Drivetrain extends WolverinesSubsystem {
 
     public static void arcadeDrive(DrivetrainSpeedMode mode, double xSpeed, double zRotation) {
         if (mode == DrivetrainSpeedMode.FAST)
-            arcadeDrive(xSpeed, zRotation, false);
+            arcadeDrive(xSpeed,
+                    zRotation * Constants.ROTATION_FACTOR,
+                    false);
         else if (mode == DrivetrainSpeedMode.SLOW) {
             arcadeDrive(xSpeed * Constants.MAX_SLOW_DRIVETRAIN,
-                    zRotation * Constants.MAX_SLOW_DRIVETRAIN * 0.75,
+                    zRotation * Constants.ROTATION_FACTOR * Constants.MAX_SLOW_DRIVETRAIN,
                     false);
         }
     }
