@@ -15,6 +15,12 @@ public class Constants {
         }
     }
 
+    public enum controlSystemPorts {
+
+
+
+    }
+
     public enum Math {
         pi(3.141592653589793238462643383279502),
         circumference(12.5663706144),

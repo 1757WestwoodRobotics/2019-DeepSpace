@@ -1,15 +1,19 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.commands.CompressStop;
 import org.whsrobotics.commands.SetDoubleSolenoid;
 import org.whsrobotics.subsystems.HatchMechJack;
+import org.whsrobotics.subsystems.PneumaticsBase;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
 import org.whsrobotics.utils.XboxController;
+
+import static org.whsrobotics.subsystems.PneumaticsBase.startCompression;
 
 public class OI {
 
@@ -17,11 +21,32 @@ public class OI {
 
     private static XboxController xboxController;
 
+    private static Joystick controlSystem;
+
     public static void init() {
 
         xboxController = new XboxController(0);
+        // |-------- Switches --------|
+        
+        //When swtich is turned on, compression starts, when it's turned off, compression stops
+        (new JoystickButton(controlSystem, 0)).whenPressed(new Compress());
+        (new JoystickButton(controlSystem, 0)).whenReleased(new CompressStop());
+        //When switch is on, the hatch mechanism is put in forward mode
+        (new JoystickButton(controlSystem, 1)).whileHeld(new SetDoubleSolenoid(
+            HatchMechJack.instance, HatchMechJack.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
+        
 
-        SmartDashboard.putData("Compress", new Compress());
+        // |-------- Buttons --------|
+
+        //When button is held, the hatch mechanism
+        (new JoystickButton(controlSystem, 2)).whileHeld(new SetDoubleSolenoid(
+            HatchMechJack.instance, HatchMechJack.floorHatchMechSolenoid, DoubleSolenoidModes.EXTENDED));
+        
+        
+        
+        
+            SmartDashboard.putData("Compress", new Compress());
+
         SmartDashboard.putData("Stop Compress", new CompressStop());
 
         SmartDashboard.putData("Superstructure Extended", new SetDoubleSolenoid(

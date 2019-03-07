@@ -1,7 +1,6 @@
 package org.whsrobotics.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import org.whsrobotics.subsystems.PneumaticsBase;
 
 public class Compress extends Command{
@@ -17,6 +16,7 @@ public class Compress extends Command{
 
     @Override
     protected void end() {
+    
     }
 
     @Override
