@@ -7,8 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.commands.CompressStop;
 import org.whsrobotics.commands.SetDoubleSolenoid;
-import org.whsrobotics.subsystems.HatchMechJack;
-import org.whsrobotics.subsystems.PneumaticsBase;
+import org.whsrobotics.subsystems.HatchMech;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
 import org.whsrobotics.utils.XboxController;
@@ -33,14 +32,14 @@ public class OI {
         (new JoystickButton(controlSystem, 0)).whenReleased(new CompressStop());
         //When switch is on, the hatch mechanism is put in forward mode
         (new JoystickButton(controlSystem, 1)).whileHeld(new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
         
 
         // |-------- Buttons --------|
 
-        //When button is held, the hatch mechanism
+        //When button is held, the hatch mechanism decends to the floor
         (new JoystickButton(controlSystem, 2)).whileHeld(new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.floorHatchMechSolenoid, DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.floorHatchMechSolenoid, DoubleSolenoidModes.EXTENDED));
         
         
         
@@ -59,48 +58,46 @@ public class OI {
             Superstructure.instance, Superstructure.getSuperstructureSolenoid(), DoubleSolenoidModes.RETRACTED));
 
         SmartDashboard.putData("Hatch Mech Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchMechSliderSolenoid(), DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.getHatchMechSliderSolenoid(), DoubleSolenoidModes.EXTENDED));
 
         SmartDashboard.putData("Hatch Mech Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchMechSliderSolenoid(), DoubleSolenoidModes.NEUTRAL));
+            HatchMech.instance, HatchMech.getHatchMechSliderSolenoid(), DoubleSolenoidModes.NEUTRAL));
 
         SmartDashboard.putData("Hatch Mech Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchMechSliderSolenoid(), DoubleSolenoidModes.RETRACTED));
+            HatchMech.instance, HatchMech.getHatchMechSliderSolenoid(), DoubleSolenoidModes.RETRACTED));
 
         SmartDashboard.putData("Drop Arms Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
 
         SmartDashboard.putData("Drop Arms Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getDropArmsSolenoid(), DoubleSolenoidModes.NEUTRAL));
+            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.NEUTRAL));
 
         SmartDashboard.putData("Drop Arms Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
+            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
 
         SmartDashboard.putData("Floor Drop Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getFloorHatchMechSolenoid(), DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.EXTENDED));
 
         SmartDashboard.putData("Floor Drop Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getFloorHatchMechSolenoid(), DoubleSolenoidModes.NEUTRAL));
+            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.NEUTRAL));
 
         SmartDashboard.putData("Floor Drop Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getFloorHatchMechSolenoid(), DoubleSolenoidModes.RETRACTED));
+            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.RETRACTED));
 
         SmartDashboard.putData("Hatch Deploy Extended", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
+            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
 
         SmartDashboard.putData("Hatch Deploy Neutral", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchDeploySolenoid(), DoubleSolenoidModes.NEUTRAL));
+            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.NEUTRAL));
 
         SmartDashboard.putData("Hatch Deploy Retracted", new SetDoubleSolenoid(
-            HatchMechJack.instance, HatchMechJack.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED));
+            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED));
 
     }
 
     public static XboxController getXboxController() {
         return xboxController;
     }
-
-    XboxController.getButton();
 
     public static DriverStation.Alliance getAlliance() {
         if (alliance == DriverStation.Alliance.Invalid) {

@@ -1,14 +1,15 @@
 package org.whsrobotics.subsystems;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 
-public class HatchMechJack extends WolverinesSubsystem {
+public class HatchMech extends WolverinesSubsystem {
 
     public static DoubleSolenoid hatchMechSliderSolenoid;
     public static DoubleSolenoid hatchDeploySolenoid;
@@ -17,16 +18,16 @@ public class HatchMechJack extends WolverinesSubsystem {
 
     public static TalonSRX ballScrewTalon;
     
-    public static HatchMechJack instance;
+    public static HatchMech instance;
 
-    public static HatchMechJack getInstance() {
+    public static HatchMech getInstance() {
         if (instance == null) {
-            instance = new HatchMechJack();
+            instance = new HatchMech();
         }
         return instance;
     }
 
-    private HatchMechJack() {
+    private HatchMech() {
         super(false);
     }
 
@@ -39,7 +40,31 @@ public class HatchMechJack extends WolverinesSubsystem {
 
         ballScrewTalon = new TalonSRX(7);
         ballScrewTalon.configFactoryDefault();
+
         ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);     // Might be normally closed
+        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);     // Might be normally closed
+
+        ballScrewTalon.configPeakOutputForward(0.5);
+        ballScrewTalon.configPeakOutputReverse(0.5);
+
+        ballScrewTalon.configClosedLoopPeakOutput(0, 0.5);
+
+        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10);
+        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+
+        ballScrewTalon.selectProfileSlot(0, 0);
+        ballScrewTalon.config_kF(0, 0);
+        ballScrewTalon.config_kP(0, 0);
+        ballScrewTalon.config_kI(0, 0);
+        ballScrewTalon.config_kD(0, 0);
+
+
+        ballScrewTalon.configMotionCruiseVelocity(0);
+        ballScrewTalon.configMotionAcceleration(0);
+        ballScrewTalon.configMotionSCurveStrength(0);
+
+
     }
 
     @Override
