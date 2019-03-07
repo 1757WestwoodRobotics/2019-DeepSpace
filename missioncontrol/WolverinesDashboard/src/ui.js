@@ -18,7 +18,13 @@ let ui = {
         readout: document.getElementById('example-readout').firstChild
     },
     autoSelect: document.getElementById('auto-select'),
-    armPosition: document.getElementById('arm-position')
+    armPosition: document.getElementById('arm-position'),
+    compress_command: document.getElementById('compress_command'),
+    hatch_toggle: document.getElementById('hatch'),
+    superstructure_toggle: document.getElementById('superstructure'),
+    drop_toggle: document.getElementById('drop'),
+    drop_arms_toggle: document.getElementById('arms'),
+    deploy_toggle: document.getElementById('deploy')
 };
 
 // Key Listeners
@@ -85,6 +91,51 @@ NetworkTables.addKeyListener('/SmartDashboard/autonomous/selected', (key, value)
     ui.autoSelect.value = value;
 });
 
+
+ui.compress_command.onclick = () => {
+
+    // Get current compressor status
+    let compress_status = (NetworkTables.getValue('/SmartDashboard/Stop Compress/running') === false);
+
+    // Switch the compress modes
+    if (compress_status) {
+        NetworkTables.putValue('/SmartDashboard/Stop Compress/running', true);
+    } else if (!compress_status) {
+        NetworkTables.putValue('/SmartDashboard/Stop Compress/running', false);
+    }
+
+    // Update the color of the button
+    compress_status = (NetworkTables.getValue('/SmartDashboard/Stop Compress/running') === false);
+    if (compress_status) {
+        ui.compress_command.style.backgroundColor = 'green';
+    } else {
+        ui.compress_command.style.backgroundColor = 'red';
+    }
+
+};
+
+ui.drop_arms_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.drop_arms_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Drop Arms Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Drop Arms Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.drop_arms_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.drop_arms_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.drop_arms_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
 // The rest of the doc is listeners for UI elements being clicked on
 ui.example.button.onclick = function() {
     // Set NetworkTables values to the opposite of whether button has active class.
@@ -106,6 +157,7 @@ ui.armPosition.oninput = function() {
     NetworkTables.putValue('/SmartDashboard/arm/encoder', parseInt(this.value));
 };
 
+
 addEventListener('error',(ev)=>{
     ipc.send('windowError',{mesg:ev.message,file:ev.filename,lineNumber:ev.lineno})
-})
+});

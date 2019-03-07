@@ -118,7 +118,7 @@ function createWindow() {
         mainWindow.show();
 
         // Run the camera streaming! TODO: change the command
-        exec('gst-launch-1.0 videotestsrc ! glimagesink', () => {
+        exec('gst-launch-1.0 udpsrc port=554 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! glimagesink', () => {
            console.log("Done");
         });
     });
