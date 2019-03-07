@@ -10,9 +10,17 @@
 #define POT_SPEED       150 // How fast to move the POT
 #define POT_FWD_PIN     9
 #define POT_REV_PIN     10
-#define TOUCH_PIN_WRITE 3
-#define TOUCH_PIN_READ  2
+#define TOUCH_PIN_WRITE 11
+#define TOUCH_PIN_READ  12
 #define TOUCH_THRESHOLD 200  // Will have to tune this appropriately
+
+// Various Buttons for the Driver station and their Ardunio Pin outs
+#define TS_1  2
+#define TS_2  3
+#define TS_3  4
+#define TS_4  5
+#define TS_5  6
+#define PB_1  7
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 boolean debug = false;
@@ -32,6 +40,14 @@ void setup() {
 
   // Built in LED pin 13 as output
   pinMode (LED_BUILTIN, OUTPUT);
+
+  // Set pin mode as input for the 5 toggle switches and 1 push button
+  pinMode (TS_1, INPUT);
+  pinMode (TS_2, INPUT);
+  pinMode (TS_3, INPUT);
+  pinMode (TS_4, INPUT);
+  pinMode (TS_5, INPUT);
+  pinMode (PB_1, INPUT);
 
   // Setup POT Motor PINS
   pinMode(POT_FWD_PIN, OUTPUT);
@@ -68,19 +84,11 @@ void loop() {
     if (Serial.availableForWrite()) {
       // Write only if slider is touched else we are in auto mode.
       DynamicJsonDocument write_doc(512);
-      write_doc = readPot();
-
-      if (touch()) {
-        writeSerial(write_doc);
-        touched = true; // previous state
-      }
-      else if (touched) {
-        writeSerial(write_doc);
-        touched = false;
-      }
+      write_doc = readSensors();
+      writeSerial(write_doc);
     }
   }
-  delay(100);
+  delay(500);
 }
 
 
@@ -140,17 +148,31 @@ void movePot(int pos)
 }
 
 
-// Retunr a reading from 0 toi 180 degrees for driving Motor
-DynamicJsonDocument readPot()
+// Read all the sensors connected to Arduino
+DynamicJsonDocument readSensors()
 {
   DynamicJsonDocument root(512);
+  JsonArray buttons = root.createNestedArray("buttons");
 
-  int val = analogRead(POT_PIN);
+  int val = analogRead(POT_PIN); // read resistance
+  //  Read all the button values
+  int b1 = digitalRead(TS_1);
+  int b2 = digitalRead(TS_2);
+  int b3 = digitalRead(TS_3);
+  int b4 = digitalRead(TS_4);
+  int b5 = digitalRead(TS_5);
+  int b6 = digitalRead(PB_1);
 
   root["sensor"] = "sliderPot";
   root["time"] = millis();
   root["manual"] = touch();  // Will toggle with tocuh of the slider
   root["position"] = map(val, MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE); // Postition will be in degrees
+  buttons.add(b1);
+  buttons.add(b2);
+  buttons.add(b3);
+  buttons.add(b4);
+  buttons.add(b5);
+  buttons.add(b6); // This is the push button
 
   return root;
 }
