@@ -11,12 +11,12 @@ import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 
 public class HatchMech extends WolverinesSubsystem {
 
-    public static DoubleSolenoid hatchMechSliderSolenoid;
-    public static DoubleSolenoid hatchDeploySolenoid;
-    public static DoubleSolenoid dropArmsSolenoid;
-    public static DoubleSolenoid floorHatchMechSolenoid;
+    private static DoubleSolenoid hatchMechSliderSolenoid;
+    private static DoubleSolenoid hatchDeploySolenoid;
+    private static DoubleSolenoid dropArmsSolenoid;
+    private static DoubleSolenoid floorHatchMechSolenoid;
 
-    public static TalonSRX ballScrewTalon;
+    private static TalonSRX ballScrewTalon;
     
     public static HatchMech instance;
 

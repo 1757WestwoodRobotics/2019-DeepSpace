@@ -27,6 +27,4 @@ public class SetDoubleSolenoid extends InstantCommand{
     protected boolean isFinished() {
         return true;
     }
-    
-    
 }
