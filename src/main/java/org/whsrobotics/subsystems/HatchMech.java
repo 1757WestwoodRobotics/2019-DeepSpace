@@ -42,8 +42,8 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configFactoryDefault();
 
         ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);     // Might be normally closed
-        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);     // Might be normally closed
+        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
+        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
 
         ballScrewTalon.configPeakOutputForward(0.5);
         ballScrewTalon.configPeakOutputReverse(0.5);
@@ -58,7 +58,6 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.config_kP(0, 0);
         ballScrewTalon.config_kI(0, 0);
         ballScrewTalon.config_kD(0, 0);
-
 
         ballScrewTalon.configMotionCruiseVelocity(0);
         ballScrewTalon.configMotionAcceleration(0);
