@@ -56,17 +56,29 @@ public class OI {
         (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_MIDDLE.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
         //When button is pressed, hatch is shot off the hatch mechanism
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(new HatchEjection());
+        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
+            new HatchEjection());
 
         
         // |-------- Xbox Buttons --------|
 
+        //Compress
         (new JoystickButton(xboxControllerB, XboxController.Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
+        //Superstructure Extended
         (new JoystickButton(xboxControllerB, XboxController.Buttons.B.value)).toggleWhenPressed(
-            new SetDoubleSolenoidLoop(HatchMech.instance, Superstructure.getSuperstructureSolenoid()));
+            new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
+        //Hatch Floor Grab
         (new JoystickButton(xboxControllerB, XboxController.Buttons.X.value)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
+        //Hatch Extend
+        (new JoystickButton(xboxControllerB, XboxController.Buttons.START.value)).whileHeld(
+            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchDeploySolenoid()));
+        //Hatch Eject
+        (new JoystickButton(xboxControllerB, XboxController.Buttons.Y.value)).whenPressed(
+            new HatchEjection());
+        
+        
         
 
         
