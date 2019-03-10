@@ -53,7 +53,7 @@ public class HatchMech extends WolverinesSubsystem {
 
         ballScrewTalon.configClosedLoopPeakOutput(0, 0.5);
 
-        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10);
+        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
         ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 
         ballScrewTalon.selectProfileSlot(0, 0);
@@ -65,14 +65,16 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configForwardSoftLimitEnable(true);
         ballScrewTalon.configReverseSoftLimitEnable(true);
 
-        ballScrewTalon.configForwardSoftLimitThreshold(62_423);
+        ballScrewTalon.configForwardSoftLimitThreshold(62_423);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
         ballScrewTalon.configReverseSoftLimitThreshold(-62_423);
 
         ballScrewTalon.configMotionCruiseVelocity(4162);
         ballScrewTalon.configMotionAcceleration(8324);
-        ballScrewTalon.configMotionSCurveStrength(0);
 
-        ballScrewTalon.setSelectedSensorPosition(0);
+        // "Nine levels (0 through 8), where 0 represents no smoothing (same as classic trapezoidal profiling) and 8 represents max smoothing." - CTRE
+        ballScrewTalon.configMotionSCurveStrength(2);   // TODO: Set a proper S-Curve strength value
+
+//        ballScrewTalon.setSelectedSensorPosition(0);  // TODO: Bind to a command/button (home reset)
 
     }
 
