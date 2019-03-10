@@ -43,6 +43,7 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configFactoryDefault();
 
         ballScrewTalon.setNeutralMode(NeutralMode.Brake);
+        ballScrewTalon.setSensorPhase(true);
 
         ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
