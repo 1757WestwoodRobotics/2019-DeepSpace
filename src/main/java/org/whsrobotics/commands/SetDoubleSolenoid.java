@@ -6,6 +6,11 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 import org.whsrobotics.subsystems.PneumaticsBase;
 
+/**
+ * @param subsystem the subsystem that is being manipulated
+ * @param solenoid the solenoid that is being set
+ * @param mode the mode of the solenoid: extended, neutral, retracted
+ */
 public class SetDoubleSolenoid extends InstantCommand{
 
     private DoubleSolenoid solenoid;

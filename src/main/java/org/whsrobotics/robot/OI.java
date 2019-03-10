@@ -25,14 +25,14 @@ public class OI {
 
     private static DriverStation.Alliance alliance;
 
-    private static XboxController xboxController;
+    private static XboxController xboxControllerA;
     private static XboxController xboxControllerB;
 
     private static Joystick controlSystem;
 
     public static void init() {
 
-        xboxController = new XboxController(ComputerPort.XBOX_CONTROLLER.port);
+        xboxControllerA = new XboxController(ComputerPort.XBOX_CONTROLLER.port);
         xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLERB.port);
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
@@ -109,7 +109,7 @@ public class OI {
 
         SmartDashboard.putData("Drop Arms Neutral", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.NEUTRAL));
-
+        //Larry the blueberry eating a cherry on a ferry while he's hairy and he's weary about an ordinary scary Mary living on a praire
         SmartDashboard.putData("Drop Arms Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
 
@@ -133,7 +133,7 @@ public class OI {
     }
 
     public static XboxController getXboxControllerA() {
-        return xboxController;
+        return xboxControllerA;
     }
 
     public static XboxController getXboxControllerB() {
