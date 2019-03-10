@@ -21,7 +21,7 @@ public class XboxController extends Joystick {
 		A(1), B(2), X(3), Y(4), LEFT_BUMPER(5), RIGHT_BUMPER(6), 
 		BACK(7), START(8), LEFT_STICK_BUTTON(9), RIGHT_STICK_BUTTON(10);
 		
-		private int value;
+		public int value;
 		
 		Buttons(int value) {
 			this.value = value;

@@ -5,6 +5,11 @@
     <meta charset="utf-8">
     <title>FRC Dashboard</title>
     <link href="css/style.css" rel="stylesheet">
+    <style>
+        .arms {
+            background-color: "green";
+        }
+    </style>
 </head>
 
 <body>
@@ -56,6 +61,14 @@
         <div>
             <p>Adjust arm height</p>
             <input id="arm-position" type="range" min="0" max="1200" value="770">
+        </div>
+        <div>
+            <button id="compress_command">Compress (toggle)</button>
+            <button id="hatch">Hatch Extension</button>
+            <button id="superstructure">Superstructure</button>
+            <button id="drop">Floor Drop</button>
+            <button id="deploy">Deploy Hatch</button>
+            <button id="arms">Drop Arms (don't do this)</button>
         </div>
     </aside>
     <div id="login">

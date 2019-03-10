@@ -53,10 +53,10 @@ public class Drivetrain extends WolverinesSubsystem {
 
         navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
 
-        leftASpark = new CANSparkMax(Constants.canID.leftA.id, kBrushless);
-        leftBSpark = new CANSparkMax(Constants.canID.leftB.id, kBrushless);
-        rightASpark = new CANSparkMax(Constants.canID.rightA.id, kBrushless);
-        rightBSpark = new CANSparkMax(Constants.canID.rightB.id, kBrushless);
+        leftASpark = new CANSparkMax(Constants.canID.LEFT_A.id, kBrushless);
+        leftBSpark = new CANSparkMax(Constants.canID.LEFT_B.id, kBrushless);
+        rightASpark = new CANSparkMax(Constants.canID.RIGHT_A.id, kBrushless);
+        rightBSpark = new CANSparkMax(Constants.canID.RIGHT_B.id, kBrushless);
 
         if (onTestRobot) {
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
@@ -68,8 +68,8 @@ public class Drivetrain extends WolverinesSubsystem {
             rightBSpark.setInverted(true);
 
         } else {
-            leftCSpark = new CANSparkMax(Constants.canID.leftC.id, kBrushless);
-            rightCSpark = new CANSparkMax(Constants.canID.rightC.id, kBrushless);
+            leftCSpark = new CANSparkMax(Constants.canID.LEFT_C.id, kBrushless);
+            rightCSpark = new CANSparkMax(Constants.canID.RIGHT_C.id, kBrushless);
 
             leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
             rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);

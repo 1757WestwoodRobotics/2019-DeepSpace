@@ -33,7 +33,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     @Override
     protected void init(boolean onTestRobot) {
-        compressor = new Compressor(Constants.canID.pcmB.id);
+        compressor = new Compressor(Constants.canID.PCM_B.id);
         compressor.clearAllPCMStickyFaults();
         compressor.setClosedLoopControl(true);
 

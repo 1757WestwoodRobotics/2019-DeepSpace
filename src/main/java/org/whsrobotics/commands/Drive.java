@@ -29,12 +29,12 @@ public class Drive extends Command {
         // If XC has button held, use the FAST parameter and set "Drivetrain.setSparkMaxSmartCurrentLimit(80)"
         if (Robot.isTestRobot) {
             Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
-                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
-                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));      // Negative only for the Test Robot!!!
+                    -OI.getXboxControllerA().getNormalizedAxis(XboxController.Axes.LEFT_Y),
+                    -OI.getXboxControllerA().getNormalizedAxis(XboxController.Axes.RIGHT_X));      // Negative only for the Test Robot!!!
         } else {
             Drivetrain.arcadeDrive(Drivetrain.DrivetrainSpeedMode.FAST,
-                    -OI.getXboxController().getNormalizedAxis(XboxController.Axes.LEFT_Y),
-                    OI.getXboxController().getNormalizedAxis(XboxController.Axes.RIGHT_X));
+                    -OI.getXboxControllerA().getNormalizedAxis(XboxController.Axes.LEFT_Y),
+                    OI.getXboxControllerA().getNormalizedAxis(XboxController.Axes.RIGHT_X));
         }
 
 
