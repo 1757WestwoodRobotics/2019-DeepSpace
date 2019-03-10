@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 public class HatchEjection extends TimedCommand {
 
     public HatchEjection() {
-        super(0.25);
+        super(0.35);
     }
     
     @Override

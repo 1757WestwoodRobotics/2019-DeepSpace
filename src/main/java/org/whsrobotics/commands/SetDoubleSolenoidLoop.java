@@ -20,7 +20,6 @@ public class SetDoubleSolenoidLoop extends Command {
      * @param solenoid  the solenoid that's being extended and retracted
      */
     public SetDoubleSolenoidLoop(Subsystem subsystem, DoubleSolenoid solenoid) {
-        requires(subsystem);
         this.solenoid = solenoid;
     }
     
