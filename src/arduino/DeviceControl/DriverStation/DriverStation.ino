@@ -1,30 +1,55 @@
 
 #include <ArduinoJson.h>  // Make sure you use ArduinoJson 6 Libs.
 #include <CapacitiveSensor.h>
+#include <Joystick.h>
 
-#define POT_PIN         A0    // Analog pot readings via this pin.
-#define MIN_POT_VALUE   0   // Minimum analog read value read from A0
-#define MAX_POT_VALUE   1023 // Maximum analog read value read from A0
+
+
+
+#define POT_R_PIN      A0    // Analog pot readings via this pin.
+#define POT_M_PIN      A1    // Analog pot readings via this pin.
+
+#define MIN_POT_VALUE   0   // Minimum analog read value read from POT
+#define MAX_POT_VALUE   1023 // Maximum analog read value read from POT
 #define MIN_RANGE       0
 #define MAX_RANGE       1023
 #define POT_SPEED       150 // How fast to move the POT
-#define POT_FWD_PIN     9
-#define POT_REV_PIN     10
-#define TOUCH_PIN_WRITE 11
-#define TOUCH_PIN_READ  12
+#define POT_FWD_PIN     10
+#define POT_REV_PIN     11
+#define TOUCH_PIN_WRITE 12
+#define TOUCH_PIN_READ  13
 #define TOUCH_THRESHOLD 200  // Will have to tune this appropriately
 
-// Various Buttons for the Driver station and their Ardunio Pin outs
-#define TS_1  2
-#define TS_2  3
-#define TS_3  4
-#define TS_4  5
-#define TS_5  6
-#define PB_1  7
+// Various Joy Stick Buttons for the Driver station and their Ardunio Pin outs
+#define MIN_AXIS_RANGE -512
+#define MAX_AXIS_RANGE 512
+#define DS_BUTTON_COUNT 12   // We have 7 button and 5 toggle switches on the Driver Station
+
+// Create Joystick
+Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
+                   JOYSTICK_TYPE_JOYSTICK,
+                   DS_BUTTON_COUNT,
+                   0,  // No HAT switch
+                   true,  // X- Axis only
+                   false,
+                   false,
+                   false,
+                   false,
+                   false,
+                   false,
+                   false,
+                   false,
+                   false,
+                   false);
+
+// Arduino Pins the buttons are connected to
+const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 boolean debug = false;
 boolean touched = true;
+const bool autoSendMode = true;
+
 
 // Testing Capacitive Touch
 
@@ -37,26 +62,28 @@ void setup() {
 
   // set up console baud rate.
   Serial.begin(115200);
+  // wait until serial port opens for native USB devices
+  while (! Serial) {
+    delay(1);
+  }
 
   // Built in LED pin 13 as output
   pinMode (LED_BUILTIN, OUTPUT);
 
-  // Set pin mode as input for the 5 toggle switches and 1 push button
-  pinMode (TS_1, INPUT);
-  pinMode (TS_2, INPUT);
-  pinMode (TS_3, INPUT);
-  pinMode (TS_4, INPUT);
-  pinMode (TS_5, INPUT);
-  pinMode (PB_1, INPUT);
+  // Configure JS buttons
 
   // Setup POT Motor PINS
   pinMode(POT_FWD_PIN, OUTPUT);
   pinMode(POT_REV_PIN, OUTPUT);
 
-  // wait until serial port opens for native USB devices
-  while (! Serial) {
-    delay(1);
-  }
+  //  Configure All buttons. Since we run out of Digital Pins we will use 2 Analog pins to serve as digital pins.
+  for (int pin = 0; pin < 10; pin++)
+    pinMode(pin, OUTPUT);
+
+  // Joystick initialization
+  // Set Range Values
+  Joystick.setXAxisRange(MIN_AXIS_RANGE, MAX_AXIS_RANGE);
+  Joystick.begin(autoSendMode);
 }
 
 
@@ -75,25 +102,21 @@ void loop() {
       const char *sensor = read_doc["sensor"];
 
       if (String(sensor) == "sliderPot") {
-        movePot(read_doc["position"]);
-        //touched = true;
+        if (!touch())
+          movePot(read_doc["position"]);
       }
     }
   }
-  else {
-    if (Serial.availableForWrite()) {
-      // Write only if slider is touched else we are in auto mode.
-      DynamicJsonDocument write_doc(512);
-      write_doc = readSensors();
-      writeSerial(write_doc);
-    }
-  }
-  delay(500);
+
+  // Process Joystick
+  processAxis();
+  processButtons();
+  delay(1000);
 }
 
 
 // Chekc if the slider was touched and return true if touched
-int touch() {
+boolean touch() {
 
   long touch_val =  cs.capacitiveSensor(30);
   boolean touched = (touch_val > TOUCH_THRESHOLD);
@@ -108,7 +131,7 @@ int touch() {
 
 }
 
-// Port Command Processor for moving Pot by a certain position.
+// Servo control of the POT
 void movePot(int pos)
 {
   // Check for Bounds
@@ -122,7 +145,7 @@ void movePot(int pos)
   int new_pos = pos;
 
   // Check which direction to move
-  int cur_pos = map(analogRead(POT_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+  int cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
 
   // Move the motor if the postions is not the same
   while (new_pos != cur_pos) {
@@ -139,7 +162,7 @@ void movePot(int pos)
       }
     }
     // read the currtent postion
-    cur_pos = map(analogRead(POT_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+    cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
   }
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);
@@ -147,39 +170,55 @@ void movePot(int pos)
 
 }
 
-
-// Read all the sensors connected to Arduino
-DynamicJsonDocument readSensors()
-{
-  DynamicJsonDocument root(512);
-  JsonArray buttons = root.createNestedArray("buttons");
-
-  int val = analogRead(POT_PIN); // read resistance
-  //  Read all the button values
-  int b1 = digitalRead(TS_1);
-  int b2 = digitalRead(TS_2);
-  int b3 = digitalRead(TS_3);
-  int b4 = digitalRead(TS_4);
-  int b5 = digitalRead(TS_5);
-  int b6 = digitalRead(PB_1);
-
-  root["sensor"] = "sliderPot";
-  root["time"] = millis();
-  root["manual"] = touch();  // Will toggle with tocuh of the slider
-  root["position"] = map(val, MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE); // Postition will be in degrees
-  buttons.add(b1);
-  buttons.add(b2);
-  buttons.add(b3);
-  buttons.add(b4);
-  buttons.add(b5);
-  buttons.add(b6); // This is the push button
-
-  return root;
-}
-
 // Sends JSON output to serial port: For testing only
 void writeSerial(DynamicJsonDocument root) {
   serializeJson(root, Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
   Serial.flush(); // Empty the buffer..
+}
+
+
+// Joystick Functions
+
+// Read the pot value for Joystick X Axis
+void processAxis()
+{
+  int val = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_AXIS_RANGE, MAX_AXIS_RANGE);
+  Joystick.setXAxis(val);
+  if (debug) {
+    Serial.print("X Axis value - ");
+    Serial.print(val);
+    Serial.println();
+  }
+}
+
+
+void processButtons()
+{
+  boolean pressed = false;
+
+  for (int i = 0; i < DS_BUTTON_COUNT; i++) {
+    if (buttons[i] == A4 || buttons[i] == A5) {
+      // process Analog pins differentl
+      pressed = analogRead(buttons[i]) / 1023;  // 1K = 5V max ADC value
+    }
+    else {
+      pressed = digitalRead(buttons[i]);
+    }
+    // We are processing digial I/O pins
+    if (debug) {
+      Serial.print("Button [");
+      Serial.print(i);
+      Serial.print("] - ");
+      Serial.print(pressed);
+      Serial.println();
+    }
+    if (pressed) {
+      Joystick.pressButton(i);
+    }
+    else {
+      Joystick.releaseButton(i);
+    }
+  }
+
 }
