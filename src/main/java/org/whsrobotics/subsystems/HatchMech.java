@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
@@ -41,12 +42,14 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon = new TalonSRX(7);
         ballScrewTalon.configFactoryDefault();
 
+        ballScrewTalon.setNeutralMode(NeutralMode.Brake);
+
         ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
-        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed);
+        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
 
         ballScrewTalon.configPeakOutputForward(0.5);
-        ballScrewTalon.configPeakOutputReverse(0.5);
+        ballScrewTalon.configPeakOutputReverse(-0.5);
 
         ballScrewTalon.configClosedLoopPeakOutput(0, 0.5);
 
@@ -54,16 +57,29 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 
         ballScrewTalon.selectProfileSlot(0, 0);
-        ballScrewTalon.config_kF(0, 0);
-        ballScrewTalon.config_kP(0, 0);
+        ballScrewTalon.config_kF(0, 0.2458);    // (100% * 1023) / 4162
+        ballScrewTalon.config_kP(0, 0.2);       // TODO: Reduce (or calculate)!!!
         ballScrewTalon.config_kI(0, 0);
         ballScrewTalon.config_kD(0, 0);
 
-        ballScrewTalon.configMotionCruiseVelocity(0);
-        ballScrewTalon.configMotionAcceleration(0);
+        ballScrewTalon.configForwardSoftLimitEnable(true);
+        ballScrewTalon.configReverseSoftLimitEnable(true);
+
+        ballScrewTalon.configForwardSoftLimitThreshold(62_423);
+        ballScrewTalon.configReverseSoftLimitThreshold(-62_423);
+
+        ballScrewTalon.configMotionCruiseVelocity(4162);
+        ballScrewTalon.configMotionAcceleration(8324);
         ballScrewTalon.configMotionSCurveStrength(0);
 
+        ballScrewTalon.setSelectedSensorPosition(0);
 
+    }
+
+    @Override
+    protected void reducedPeriodic() {
+        SmartDashboard.putNumber("Hatch Mech Position", ballScrewTalon.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Hatch Mech Velocity", ballScrewTalon.getSelectedSensorVelocity());
     }
 
     @Override
