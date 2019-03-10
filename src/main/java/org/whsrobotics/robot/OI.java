@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.junit.runner.Computer;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.commands.CompressStop;
 import org.whsrobotics.commands.HatchEjection;
@@ -72,8 +71,8 @@ public class OI {
         (new JoystickButton(xboxControllerB, XboxController.Buttons.X.value)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
         //Hatch Extend
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.START.value)).whileHeld(
-            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchDeploySolenoid()));
+        (new JoystickButton(xboxControllerB, XboxController.Buttons.BACK.value)).toggleWhenPressed(
+            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Hatch Eject
         (new JoystickButton(xboxControllerB, XboxController.Buttons.Y.value)).whenPressed(
             new HatchEjection());
