@@ -29,7 +29,7 @@ public class OI {
     private static XboxController xboxControllerB;
 
     private static Joystick controlSystem;
-    
+
     public static void init() {
 
         xboxController = new XboxController(ComputerPort.XBOX_CONTROLLER.port);
@@ -37,7 +37,7 @@ public class OI {
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
         // |-------- Switches --------|
-        
+
         //When swtich is off, compression stops (compression is automatically on)
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whenInactive(
             new CompressStop());
@@ -58,7 +58,7 @@ public class OI {
         (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
             new HatchEjection());
 
-        
+
         // |-------- Xbox Buttons --------|
 
         //Compress
@@ -76,8 +76,8 @@ public class OI {
         //Hatch Eject
         (new JoystickButton(xboxControllerB, XboxController.Buttons.Y.value)).whenPressed(
             new HatchEjection());
-        
-        
+
+
         
 
         
