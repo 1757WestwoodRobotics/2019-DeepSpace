@@ -4,12 +4,14 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import org.whsrobotics.commands.Drive;
 import org.whsrobotics.robot.Constants;
 import org.whsrobotics.robot.Constants.Math;
+import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -36,6 +38,8 @@ public class Drivetrain extends WolverinesSubsystem {
     private static Drivetrain instance;
     private static boolean testRobot;
 
+    private static DrivetrainSpeedMode drivetrainSpeedMode = DrivetrainSpeedMode.SLOW;
+
     public static Drivetrain getInstance() {
         if (instance == null) {
             instance = new Drivetrain();
@@ -52,6 +56,7 @@ public class Drivetrain extends WolverinesSubsystem {
         testRobot = onTestRobot;
 
         navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
+        navX.zeroYaw();
 
         leftASpark = new CANSparkMax(Constants.canID.LEFT_A.id, kBrushless);
         leftBSpark = new CANSparkMax(Constants.canID.LEFT_B.id, kBrushless);
@@ -97,19 +102,28 @@ public class Drivetrain extends WolverinesSubsystem {
         differentialDrive.arcadeDrive(xSpeed, zRotation, squaredInputs);
     }
 
-    public static void arcadeDrive(DrivetrainSpeedMode mode, double xSpeed, double zRotation) {
-        if (mode == DrivetrainSpeedMode.FAST)
+    public static void arcadeDrive(double xSpeed, double zRotation) {
+        if (drivetrainSpeedMode == DrivetrainSpeedMode.FAST)
             arcadeDrive(xSpeed,
                     zRotation * Constants.ROTATION_FACTOR,
                     false);
-        else if (mode == DrivetrainSpeedMode.SLOW) {
+        else if (drivetrainSpeedMode == DrivetrainSpeedMode.SLOW) {
             arcadeDrive(xSpeed * Constants.MAX_SLOW_DRIVETRAIN,
                     zRotation * Constants.ROTATION_FACTOR * Constants.MAX_SLOW_DRIVETRAIN,
                     false);
         }
     }
 
-    
+    public static void setDrivetrainSpeedMode(DrivetrainSpeedMode mode) {
+        drivetrainSpeedMode = mode;
+
+        if (mode == DrivetrainSpeedMode.FAST) {
+            setSparkMaxSmartCurrentLimit(80);
+        } else if (mode == DrivetrainSpeedMode.SLOW) {
+            setSparkMaxSmartCurrentLimit(60);
+        }
+
+    }
 
 //    public static void tankDrive(double leftSpeed, double rightSpeed) {
 //        differentialDrive.tankDrive(leftSpeed, rightSpeed);
@@ -127,7 +141,6 @@ public class Drivetrain extends WolverinesSubsystem {
         }
 
     }
-
 
     public static void setSparkMaxSmartCurrentLimit(int amps) {
         leftASpark.setSmartCurrentLimit(amps);
@@ -187,6 +200,10 @@ public class Drivetrain extends WolverinesSubsystem {
 
 
         // TODO: Sean – report Spark Max currents and temperature (individually)
+
+
+        OI.getRobotTable().getEntry("angle").setDouble(navX.getAngle());        // Navx yaw angle (Z axis)
+
 
     }
 

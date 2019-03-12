@@ -26,13 +26,10 @@ public class Superstructure extends WolverinesSubsystem {
     @Override
     protected void init(boolean onTestRobot) {
         superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
-        superstructureSolenoid.setName("Superstructure Solenoid");
+        superstructureSolenoid.setName("superstructureSolenoid");
 
-    }
+        PneumaticsBase.registerDoubleSolenoid(superstructureSolenoid);
 
-    public static void init(DoubleSolenoid solenoid) {
-        superstructureSolenoid = solenoid;
-        instance = new Superstructure();
     }
 
     @Override
@@ -41,7 +38,7 @@ public class Superstructure extends WolverinesSubsystem {
     }
 
     public static DoubleSolenoidModes getSuperstructurePosition() {
-        return null;    // TODO: Return based on state of the solenoid... either sensor or local variable
+        return DoubleSolenoidModes.lookup(superstructureSolenoid.get());
     }
 
     public static DoubleSolenoid getSuperstructureSolenoid() {

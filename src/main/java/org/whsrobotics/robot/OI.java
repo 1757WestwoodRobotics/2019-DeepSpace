@@ -1,25 +1,21 @@
 package org.whsrobotics.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.whsrobotics.commands.Compress;
-import org.whsrobotics.commands.CompressStop;
-import org.whsrobotics.commands.HatchEjection;
-import org.whsrobotics.commands.SetDoubleSolenoid;
-import org.whsrobotics.commands.SetDoubleSolenoidLoop;
+import org.whsrobotics.commands.*;
 import org.whsrobotics.subsystems.HatchMech;
-import org.whsrobotics.subsystems.PneumaticsBase;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
 import org.whsrobotics.utils.XboxController;
-import org.whsrobotics.utils.XboxController.Buttons;
 
 import static org.whsrobotics.robot.Constants.ComputerPort;
 import static org.whsrobotics.robot.Constants.ControlSystemPort;
-import static org.whsrobotics.subsystems.PneumaticsBase.startCompression;
+import static org.whsrobotics.utils.XboxController.*;
 
 public class OI {
 
@@ -29,6 +25,8 @@ public class OI {
     private static XboxController xboxControllerB;
 
     private static Joystick controlSystem;
+
+    private static NetworkTable robotTable;
 
     public static void init() {
 
@@ -61,25 +59,30 @@ public class OI {
 
         // |-------- Xbox Buttons --------|
 
+        // Drivetrain FAST/SLOW mode (FAST while held)
+        (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value))
+                .whileHeld(new SetDrivetrainFast(5));
+
         //Compress
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.A.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
         //Superstructure Extended
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.B.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //Hatch Floor Grab
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.X.value)).whileHeld(
+        (new JoystickButton(xboxControllerB, Buttons.X.value)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
         //Hatch Extend
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.BACK.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Hatch Eject
-        (new JoystickButton(xboxControllerB, XboxController.Buttons.Y.value)).whenPressed(
+        (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
             new HatchEjection());
 
 
-        
+        // NETWORK TABLES STUFF
 
+        robotTable = NetworkTableInstance.getDefault().getTable("/Robot");
         
         
         SmartDashboard.putData("Compress", new Compress());
@@ -109,7 +112,7 @@ public class OI {
 
         SmartDashboard.putData("Drop Arms Neutral", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.NEUTRAL));
-        //Larry the blueberry eating a cherry on a ferry while he's hairy and he's weary about an ordinary scary Mary living on a praire
+
         SmartDashboard.putData("Drop Arms Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
 
@@ -130,6 +133,7 @@ public class OI {
 
         SmartDashboard.putData("Hatch Deploy Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED));
+
     }
 
     public static XboxController getXboxControllerA() {
@@ -150,6 +154,14 @@ public class OI {
         }
 
         return alliance;
+    }
+
+    public static double getMatchTime() {
+        return DriverStation.getInstance().getMatchTime();
+    }
+
+    public static NetworkTable getRobotTable() {
+        return robotTable;
     }
 
 }

@@ -188,14 +188,6 @@ public class VisionNetwork {
         visionSettingsTable.getEntry("status").setString(visionCommand.toString());
     }
 
-    // Keep-alive
-
-
-
-    // TODO
-    // Send start to vision
-    // Send stop to vision
-
     // check if data is stale (can use a global latest_count variable and delete when accessing or periodically)
         // No need for deletion
 

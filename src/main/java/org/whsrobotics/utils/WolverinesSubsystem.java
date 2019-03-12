@@ -12,7 +12,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
     /**
      * The reduced periodic loop time in seconds. Reduces processing and network congestion.
      */
-    private static final double PERIODIC_TIME = 0.5;        // seconds
+    private static final double PERIODIC_TIME = 0.25;        // seconds
 
     // Collections for the subsystem references
     private static volatile HashSet<WolverinesSubsystem> subsystems;
@@ -24,6 +24,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
     private static boolean isTestRobot;
 
     private boolean isMissionCritical;
+    private boolean hasSuccessfulInit = false;
 
     // Initialize the collections with empty HashSets
     static {
@@ -86,6 +87,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
             try {
                 ws.init(isTestRobot);
                 WolverinesSubsystem.subsystems.add(ws);
+                ws.hasSuccessfulInit = true;
 
             } catch (Exception ex) {
 
@@ -150,6 +152,7 @@ public abstract class WolverinesSubsystem extends Subsystem {
                 ws.reducedPeriodic();
             } catch (Exception ex) {
 
+                ws.hasSuccessfulInit = false;
                 subsystems.remove(ws);
                 failedSubsystems.add(ws);
 
@@ -170,6 +173,10 @@ public abstract class WolverinesSubsystem extends Subsystem {
      */
     protected void reducedPeriodic() {
         // Override me!
+    }
+
+    public boolean ensureInit() {
+        return hasSuccessfulInit;
     }
 
 }
