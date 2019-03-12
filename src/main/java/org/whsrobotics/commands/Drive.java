@@ -29,8 +29,6 @@ public class Drive extends Command {
 
         // TODO: Sean
 
-        // Set Brake mode based on button hold
-
         if (OI.getXboxControllerA().getRawButton(Buttons.LEFT_BUMPER)) {
             Drivetrain.setIdleMode(IdleMode.kBrake);
         }  else {
