@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
+import javax.naming.OperationNotSupportedException;
+
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 
@@ -34,15 +36,25 @@ public class HatchMech extends WolverinesSubsystem {
     @Override
     protected void init(boolean onTestRobot) {
         hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
+        hatchMechSliderSolenoid.setName("hatchMechSliderSolenoid");
+
         hatchDeploySolenoid = new DoubleSolenoid(HATCH_DEPLOY.module, HATCH_DEPLOY.a, HATCH_DEPLOY.b);
+        hatchDeploySolenoid.setName("hatchDeploySolenoid");
+
         dropArmsSolenoid = new DoubleSolenoid(DROP_ARMS.module, DROP_ARMS.a, DROP_ARMS.b);
+        dropArmsSolenoid.setName("dropArmsSolenoid");
+
         floorHatchMechSolenoid = new DoubleSolenoid(HATCH_FLOOR.module, HATCH_FLOOR.a, HATCH_FLOOR.b);
+        floorHatchMechSolenoid.setName("floorHatchMechSolenoid");
+
+        PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid, hatchDeploySolenoid, dropArmsSolenoid, floorHatchMechSolenoid);
+
 
         ballScrewTalon = new TalonSRX(7);
         ballScrewTalon.configFactoryDefault();
 
         ballScrewTalon.setNeutralMode(NeutralMode.Brake);
-        ballScrewTalon.setSensorPhase(true);
+        ballScrewTalon.setSensorPhase(false);
 
         ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
@@ -57,8 +69,8 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 
         ballScrewTalon.selectProfileSlot(0, 0);
-        ballScrewTalon.config_kF(0, 0.2458);    // (100% * 1023) / 4162
-        ballScrewTalon.config_kP(0, 0.2);       // TODO: Reduce (or calculate)!!!
+        ballScrewTalon.config_kF(0, 0.0);
+        ballScrewTalon.config_kP(0, 0.1);
         ballScrewTalon.config_kI(0, 0);
         ballScrewTalon.config_kD(0, 0);
 
@@ -68,13 +80,11 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configForwardSoftLimitThreshold(62_423);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
         ballScrewTalon.configReverseSoftLimitThreshold(-62_423);
 
-        ballScrewTalon.configMotionCruiseVelocity(4162);
+        ballScrewTalon.configMotionCruiseVelocity(4162);    // Represents 2"/sec
         ballScrewTalon.configMotionAcceleration(8324);
 
         // "Nine levels (0 through 8), where 0 represents no smoothing (same as classic trapezoidal profiling) and 8 represents max smoothing." - CTRE
-        ballScrewTalon.configMotionSCurveStrength(2);   // TODO: Set a proper S-Curve strength value
-
-//        ballScrewTalon.setSelectedSensorPosition(0);  // TODO: Bind to a command/button (home reset)
+        ballScrewTalon.configMotionSCurveStrength(2);
 
     }
 
@@ -88,6 +98,8 @@ public class HatchMech extends WolverinesSubsystem {
     protected void initDefaultCommand() {
 
     }
+
+    // –––––– SOLENOIDS –––––– //
 
     public static DoubleSolenoid getHatchMechSliderSolenoid() {
         return hatchMechSliderSolenoid;
@@ -105,11 +117,32 @@ public class HatchMech extends WolverinesSubsystem {
         return floorHatchMechSolenoid;
     }
 
-    // Slide ballScrewTalon to position
-    public static void moveLinear() { }
-    public static void moveRotation() { }
-    public static double convertRotationToLinear(double degrees) { return 0.0; }
-    public static double convertLinearToRotations(double rotation) { return 0.0; }
+
+    // –––––– BALL SCREW –––––– //
+
+    public enum Units {
+        INCH, CM, NATIVE_TICKS
+    }
+
+    // TODO: Sean, create a command for this method
+    public static void moveBallScrewMotionMagic(Units unit, double position) {
+        switch (unit) {
+            case INCH:
+                ballScrewTalon.set(ControlMode.MotionMagic, position * 20807);  // ~20807 ticks per inch
+                break;
+            case CM:
+                ballScrewTalon.set(ControlMode.MotionMagic, (position / 2.54) * 20807);
+                break;
+            case NATIVE_TICKS:
+                ballScrewTalon.set(ControlMode.MotionMagic, position);
+                break;
+        }
+    }
+
+    // TODO: Sean, bind to a command/button
+    public static void resetEncoder() {
+        ballScrewTalon.setSelectedSensorPosition(0);
+    }
 
 
 }

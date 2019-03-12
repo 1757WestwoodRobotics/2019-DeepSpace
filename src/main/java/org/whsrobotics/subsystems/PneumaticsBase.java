@@ -7,7 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
 import org.whsrobotics.robot.Constants;
+import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 
@@ -15,8 +21,7 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     private static Compressor compressor;
     private static AnalogPressureTransducer pressureTransducer;
-
-    private static DoubleSolenoid[] doubleSolenoids;
+    private static HashSet<DoubleSolenoid> doubleSolenoids;
 
     public static PneumaticsBase instance;
 
@@ -38,6 +43,8 @@ public class PneumaticsBase extends WolverinesSubsystem {
         compressor.setClosedLoopControl(true);
 
         pressureTransducer = new AnalogPressureTransducer(0);
+
+        doubleSolenoids = new HashSet<>();
     }
 
     public enum DoubleSolenoidModes {
@@ -50,11 +57,32 @@ public class PneumaticsBase extends WolverinesSubsystem {
         DoubleSolenoidModes(DoubleSolenoid.Value value) {
             this.value = value;
         }
+
+        private static final HashMap<DoubleSolenoid.Value, DoubleSolenoidModes> table = new HashMap<>();
+
+        static {
+            Arrays.stream(DoubleSolenoidModes.values()).forEach(dsm -> table.put(dsm.value, dsm));
+        }
+
+        public static DoubleSolenoidModes lookup(DoubleSolenoid.Value value) {
+            return table.get(value);
+        }
+
     }
 
     @Override
     protected void reducedPeriodic() {
-        SmartDashboard.putNumber("Pressure (psi)", pressureTransducer.getPSI());
+        SmartDashboard.putNumber("Pressure (psi)", getPressure());
+        SmartDashboard.putBoolean("Pressure Switch", getPressureSwitchState());
+
+        OI.getRobotTable().getEntry("compressor").setBoolean(getCompressorState());
+        OI.getRobotTable().getEntry("compressor_current").setDouble(getCompressorCurrent());
+
+        // Update NetworkTables status for each DoubleSolenoid
+        doubleSolenoids.forEach(doubleSolenoid ->
+                OI.getRobotTable().getEntry(doubleSolenoid.getName())
+                        .setString(DoubleSolenoidModes.lookup(doubleSolenoid.get()).toString()));
+
     }
 
     public static Compressor getCompressor(){
@@ -90,8 +118,12 @@ public class PneumaticsBase extends WolverinesSubsystem {
         return compressor.getPressureSwitchValue();
     }
 
-    public static double getPressureTransducer() {
+    public static double getPressure() {
         return pressureTransducer.getPSI();
+    }
+
+    public static void registerDoubleSolenoid(DoubleSolenoid... ds) {
+        doubleSolenoids.addAll(Arrays.asList(ds));
     }
 
 }

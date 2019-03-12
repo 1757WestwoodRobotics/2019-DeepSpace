@@ -26,8 +26,6 @@ public class Robot extends TimedRobot {
 
         OI.init();
 
-//        WolverinesSubsystem.beginReducedPeriodic();       // Not needed, already called in WolverinesSubsystem (make sure this works)
-
     }
 
     /**

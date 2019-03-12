@@ -2,6 +2,7 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 public class ElectronicsSystem extends WolverinesSubsystem {
@@ -41,6 +42,7 @@ public class ElectronicsSystem extends WolverinesSubsystem {
 
         SmartDashboard.putNumberArray("PDP Individual Current", pdpCurrents);
 
+        OI.getRobotTable().getEntry("time").setDouble(OI.getMatchTime());
     }
 
     @Override
