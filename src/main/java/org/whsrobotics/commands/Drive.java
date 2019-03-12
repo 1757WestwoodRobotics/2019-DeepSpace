@@ -13,8 +13,6 @@ import org.whsrobotics.utils.XboxController.Buttons;
 
 public class Drive extends Command {
 
-    private int currentLimit = 80;
-
     public Drive() {
         requires(Drivetrain.getInstance());
     }
