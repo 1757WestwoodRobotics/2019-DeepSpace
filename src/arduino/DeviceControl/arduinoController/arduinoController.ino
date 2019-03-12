@@ -128,21 +128,13 @@ double distances[NUM_LIDARS];
 #define LL_CFG_LOW_SENS          5
 
 
-/*
-    JSON Section for creating JSON output to Serial.
-*/
-
-const size_t capacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(3) + 90;
-DynamicJsonBuffer jsonBuffer(capacity);
-
-
 
 void setup() {
 
   // set up console baud rate.
   Serial.begin(115200);
 
-  
+
   // Built in LED pin 13 as output
   pinMode (LED_BUILTIN, OUTPUT);
 
@@ -170,23 +162,19 @@ void loop() {
   // Read  Serial PORT to see if you received a command in JSON
   if (Serial.available()) {
 
-    JsonObject& cmdObj = jsonBuffer.parse(Serial);
+    DynamicJsonDocument read_doc(512);
+    DeserializationError error =  deserializeJson(read_doc, Serial);
 
     // Only if JSON Parse succeds do something or ignore the command
-    if (cmdObj.success()) {
-      const char *sensor = cmdObj["sensor"]; // Look up which sensor
+    if (!error) {
+      const char *sensor = read_doc["sensor"]; // Look up which sensor
       if (String(sensor) == "ringLight") {
-        ledCommands(cmdObj["color"]);
-      }
-      else if (String(sensor) == "Lidar") {
-        // Process Command for LIDARs
-        writeLidar();
+        ledCommands(read_doc["color"]);
       }
     }
   }
   // keep reading Lidars in the background
   readLidars();
-  jsonBuffer.clear(); // free up buffer space.
   delay(1);
 }
 
@@ -379,16 +367,15 @@ void readLidars() {
 
 // Sends JSON output to serial port:
 void writeLidar() {
-  JsonObject& root = jsonBuffer.createObject();
+  DynamicJsonDocument root(512);
   root["sensor"] = "lidar";
   root["time"] = millis(); // current Arduino time elapsed since reboot.
+  root["front"] = distances[0];
+  root["back"]  = distances[1];
+  root["left"]  = distances[2];
+  root["right"] = distances[3];
 
-  JsonArray& objects = root.createNestedArray("objects");
-  objects.add(distances[0]);
-  objects.add(distances[1]);
-  objects.add(distances[2]);
-  objects.add(distances[3]);
-  root.printTo(Serial);
+  serializeJson(root, Serial);
   Serial.println(); // Always send a CR at the end so reciever does not block.
-  jsonBuffer.clear(); // Free up any objectes we have created
+  Serial.flush(); // Empty the buffer..
 }
