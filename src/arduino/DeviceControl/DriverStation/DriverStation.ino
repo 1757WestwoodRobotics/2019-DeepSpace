@@ -102,16 +102,25 @@ void loop() {
       const char *sensor = read_doc["sensor"];
 
       if (String(sensor) == "sliderPot") {
-        if (!touch())
+        if (!touch()) // Ignore movePot if slider is being touched.
           movePot(read_doc["position"]);
       }
     }
+  }
+  if(touch()) {
+    // as long as slider is being tocuhed and moved send position back to robot.
+    DynamicJsonDocument write_doc(512);
+
+    write_doc["sensor"] = "sliderPot";
+    write_doc["position"] = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+    write_doc["manual_control"] = touch();
+    writeSerial(write_doc);
   }
 
   // Process Joystick
   processAxis();
   processButtons();
-  delay(1000);
+  delay(100);
 }
 
 
