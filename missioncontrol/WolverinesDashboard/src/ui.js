@@ -25,7 +25,7 @@ let ui = {
     drop_toggle: document.getElementById('drop'),
     drop_arms_toggle: document.getElementById('arms'),
     deploy_toggle: document.getElementById('deploy'),
-    neutralize_button: documentment.getElementById('neutralize')
+    //neutralize_button: documentment.getElementById('neutralize')
 };
 
 let cylinders = [
@@ -233,11 +233,11 @@ ui.hatch_toggle.onclick = () => {
 
 };
 
-ui.neutralize_button.onclick() = () => {
+/*ui.neutralize_button.onclick() = () => {
     for (i = 0; y < length(cylinders); i++) {
         NetworkTables.putValue('/SmartDashboard/' + cylinders[i] + ' Neutral/running', true);
     }
-}
+}*/
 
 // The rest of the doc is listeners for UI elements being clicked on
 ui.example.button.onclick = function() {
