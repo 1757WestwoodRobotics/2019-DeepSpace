@@ -11,8 +11,6 @@
 
 #define MIN_POT_VALUE   0   // Minimum analog read value read from POT
 #define MAX_POT_VALUE   1023 // Maximum analog read value read from POT
-#define MIN_RANGE       0
-#define MAX_RANGE       1023
 #define POT_SPEED       150 // How fast to move the POT
 #define POT_FWD_PIN     10
 #define POT_REV_PIN     11
@@ -21,8 +19,8 @@
 #define TOUCH_THRESHOLD 200  // Will have to tune this appropriately
 
 // Various Joy Stick Buttons for the Driver station and their Ardunio Pin outs
-#define MIN_AXIS_RANGE -512
-#define MAX_AXIS_RANGE 512
+#define MIN_RANGE -512
+#define MAX_RANGE  512
 #define DS_BUTTON_COUNT 12   // We have 7 button and 5 toggle switches on the Driver Station
 
 // Create Joystick
@@ -82,7 +80,7 @@ void setup() {
 
   // Joystick initialization
   // Set Range Values
-  Joystick.setXAxisRange(MIN_AXIS_RANGE, MAX_AXIS_RANGE);
+  Joystick.setXAxisRange(MIN_RANGE, MAX_RANGE);
   Joystick.begin(autoSendMode);
 }
 
@@ -192,7 +190,7 @@ void writeSerial(DynamicJsonDocument root) {
 // Read the pot value for Joystick X Axis
 void processAxis()
 {
-  int val = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_AXIS_RANGE, MAX_AXIS_RANGE);
+  int val = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
   Joystick.setXAxis(val);
   if (debug) {
     Serial.print("X Axis value - ");

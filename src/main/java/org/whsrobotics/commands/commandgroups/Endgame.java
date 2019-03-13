@@ -13,13 +13,17 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 
 public class Endgame extends CommandGroup {
 
+    /**
+     * Command group that executes all the commands necesary for the end of the match, including ramp deployment
+     * @author Sean Lendrum
+     */
     public Endgame() {
 
         addSequential(new SetDoubleSolenoid(
             Superstructure.instance, Superstructure.getSuperstructureSolenoid(), DoubleSolenoidModes.EXTENDED));
         addSequential(new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
-        addSequential(new RampDeployment()); 
-             
+        addSequential(new RampDeployment());      
+
     }
 }
