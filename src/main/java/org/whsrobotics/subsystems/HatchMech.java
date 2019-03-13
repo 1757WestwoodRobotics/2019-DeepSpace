@@ -13,6 +13,8 @@ import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 
 public class HatchMech extends WolverinesSubsystem {
 
+    private static final int BALL_SCREW_MAX_ERROR = 4096;
+
     private static DoubleSolenoid hatchMechSliderSolenoid;
     private static DoubleSolenoid hatchDeploySolenoid;
     private static DoubleSolenoid dropArmsSolenoid;
@@ -80,6 +82,8 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configForwardSoftLimitThreshold(62_423);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
         ballScrewTalon.configReverseSoftLimitThreshold(-62_423);
 
+        ballScrewTalon.configAllowableClosedloopError(0, 500);  // TODO EDIT
+
         ballScrewTalon.configMotionCruiseVelocity(4162);    // Represents 2"/sec
         ballScrewTalon.configMotionAcceleration(8324);
 
@@ -123,7 +127,7 @@ public class HatchMech extends WolverinesSubsystem {
     public enum Units {
         INCH, CM, NATIVE_TICKS
     }
-    //TODO: Sean - make into its own command
+
     public static void moveBallScrewMotionMagic(Units unit, double position) {
         switch (unit) {
             case INCH:
@@ -143,6 +147,8 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.setSelectedSensorPosition(0);
     }
 
-    // TODO: LARRY, poll BST for finished status and put in Command
+    public static boolean ballScrewIsFinished() {
+        return Math.abs(ballScrewTalon.getSelectedSensorPosition() - ballScrewTalon.getClosedLoopTarget()) < BALL_SCREW_MAX_ERROR;
+    }
 
 }
