@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import javax.naming.OperationNotSupportedException;
@@ -14,6 +15,13 @@ import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 public class HatchMech extends WolverinesSubsystem {
 
     private static final int BALL_SCREW_MAX_ERROR = 4096;
+    private static final int BALL_SCREW_MAX_VELOCITY = 4162;
+    private static final int BALL_SCREW_MAX_ACCEL = 8324;
+
+    private static final int BALL_SCREW_FWD_LIMIT = 62_423;
+    private static final int BALL_SCREW_REV_LIMIT = -62_423;
+    private static final int BALL_SCREW_S_CURVE = 2;
+
 
     private static DoubleSolenoid hatchMechSliderSolenoid;
     private static DoubleSolenoid hatchDeploySolenoid;
@@ -79,23 +87,23 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.configForwardSoftLimitEnable(true);
         ballScrewTalon.configReverseSoftLimitEnable(true);
 
-        ballScrewTalon.configForwardSoftLimitThreshold(62_423);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
-        ballScrewTalon.configReverseSoftLimitThreshold(-62_423);
+        ballScrewTalon.configForwardSoftLimitThreshold(BALL_SCREW_FWD_LIMIT);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
+        ballScrewTalon.configReverseSoftLimitThreshold(BALL_SCREW_REV_LIMIT);
 
-        ballScrewTalon.configAllowableClosedloopError(0, 500);  // TODO EDIT
+        ballScrewTalon.configAllowableClosedloopError(0, BALL_SCREW_MAX_ERROR);
 
-        ballScrewTalon.configMotionCruiseVelocity(4162);    // Represents 2"/sec
-        ballScrewTalon.configMotionAcceleration(8324);
+        ballScrewTalon.configMotionCruiseVelocity(BALL_SCREW_MAX_VELOCITY);    // Represents 2"/sec
+        ballScrewTalon.configMotionAcceleration(BALL_SCREW_MAX_ACCEL);
 
         // "Nine levels (0 through 8), where 0 represents no smoothing (same as classic trapezoidal profiling) and 8 represents max smoothing." - CTRE
-        ballScrewTalon.configMotionSCurveStrength(2);
+        ballScrewTalon.configMotionSCurveStrength(BALL_SCREW_S_CURVE);
 
     }
 
     @Override
     protected void reducedPeriodic() {
-        SmartDashboard.putNumber("Hatch Mech Position", ballScrewTalon.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Hatch Mech Velocity", ballScrewTalon.getSelectedSensorVelocity());
+        OI.getRobotTable().getEntry("Hatch Mech Position").setNumber(ballScrewTalon.getSelectedSensorPosition());
+        OI.getRobotTable().getEntry("Hatch Mech Velocity").setNumber(ballScrewTalon.getSelectedSensorVelocity());
     }
 
     @Override
@@ -142,7 +150,7 @@ public class HatchMech extends WolverinesSubsystem {
         }
     }
 
-    // TODO: Sean, bind to a command/button
+    // TODO: Sean, bind to a command/button (X on XboxControllerA or on the control system AND smartdashboard)
     public static void resetEncoder() {
         ballScrewTalon.setSelectedSensorPosition(0);
     }
