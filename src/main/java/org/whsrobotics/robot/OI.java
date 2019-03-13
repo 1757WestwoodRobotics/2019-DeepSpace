@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.whsrobotics.commands.*;
+import org.whsrobotics.commands.commandgroups.Endgame;
 import org.whsrobotics.subsystems.HatchMech;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
@@ -55,6 +56,10 @@ public class OI {
         //When button is pressed, hatch is shot off the hatch mechanism
         (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
             new HatchEjection());
+        
+        // |-------- Big Red Button --------|
+        
+        (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).whenPressed(new Endgame());
 
 
         // |-------- Xbox Buttons --------|

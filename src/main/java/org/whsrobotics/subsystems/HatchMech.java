@@ -123,8 +123,7 @@ public class HatchMech extends WolverinesSubsystem {
     public enum Units {
         INCH, CM, NATIVE_TICKS
     }
-
-    // TODO: Sean, create a command for this method
+    //TODO: Sean - make into its own command
     public static void moveBallScrewMotionMagic(Units unit, double position) {
         switch (unit) {
             case INCH:
@@ -144,5 +143,6 @@ public class HatchMech extends WolverinesSubsystem {
         ballScrewTalon.setSelectedSensorPosition(0);
     }
 
+    // TODO: LARRY, poll BST for finished status and put in Command
 
 }
