@@ -44,7 +44,7 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
 const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-boolean debug = false;
+boolean debug = true;
 boolean touched = true;
 const bool autoSendMode = true;
 
@@ -100,12 +100,20 @@ void loop() {
       const char *sensor = read_doc["sensor"];
 
       if (String(sensor) == "sliderPot") {
-        if (!touch()) // Ignore movePot if slider is being touched.
-          movePot(read_doc["position"]);
+        if (!touch()) { // Ignore movePot if slider is being touched.
+          int position = read_doc["position"];
+
+          if (debug) {
+            Serial.print("Recieved poistion :");
+            Serial.print (position);
+            Serial.println();
+          }
+          movePot(position);
+        }
       }
     }
   }
-  if(touch()) {
+  if (touch()) {
     // as long as slider is being tocuhed and moved send position back to robot.
     DynamicJsonDocument write_doc(512);
 
@@ -154,8 +162,24 @@ void movePot(int pos)
   // Check which direction to move
   int cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
 
+  if (debug) {
+    Serial.print("New Pos = ");
+    Serial.print(new_pos);
+    Serial.print(" Current Pos = ");
+    Serial.print(cur_pos);
+    Serial.println();
+  }
   // Move the motor if the postions is not the same
-  while (new_pos != cur_pos) {
+
+  int breakloop = 0; // this is to braak out of the loop in case we never able to reach the intended postion
+  while ((new_pos != cur_pos) && (breakloop < MAX_POT_VALUE)) {
+    if (debug) {
+      Serial.print("New Pos = ");
+      Serial.print(new_pos);
+      Serial.print(" Current Pos = ");
+      Serial.print(cur_pos);
+      Serial.println();
+    }
     // Power the Motor PINS
     // turn Motor # 1 in one direction
     if (new_pos > cur_pos) {
@@ -170,6 +194,7 @@ void movePot(int pos)
     }
     // read the currtent postion
     cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+    breakloop++;
   }
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);

@@ -16,6 +16,7 @@ def sendPosition(value):
     cmd["position"] = value
     print(json.dumps(cmd))
     arduino.write(json.dumps(cmd))
+    print("Sent message to arduino...")
     
 ##############################################################################################################
 # Sit in a loop reading the Network table for Slider
@@ -26,7 +27,7 @@ NetworkTables.initialize(server="192.168.1.218")
 sd = NetworkTables.getTable('Slider')
 
 while True:
-    position = sd.getNumber('position', "N/A")
+    position = sd.getNumber('position', 0)
     print("position:", position)
-    sendPosition(position)
+    #sendPosition(position)
     time.sleep(1)
