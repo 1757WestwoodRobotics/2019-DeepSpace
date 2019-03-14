@@ -13,11 +13,11 @@ Example DriverStation JSON: postion can range form -512 to 512
   "sensor": "sliderPot",
   "position": 0
 }
-
+'''
 
 
 # Arduino controls via Serial Port
-class driverStation():
+class Arduino():
     # Set up the serial port and ensure it is non-blocking
 	def __init__(self, port):
 		self._port=serial.Serial(port, baudrate=115200, timeout=1)
