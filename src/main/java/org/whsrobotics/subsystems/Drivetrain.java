@@ -14,16 +14,16 @@ import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Drivetrain extends WolverinesSubsystem {
 
-    private static CANSparkMax leftASpark;
-    private static CANSparkMax leftBSpark;
-    private static CANSparkMax leftCSpark;  // not on the test robot
-    private static CANSparkMax rightASpark;
-    private static CANSparkMax rightBSpark;
-    private static CANSparkMax rightCSpark; // not on the test robot
+    private static CANSparkMax[] leftSet;
+    private static CANSparkMax[] rightSet;
 
     private static SpeedControllerGroup leftDrive;
     private static SpeedControllerGroup rightDrive;
@@ -32,8 +32,10 @@ public class Drivetrain extends WolverinesSubsystem {
 
     private static AHRS navX;
 
-    private static double rawEncoderPositions;
-    private static double rawEncoderVelocities;
+    private static double leftEncoderPosition;
+    private static double leftEncoderVelocity;
+    private static double rightEncoderPosition;
+    private static double rightEncoderVelocity;
 
     private static Drivetrain instance;
     private static boolean testRobot;
@@ -58,26 +60,29 @@ public class Drivetrain extends WolverinesSubsystem {
         navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
         navX.zeroYaw();
 
-        leftASpark = new CANSparkMax(Constants.canID.LEFT_A.id, kBrushless);
-        leftBSpark = new CANSparkMax(Constants.canID.LEFT_B.id, kBrushless);
-        rightASpark = new CANSparkMax(Constants.canID.RIGHT_A.id, kBrushless);
-        rightBSpark = new CANSparkMax(Constants.canID.RIGHT_B.id, kBrushless);
+        leftSet = new CANSparkMax[3];
+        rightSet = new CANSparkMax[3];
+
+        leftSet[0] = new CANSparkMax(Constants.canID.LEFT_A.id, kBrushless);
+        leftSet[1] = new CANSparkMax(Constants.canID.LEFT_B.id, kBrushless);
+        rightSet[0] = new CANSparkMax(Constants.canID.RIGHT_A.id, kBrushless);
+        rightSet[1] = new CANSparkMax(Constants.canID.RIGHT_B.id, kBrushless);
 
         if (onTestRobot) {
-            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark);
-            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark);
+            leftDrive = new SpeedControllerGroup(leftSet[0], leftSet[1]);
+            rightDrive = new SpeedControllerGroup(rightSet[0], rightSet[1]);
 
-            leftASpark.setInverted(true);
-            leftBSpark.setInverted(true);
-            rightASpark.setInverted(true);
-            rightBSpark.setInverted(true);
+            leftSet[0].setInverted(true);
+            leftSet[1].setInverted(true);
+            rightSet[0].setInverted(true);
+            rightSet[1].setInverted(true);
 
         } else {
-            leftCSpark = new CANSparkMax(Constants.canID.LEFT_C.id, kBrushless);
-            rightCSpark = new CANSparkMax(Constants.canID.RIGHT_C.id, kBrushless);
+            leftSet[2] = new CANSparkMax(Constants.canID.LEFT_C.id, kBrushless);
+            rightSet[2] = new CANSparkMax(Constants.canID.RIGHT_C.id, kBrushless);
 
-            leftDrive = new SpeedControllerGroup(leftASpark, leftBSpark, leftCSpark);
-            rightDrive = new SpeedControllerGroup(rightASpark, rightBSpark, rightCSpark);
+            leftDrive = new SpeedControllerGroup(leftSet[0], leftSet[1], leftSet[2]);
+            rightDrive = new SpeedControllerGroup(rightSet[0], rightSet[1], rightSet[2]);
 
         }
 
@@ -129,35 +134,44 @@ public class Drivetrain extends WolverinesSubsystem {
 //        differentialDrive.tankDrive(leftSpeed, rightSpeed);
 //    }
 
-    public static void setIdleMode(IdleMode idleMode){
-        leftASpark.setIdleMode(idleMode);
-        leftBSpark.setIdleMode(idleMode);
-        rightASpark.setIdleMode(idleMode);
-        rightBSpark.setIdleMode(idleMode);
+    public static void getSparkMaxCurrents() {
 
-        if (!testRobot) {
-            leftCSpark.setIdleMode(idleMode);
-            rightCSpark.setIdleMode(idleMode);
-        }
+    }
 
+    public static void getSparkMaxTemperatures() {
+
+    }
+
+    public static void setIdleMode(IdleMode idleMode) {
+        Stream.of(leftSet, rightSet)
+                .flatMap(Stream::of)
+                .filter(Objects::nonNull)
+                .forEach(c -> c.setIdleMode(idleMode));
     }
 
     public static void setSparkMaxSmartCurrentLimit(int amps) {
-        leftASpark.setSmartCurrentLimit(amps);
-        leftBSpark.setSmartCurrentLimit(amps);
-        rightASpark.setSmartCurrentLimit(amps);
-        rightBSpark.setSmartCurrentLimit(amps);
-
-        if (!testRobot) {
-            leftCSpark.setSmartCurrentLimit(amps);
-            rightCSpark.setSmartCurrentLimit(amps);
-        }
-
+         Stream.of(leftSet, rightSet)
+                .flatMap(Stream::of)
+                .filter(Objects::nonNull)
+                .forEach(c -> c.setSmartCurrentLimit(amps));
     }
 
     public static void getEncoderTelemetry() {
-        rawEncoderPositions = leftASpark.getEncoder().getPosition();
-        rawEncoderVelocities = leftASpark.getEncoder().getVelocity();
+        Arrays.stream(leftSet)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(c -> {
+            leftEncoderPosition = c.getEncoder().getPosition();
+            leftEncoderVelocity = c.getEncoder().getVelocity();
+        });
+
+        Arrays.stream(rightSet)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(c -> {
+            rightEncoderPosition = c.getEncoder().getPosition();
+            rightEncoderVelocity = c.getEncoder().getVelocity();
+        });
     }
 
     /*
@@ -200,6 +214,7 @@ public class Drivetrain extends WolverinesSubsystem {
 
 
         // TODO: Sean – report Spark Max currents and temperature (individually)
+        OI.getRobotTable().getEntry("SparkMax Currents");
 
 
         OI.getRobotTable().getEntry("angle").setDouble(navX.getAngle());        // Navx yaw angle (Z axis)
