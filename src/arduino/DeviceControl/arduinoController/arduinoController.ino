@@ -91,7 +91,7 @@ VL53L0X_RangingMeasurementData_t lox_measure;
 #define NUM_LIDARS    4
 
 // Array to store distances measured
-double distances[NUM_LIDARS];
+double distances[NUM_LIDARS] = {-1.0, -1.0, -1.0, -1.0};
 
 // Data Out PINS used for LED and Shutdown PINS for each of the VL53L0X
 
@@ -171,11 +171,16 @@ void loop() {
       if (String(sensor) == "ringLight") {
         ledCommands(read_doc["color"]);
       }
+      else if(String(sensor) == "Lidar") {
+        if(read_doc["read"])
+          writeLidar();
+      }
     }
   }
   // keep reading Lidars in the background
   readLidars();
-  delay(1);
+  writeLidar();
+  delay(100);
 }
 
 

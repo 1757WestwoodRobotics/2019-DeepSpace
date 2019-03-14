@@ -6,10 +6,10 @@ import json
 import arduinoControl
 
 # If Teensy or Arduino is connected to Mac or Linux uncomment line below and change port
-arduino = arduinoControl.Arduino('/dev/cu.usbmodem52640001')
+#arduino = arduinoControl.Arduino('/dev/cu.usbmodem52640001')
 
 #Teensy or Arduino connectd to PC on COM Ports. Modify COM13 tot he right COM Port
-#arduino = arduinoControl.Arduino('COM13')
+arduino = arduinoControl.Arduino('COM18')
 
 while 1:
 	val = input("Enter a color 0 to 6 to control LED color, 8 - read lidar, 9 - exit):")
