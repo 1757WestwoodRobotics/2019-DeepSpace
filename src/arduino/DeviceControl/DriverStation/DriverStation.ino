@@ -86,26 +86,8 @@ void setup() {
 
 
 void loop() {
-  int how_many = 0;
-
-  // Read  Serial PORT to see if you received a command
-  if (how_many = Serial.available()) {
-
-    DynamicJsonDocument read_doc(512);
-    DeserializationError error =  deserializeJson(read_doc, Serial);
-
-
-    // Only if JSON Parse succeds do something or ignore the command
-    if (!error) {
-      const char *sensor = read_doc["sensor"];
-
-      if (String(sensor) == "sliderPot") {
-        if (!touch()) // Ignore movePot if slider is being touched.
-          movePot(read_doc["position"]);
-      }
-    }
-  }
-  if(touch()) {
+ 
+  if (touch()) {
     // as long as slider is being tocuhed and moved send position back to robot.
     DynamicJsonDocument write_doc(512);
 
@@ -118,7 +100,46 @@ void loop() {
   // Process Joystick
   processAxis();
   processButtons();
-  delay(100);
+
+  // Process any data over Serial Port.
+   int how_many = 0;
+
+  // Read  Serial PORT to see if you received a command
+  if (how_many = Serial.available()) {
+    if (debug) {
+      Serial.print("Proccesing - ");
+      Serial.print(how_many);
+      Serial.println();
+      Serial.print("Before JSON Parse...");
+      Serial.print(millis());
+      Serial.println();
+    }
+    DynamicJsonDocument read_doc(512);
+    DeserializationError error =  deserializeJson(read_doc, Serial);
+
+    if (debug) {
+      Serial.print("After JSON Parse...");
+      Serial.print(millis());
+      Serial.println();
+    }
+    // Only if JSON Parse succeds do something or ignore the command
+    if (!error) {
+      const char *sensor = read_doc["sensor"];
+
+      if (String(sensor) == "sliderPot") {
+        if (!touch()) { // Ignore movePot if slider is being touched.
+          int position = read_doc["position"];
+
+          if (debug) {
+            Serial.print("Recieved poistion :");
+            Serial.print (position);
+            Serial.println();
+          }
+          movePot(position);
+        }
+      }
+    }
+  }
 }
 
 
@@ -141,6 +162,9 @@ boolean touch() {
 // Servo control of the POT
 void movePot(int pos)
 {
+
+  digitalWrite(LED_BUILTIN, HIGH);
+
   // Check for Bounds
   if (pos >= MAX_RANGE)
     pos = MAX_RANGE;
@@ -154,8 +178,24 @@ void movePot(int pos)
   // Check which direction to move
   int cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
 
+  if (debug) {
+    Serial.print("New Pos = ");
+    Serial.print(new_pos);
+    Serial.print(" Current Pos = ");
+    Serial.print(cur_pos);
+    Serial.println();
+  }
   // Move the motor if the postions is not the same
-  while (new_pos != cur_pos) {
+
+  int breakloop = 0; // this is to braak out of the loop in case we never able to reach the intended postion
+  while ((new_pos != cur_pos) && (breakloop < MAX_POT_VALUE)) {
+    if (debug) {
+      Serial.print("New Pos = ");
+      Serial.print(new_pos);
+      Serial.print(" Current Pos = ");
+      Serial.print(cur_pos);
+      Serial.println();
+    }
     // Power the Motor PINS
     // turn Motor # 1 in one direction
     if (new_pos > cur_pos) {
@@ -170,11 +210,12 @@ void movePot(int pos)
     }
     // read the currtent postion
     cur_pos = map(analogRead(POT_M_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+    breakloop++;
   }
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);
   analogWrite(POT_REV_PIN, 0);
-
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 // Sends JSON output to serial port: For testing only
