@@ -26,7 +26,7 @@ public class VisionNetwork {
     /**
      * Items that can be chosen for vision tracking
      */
-    enum VisionType {
+    public enum VisionType {
 
         /**
          * CARGO game piece
@@ -39,7 +39,7 @@ public class VisionNetwork {
         PANEL,
 
         /**
-        * Reflective tape vision targets
+        * Reflective tape vision targets // TODO Item 255
         */
         TARGET,
 
@@ -48,10 +48,6 @@ public class VisionNetwork {
         */
         TAPE
 
-    }
-
-    enum VisionCommand {
-        START, STOP, RESTART
     }
 
     /**
@@ -161,6 +157,7 @@ public class VisionNetwork {
         return globalCount > countToCheck + MAX_DELTA_COUNT;
     }
 
+    // This is the horizontal angle
     public static Optional<Double> getAzimuth(VisionType visionType) {
         return getVisionObjectDetails(visionType)
                 .map(VisionObjectDetails::getAzimuth);      // return azimuth ifPresent, otherwise empty
@@ -182,10 +179,6 @@ public class VisionNetwork {
 
         visionSettingsTable.getEntry("vision_types").setStringArray(vt);
 
-    }
-
-    public static void setVisionStatus(VisionCommand visionCommand) {
-        visionSettingsTable.getEntry("status").setString(visionCommand.toString());
     }
 
     // check if data is stale (can use a global latest_count variable and delete when accessing or periodically)

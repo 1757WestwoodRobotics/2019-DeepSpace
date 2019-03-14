@@ -3,11 +3,15 @@ package org.whsrobotics.subsystems;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
+import org.whsrobotics.vision.VisionNetwork;
 
 import javax.naming.OperationNotSupportedException;
+
+import java.util.Optional;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
@@ -136,18 +140,31 @@ public class HatchMech extends WolverinesSubsystem {
         INCH, CM, NATIVE_TICKS
     }
 
+    // TODO: Error if the position is greater than the exceeded range!!!
     public static void moveBallScrewMotionMagic(Units unit, double position) {
         switch (unit) {
             case INCH:
-                ballScrewTalon.set(ControlMode.MotionMagic, position * 20807);  // ~20807 ticks per inch
+                _moveBallScrew(position * 20807);  // ~20807 ticks per inch
                 break;
             case CM:
-                ballScrewTalon.set(ControlMode.MotionMagic, (position / 2.54) * 20807);
+                _moveBallScrew((position / 2.54) * 20807);
                 break;
             case NATIVE_TICKS:
-                ballScrewTalon.set(ControlMode.MotionMagic, position);
+                _moveBallScrew(position);
                 break;
         }
+    }
+
+    private static void _moveBallScrew(double position) {
+        if (position < BALL_SCREW_REV_LIMIT || position > BALL_SCREW_FWD_LIMIT) {
+            DriverStation.reportError("**** ERROR: Cannot move the ball screw this far to " + position + " ticks! ****",  false);
+        } else {
+            ballScrewTalon.set(ControlMode.MotionMagic, position);
+        }
+    }
+
+    public static void centerBallScrew() {
+        moveBallScrewMotionMagic(Units.NATIVE_TICKS, 0);
     }
 
     // TODO: Sean, bind to a command/button (X on XboxControllerA or on the control system AND smartdashboard)
@@ -157,6 +174,20 @@ public class HatchMech extends WolverinesSubsystem {
 
     public static boolean ballScrewIsFinished() {
         return Math.abs(ballScrewTalon.getSelectedSensorPosition() - ballScrewTalon.getClosedLoopTarget()) < BALL_SCREW_MAX_ERROR;
+    }
+
+    // Should be updated periodically -> whileHeld with Button
+    public static void moveWithVision() {
+        Optional<Double> azimuth = VisionNetwork.getAzimuth(VisionNetwork.VisionType.TARGET);   // degrees
+        Optional<Double> distance = VisionNetwork.getDistance(VisionNetwork.VisionType.TARGET); // meters
+
+        // Assumes it's NOT outdated
+        azimuth.ifPresent(angle -> {
+            distance.ifPresent(forwardDistance -> {
+                double translateDistance = (Math.tan(Math.toRadians(angle)) * forwardDistance) * 1000; // m to cm
+                moveBallScrewMotionMagic(Units.CM, translateDistance);
+            });
+        });
     }
 
 }
