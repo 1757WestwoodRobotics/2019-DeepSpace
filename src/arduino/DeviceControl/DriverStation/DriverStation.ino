@@ -86,15 +86,42 @@ void setup() {
 
 
 void loop() {
-  int how_many = 0;
+ 
+  if (touch()) {
+    // as long as slider is being tocuhed and moved send position back to robot.
+    DynamicJsonDocument write_doc(512);
+
+    write_doc["sensor"] = "sliderPot";
+    write_doc["position"] = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
+    write_doc["manual_control"] = touch();
+    writeSerial(write_doc);
+  }
+
+  // Process Joystick
+  processAxis();
+  processButtons();
+
+  // Process any data over Serial Port.
+   int how_many = 0;
 
   // Read  Serial PORT to see if you received a command
   if (how_many = Serial.available()) {
-
+    if (debug) {
+      Serial.print("Proccesing - ");
+      Serial.print(how_many);
+      Serial.println();
+      Serial.print("Before JSON Parse...");
+      Serial.print(millis());
+      Serial.println();
+    }
     DynamicJsonDocument read_doc(512);
     DeserializationError error =  deserializeJson(read_doc, Serial);
 
-
+    if (debug) {
+      Serial.print("After JSON Parse...");
+      Serial.print(millis());
+      Serial.println();
+    }
     // Only if JSON Parse succeds do something or ignore the command
     if (!error) {
       const char *sensor = read_doc["sensor"];
@@ -113,20 +140,6 @@ void loop() {
       }
     }
   }
-  if (touch()) {
-    // as long as slider is being tocuhed and moved send position back to robot.
-    DynamicJsonDocument write_doc(512);
-
-    write_doc["sensor"] = "sliderPot";
-    write_doc["position"] = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
-    write_doc["manual_control"] = touch();
-    writeSerial(write_doc);
-  }
-
-  // Process Joystick
-  processAxis();
-  processButtons();
-  delay(100);
 }
 
 
@@ -151,7 +164,7 @@ void movePot(int pos)
 {
 
   digitalWrite(LED_BUILTIN, HIGH);
-  
+
   // Check for Bounds
   if (pos >= MAX_RANGE)
     pos = MAX_RANGE;
