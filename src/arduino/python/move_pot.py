@@ -10,8 +10,7 @@ arduino = DriverStation.Arduino('COM17')
 
 ##############################################################################################################
 
-def valueChanged(table, key, value, isNew):
-    print("valueChanged: key: '%s'; value: %s; isNew: %s" % (key, value, isNew))
+def sendPosition(value):
     command = '{ "sensor": "sliderPot", "position": 0 }'
     cmd = json.loads(command)
     cmd["position"] = value
@@ -29,4 +28,5 @@ sd = NetworkTables.getTable('Slider')
 while True:
     position = sd.getNumber('position', "N/A")
     print("position:", position)
+    sendPosition(position)
     time.sleep(1)
