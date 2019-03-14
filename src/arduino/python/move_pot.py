@@ -43,7 +43,7 @@ while True:
     position = read_network_value('position', table)
     command = '{ "sensor": "sliderPot", "position": 0 }'
     cmd = json.loads(command)
-    cmd["position"] = val
+    cmd["position"] = position
     print(json.dumps(cmd))
     arduino.write(json.dumps(cmd))
 #     publish_network_value('ABC', 104.5, table)
