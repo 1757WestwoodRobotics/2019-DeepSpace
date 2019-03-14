@@ -21,7 +21,7 @@ def sendPosition(value):
 ##############################################################################################################
 # Sit in a loop reading the Network table for Slider
 # and update Arduino via serial port to move the slider pot.
-# Postion values are bount  to -512 to 512 by the arduino.
+# Postion values are bound  to -512 to 512 by the arduino.
 ######################################################################
 NetworkTables.initialize(server="192.168.1.218")
 sd = NetworkTables.getTable('Slider')

@@ -44,7 +44,7 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
 const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-boolean debug = true;
+boolean debug = false;
 boolean touched = true;
 const bool autoSendMode = true;
 
@@ -149,6 +149,9 @@ boolean touch() {
 // Servo control of the POT
 void movePot(int pos)
 {
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  
   // Check for Bounds
   if (pos >= MAX_RANGE)
     pos = MAX_RANGE;
@@ -199,7 +202,7 @@ void movePot(int pos)
   // Stop the Pot Motor
   analogWrite(POT_FWD_PIN, 0);
   analogWrite(POT_REV_PIN, 0);
-
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 // Sends JSON output to serial port: For testing only
