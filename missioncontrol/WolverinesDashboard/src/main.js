@@ -128,6 +128,7 @@ function createWindow() {
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
         console.log('main window closed');
+        exec('taskkill /IM "gst-launch-1.0.exe"');
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
@@ -157,13 +158,13 @@ app.on('window-all-closed', function () {
     // Not like we're creating a consumer application though.
     // Let's just kill it anyway.
     // If you want to restore the standard behavior, uncomment the next line.
-
     // if (process.platform !== 'darwin')
     app.quit();
 });
 
 app.on('quit', function () {
     console.log('Application quit.');
+    
 });
 
 app.on('activate', function () {

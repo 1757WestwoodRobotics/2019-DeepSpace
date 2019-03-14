@@ -24,8 +24,17 @@ let ui = {
     superstructure_toggle: document.getElementById('superstructure'),
     drop_toggle: document.getElementById('drop'),
     drop_arms_toggle: document.getElementById('arms'),
-    deploy_toggle: document.getElementById('deploy')
+    deploy_toggle: document.getElementById('deploy'),
+    //neutralize_button: documentment.getElementById('neutralize')
 };
+
+let cylinders = [
+    "Hatch Mech",
+    "Superstructure",
+    "Hatch Deploy",
+    "Drop Arms",
+    "Floor Drop"
+]
 
 // Key Listeners
 
@@ -143,6 +152,100 @@ ui.drop_arms_toggle.onclick = () => {
     }
 
 };
+
+ui.deploy_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.deploy_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Deploy Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Deploy Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.deploy_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.deploy_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.deploy_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.superstructure_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.superstructure_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Superstructure Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Superstructure Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.superstructure_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.superstructure_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.superstructure_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.drop_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.drop_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Floor Drop Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Floor Drop Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.drop_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.drop_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.drop_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.hatch_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.hatch_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Mech Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Mech Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.hatch_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.hatch_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.hatch_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+/*ui.neutralize_button.onclick() = () => {
+    for (i = 0; y < length(cylinders); i++) {
+        NetworkTables.putValue('/SmartDashboard/' + cylinders[i] + ' Neutral/running', true);
+    }
+}*/
 
 // The rest of the doc is listeners for UI elements being clicked on
 ui.example.button.onclick = function() {
