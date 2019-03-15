@@ -22,8 +22,8 @@ public class HatchMech extends WolverinesSubsystem {
     private static final int BALL_SCREW_MAX_VELOCITY = 4162;
     private static final int BALL_SCREW_MAX_ACCEL = 8324;
 
-    private static final int BALL_SCREW_FWD_LIMIT = 62_423;
-    private static final int BALL_SCREW_REV_LIMIT = -62_423;
+    public static final int BALL_SCREW_FWD_LIMIT = 62_423;
+    public static final int BALL_SCREW_REV_LIMIT = -62_423;
     private static final int BALL_SCREW_S_CURVE = 2;
 
 

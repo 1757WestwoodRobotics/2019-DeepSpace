@@ -1,3 +1,5 @@
+//import { setupMaster } from "cluster";
+
 // Define UI elements
 let ui = {
     timer: document.getElementById('timer'),
@@ -24,8 +26,28 @@ let ui = {
     superstructure_toggle: document.getElementById('superstructure'),
     drop_toggle: document.getElementById('drop'),
     drop_arms_toggle: document.getElementById('arms'),
-    deploy_toggle: document.getElementById('deploy')
+    deploy_toggle: document.getElementById('deploy'),
+    //neutralize_button: documentment.getElementById('neutralize')
+    hatch: [
+        document.getElementById('hatch1'),
+        document.getElementById('hatch2')
+    ],
+    test: document.getElementById('doesitwork')
 };
+
+let moveHatch = (xx) => {
+    for (i = 0; i < ui.hatch.length; i++) {
+        ui.hatch[i].setAttribute("x", xx);
+    };
+};
+
+let cylinders = [
+    "Hatch Mech",
+    "Superstructure",
+    "Hatch Deploy",
+    "Drop Arms",
+    "Floor Drop"
+];
 
 // Key Listeners
 
@@ -44,17 +66,9 @@ NetworkTables.addKeyListener('/Robot/angle', updateGyro);
 
 // The following case is an example, for a robot with an arm at the front.
 NetworkTables.addKeyListener('/SmartDashboard/arm/encoder', (key, value) => {
-    // 0 is all the way back, 1200 is 45 degrees forward. We don't want it going past that.
-    if (value > 1140) {
-        value = 1140;
-    }
-    else if (value < 0) {
-        value = 0;
-    }
-    // Calculate visual rotation of arm
-    var armAngle = value * 3 / 20 - 45;
     // Rotate the arm in diagram to match real arm
-    ui.robotDiagram.arm.style.transform = `rotate(${armAngle}deg)`;
+    if (value > 192) value = 192;
+    moveHatch(value);
 });
 
 // This button is just an example of triggering an event on the robot by clicking a button.
@@ -74,7 +88,7 @@ NetworkTables.addKeyListener('/Robot/time', (key, value) => {
         ui.timer.style.backgroundColor = "orange";      // 30-6
     } else if (value <= 5) {
         ui.timer.style.backgroundColor = "red";         // 0-5
-    }
+    };
 
 });
 
@@ -99,6 +113,9 @@ NetworkTables.addKeyListener('/SmartDashboard/autonomous/selected', (key, value)
     ui.autoSelect.value = value;
 });
 
+ui.test.onclick = () => {
+    alert(ui.hatch[0].getAttribute('x'));
+}
 
 ui.compress_command.onclick = () => {
 
@@ -143,6 +160,100 @@ ui.drop_arms_toggle.onclick = () => {
     }
 
 };
+
+ui.deploy_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.deploy_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Deploy Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Deploy Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.deploy_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.deploy_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.deploy_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.superstructure_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.superstructure_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Superstructure Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Superstructure Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.superstructure_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.superstructure_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.superstructure_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.drop_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.drop_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Floor Drop Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Floor Drop Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.drop_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.drop_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.drop_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+ui.hatch_toggle.onclick = () => {
+
+    // Get current compressor status
+    let toggle_status = (ui.hatch_toggle.style.backgroundColor === 'green');
+
+    // Switch the compress modes
+    if (toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Mech Retracted/running', true);
+    } else if (!toggle_status) {
+        NetworkTables.putValue('/SmartDashboard/Hatch Mech Extended/running', true);
+    }
+
+    // Update the color of the button
+    toggle_status = (ui.hatch_toggle.style.backgroundColor === 'green');
+    if (toggle_status) {
+        ui.hatch_toggle.style.backgroundColor = 'red';
+    } else {
+        ui.hatch_toggle.style.backgroundColor = 'green';
+    }
+
+};
+
+/*ui.neutralize_button.onclick() = () => {
+    for (i = 0; y < length(cylinders); i++) {
+        NetworkTables.putValue('/SmartDashboard/' + cylinders[i] + ' Neutral/running', true);
+    }
+}*/
 
 // The rest of the doc is listeners for UI elements being clicked on
 ui.example.button.onclick = function() {

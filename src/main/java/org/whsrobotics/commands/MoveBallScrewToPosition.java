@@ -8,6 +8,10 @@ public class MoveBallScrewToPosition extends Command {
     private double position;
     private HatchMech.Units unit;
 
+    /**
+     * @param unit unit of measurement
+     * @param position the position that the ball screw is moving to
+     */
     public MoveBallScrewToPosition(HatchMech.Units unit, double position) {
         this.unit = unit;
         this.position = position;

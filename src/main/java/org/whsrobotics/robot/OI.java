@@ -24,7 +24,10 @@ public class OI {
 
     private static XboxController xboxControllerA;
     private static XboxController xboxControllerB;
-
+    /**
+     * Input is -1 to 1
+     * Output is -512 to 512
+     */
     private static Joystick controlSystem;
 
     private static NetworkTable robotTable;
@@ -139,6 +142,16 @@ public class OI {
         SmartDashboard.putData("Hatch Deploy Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED));
 
+    }
+
+    public static double getSliderValue(){
+        return controlSystem.getRawAxis(0);
+    }
+    
+    public static void setSliderPosition(double position) {
+        getRobotTable().getEntry("Slider").setNumber(position);
+        
+        (new MoveBallScrewToPosition(HatchMech.Units.NATIVE_TICKS, position * HatchMech.BALL_SCREW_FWD_LIMIT)).start();
     }
 
     public static XboxController getXboxControllerA() {

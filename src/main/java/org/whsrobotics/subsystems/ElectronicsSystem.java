@@ -33,14 +33,13 @@ public class ElectronicsSystem extends WolverinesSubsystem {
     @Override
     public void reducedPeriodic() {
 
-        SmartDashboard.putNumber("PDP Voltage", pdp.getVoltage());
-        SmartDashboard.putNumber("PDP Total Current", pdp.getTotalCurrent());
+        OI.getRobotTable().getEntry("PDP Voltage").setNumber(pdp.getVoltage());
 
         for (int i = 0; i <= 15; i++) {
             pdpCurrents[i] = pdp.getCurrent(i);
         }
 
-        SmartDashboard.putNumberArray("PDP Individual Current", pdpCurrents);
+        OI.getRobotTable().getEntry("PDP Currents").setDoubleArray(pdpCurrents);
 
         OI.getRobotTable().getEntry("time").setDouble(OI.getMatchTime());
     }
