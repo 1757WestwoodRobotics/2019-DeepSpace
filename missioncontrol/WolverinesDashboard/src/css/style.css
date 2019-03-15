@@ -133,10 +133,10 @@ aside {
     right: 0;
     top: 0;
     width: 15vw;
-    height: 100vh;
+    height: 140vh;
 }
 aside > * {
-    margin-bottom: 20px;
+    margin-bottom: 90px;
 }
 #login {
     position: fixed;
