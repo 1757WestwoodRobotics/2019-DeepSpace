@@ -3,10 +3,14 @@
 DriverStation:
 ==============
 Emulates a Joystcik and controls the slider pot and 7 Buttons and 5 Switches. DriverStation uses a Arduino Leonardo++. This code only works on certain Arduino's so make sure you have atleast a Leonardo. The DriverStaion appears as a Joystick device on the Laptop and talks directly to the FRCDriverStation.
-![Driver Station Fritz](/images/DriverStation.jpg "Driver Station Layout")
+
+---
+![Driver Station Fritz](/src/arduino/images/DriverStation.jpg "Driver Station Layout")
 
 ArduinoController: 
 =================
+![Lidar & Right Light Fritz](/src/arduino/images/Lidar-RingLight-Controller.jpg "Lidar & Ring Light Layout")
+
 Ring light for Vision
 ----------------------
 1 Ring light controlled via Data in and Data Out of the Ring lights. There are 24 LEDs in each ring.
