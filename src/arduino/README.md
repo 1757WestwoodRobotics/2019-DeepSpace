@@ -3,7 +3,7 @@
 DriverStation:
 ==============
 Emulates a Joystcik and controls the slider pot and 7 Buttons and 5 Switches. DriverStation uses a Arduino Leonardo++. This code only works on certain Arduino's so make sure you have atleast a Leonardo. The DriverStaion appears as a Joystick device on the Laptop and talks directly to the FRCDriverStation.
-![Driver Station Fritz](/2019-DeepSpace/src/arduino/images/DriverStation.jpg "Driver Station Layout")
+![Driver Station Fritz](/images/DriverStation.jpg "Driver Station Layout")
 
 ArduinoController: 
 =================
