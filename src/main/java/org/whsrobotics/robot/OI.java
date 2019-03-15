@@ -149,7 +149,7 @@ public class OI {
     }
     
     public static void setSliderPosition(double position) {
-        getRobotTable().getEntry("Slider").setNumber(position);
+        getRobotTable().getSubTable("Slider").getEntry("position").setNumber(position);
         
         (new MoveBallScrewToPosition(HatchMech.Units.NATIVE_TICKS, position * HatchMech.BALL_SCREW_FWD_LIMIT)).start();
     }
