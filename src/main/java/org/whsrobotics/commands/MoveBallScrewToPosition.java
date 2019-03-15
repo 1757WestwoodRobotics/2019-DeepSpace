@@ -19,7 +19,7 @@ public class MoveBallScrewToPosition extends Command {
 
     @Override
     protected void initialize() {
-        HatchMech.moveBallScrewMotionMagic(HatchMech.Units.NATIVE_TICKS, position);
+        HatchMech.moveBallScrewMotionMagic(unit, position);
     }
 
     @Override
