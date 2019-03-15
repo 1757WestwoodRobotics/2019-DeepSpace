@@ -1,13 +1,15 @@
 # Folder contains code to control Driver Station, LED lights and Lidars connected to Arduino. Communication is via I2C for Lidars.
 
 DriverStation:
---------------
+==============
 Emulates a Joystcik and controls the slider pot and 7 Buttons and 5 Switches. DriverStation uses a Arduino Leonardo++. This code only works on certain Arduino's so make sure you have atleast a Leonardo. The DriverStaion appears as a Joystick device on the Laptop and talks directly to the FRCDriverStation.
-
+![Driver Station Fritz](/2019-DeepSpace/src/arduino/images/DriverStation.jpg "Driver Station Layout")
 
 ArduinoController: 
-------------------
-Ring light for Vision - 1 Ring light controlled via Data in and Data Out of the Ring lights. There are 24 LEDs in each ring.
+=================
+Ring light for Vision
+----------------------
+1 Ring light controlled via Data in and Data Out of the Ring lights. There are 24 LEDs in each ring.
 
 |Teensy      | Ring Light   |   5V Buck |
 |-------     | ----------   |---------- |
@@ -16,7 +18,9 @@ Ring light for Vision - 1 Ring light controlled via Data in and Data Out of the 
 |GND (Black) |   GND (Black)| V out GND |
 
 
-Lidars: Used to detect objects around the Robot -  Controls Lidars(Front, Back, Left and Right)
+Lidars:
+------
+Used to detect objects around the Robot - Controls Lidars(Front, Back, Left and Right)
 * Front Lidar is GARMIN Lidar Lite V3
 * Rear, Left & Right Lidars is a VL53L0X
 
