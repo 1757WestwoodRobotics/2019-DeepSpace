@@ -1,68 +1,56 @@
-# Folder contains code to control LED lights and Lidars connected to Arduino. Communication is via I2C
+# Folder contains code to control Driver Station, LED lights and Lidars connected to Arduino. Communication is via I2C for Lidars.
 
-Ring Lights: Used only for Vision - Directory ledControl
---------------------------------------------------------
-We plan to use 3 Ring lights daisly chained via Data in and Data Out of the Ring lights. There are 24 LEDs in each ring and hence 72 LEDs in total.
-
-|Arduino     | Ring Light   |
-|-------     | ----------   |
-|Data Pin 6  |   Data In    |
-|VCC 5V      |   VCC        |
-|GND         |   GND        |
+DriverStation:
+--------------
+Emulates a Joystcik and controls the slider pot and 7 Buttons and 5 Switches. DriverStation uses a Arduino Leonardo++. This code only works on certain Arduino's so make sure you have atleast a Leonardo. The DriverStaion appears as a Joystick device on the Laptop and talks directly to the FRCDriverStation.
 
 
-Lidars: Used to detect objects around the Robot - Directories fronBackLidarControl & leftRightLidarControl
-----------------------------------------------------------------------------------------------------------
+ArduinoController: 
+------------------
+Ring light for Vision - 1 Ring light controlled via Data in and Data Out of the Ring lights. There are 24 LEDs in each ring.
 
-Front & Back Lidars:
+|Teensy      | Ring Light   |   5V Buck |
+|-------     | ----------   |---------- |
+|D11 (Yellow)|   Data In    | -         |
+|-           |   VCC (Red)  | V out +   |
+|GND (Black) |   GND (Black)| V out GND |
+
+
+Lidars: Used to detect objects around the Robot -  Controls Lidars(Front, Back, Left and Right)
 * Front Lidar is GARMIN Lidar Lite V3
-* Rear Lidar is a VL53L0X
+* Rear, Left & Right Lidars is a VL53L0X
 
 Front LIDAR Connections:
 
-|  Lidar-Lite      | Arduino 1 |
-|------------------|-----------|
-| 5v dc (red)      |     5v    |
-| I2C SCL (green)  |     SCL   |
-| I2C SDA (blue)   |     SDA   |
-| Ground (black)   |     GND   |
+|  Lidar-Lite      | Teensy3.2 |   5V Buck |
+|------------------|-----------|-----------|
+| 5v dc (red)      |     -     | V out +   |
+| Ground (black)   |     GND   | V out GND |
+| I2C SCL (blue)   |     SCL   | -         |
+| I2C SDA (green)  |     SDA   | -         |
+|
  
-Back LIDAR Connections:
+Back, Left, Right LIDAR Connections:
 
-|  LOX Back  | Arduino 1 |
-|------------|-----------|
-|    5v      |     5v    |
-|    GND     |     GND   |
-|    SCL     |     SCL   |
-|    SDA     |     SDA   |
+|  LOX Back   | LOX Laeft  | LOX Right   | Teensy3.2 |   5V Buck |
+|-------------|------------|-------------|-----------|-----------|
+|    5v       |     5v     |     5v      |    -      | V out +   |
+|    GND      |     GND    |     GND     |     GND   | V out GND |  
+|  SCL (blue) |     SCL    |     SCL     |     SCL   |    -      |
+|  SDA (green)|     SDA    |     SDA     |     SCL   |    -      |
+|  XSHUT(grey)|     -      |     -       |     D7    |    -      |
+|  -          |XSHUT(brown)|     -       |     D8    |    -      |
+|  -          |     -      |XSHUT(orange)|     D9    |    -      |
 
-Left & Right Lidars:
-* Shutdown PINS for each of the VL53L0X to set up I2C Address. Make sure to connect Digital Out Pins of Arduino appropriately to the LOX XSHUT Pins.
-
-|  LOX Left  | Arduino 2 |
-|------------|-----------|
-|    5v      |     5v    |
-|    GND     |     GND   |
-|    SCL     |     SCL   |
-|    SDA     |     SDA   |
-|    XSHUT   |     D7    |
-
-| LOX Right  | Arduino 2 |
-|------------|-----------|
-|    5v      |     5v    |
-|    GND     |     GND   |
-|    SCL     |     SCL   |
-|    SDA     |     SDA   |
-|    XSHUT   |     D8    |
-
-  
 
 * I2C is used to communicate between Arduinos and Lidar - Only between LIDAR and Arduino. The Front and Back LIDARs use default I2C Addressed. The Left and Right VL53L0X use specfic I2C addressed as detailed in the table below.
 
-| LOX  | I2C Address |
-|------|-------------|
-| Left |   0x32      |
-| Right|   0x33      |
+| LOX  | I2C Address    |
+|------|----------------|
+| Front|   Default(0x62)|
+| Back |   0x31         |
+| Left |   0x32         |
+| Right|   0x33         |
 
 
 
