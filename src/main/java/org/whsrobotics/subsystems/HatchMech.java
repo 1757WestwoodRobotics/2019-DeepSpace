@@ -176,7 +176,7 @@ public class HatchMech extends WolverinesSubsystem {
         return Math.abs(ballScrewTalon.getSelectedSensorPosition() - ballScrewTalon.getClosedLoopTarget()) < BALL_SCREW_MAX_ERROR;
     }
 
-    // Should be updated periodically -> whileHeld with Button
+    // Should be updated periodically -> whileHeld with Button TODO SEAN
     public static void moveWithVision() {
         Optional<Double> azimuth = VisionNetwork.getAzimuth(VisionNetwork.VisionType.TARGET);   // degrees
         Optional<Double> distance = VisionNetwork.getDistance(VisionNetwork.VisionType.TARGET); // meters

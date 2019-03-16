@@ -21,7 +21,7 @@
 // Various Joy Stick Buttons for the Driver station and their Ardunio Pin outs
 #define MIN_RANGE -512
 #define MAX_RANGE  512
-#define DS_BUTTON_COUNT 12   // We have 7 button and 5 toggle switches on the Driver Station
+#define DS_BUTTON_COUNT 11   // We have 7 button and 5 toggle switches on the Driver Station
 
 // Create Joystick
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
@@ -41,10 +41,10 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
                    false);
 
 // Arduino Pins the buttons are connected to
-const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5};
+const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-boolean debug = false;
+boolean debug = true;
 boolean touched = true;
 const bool autoSendMode = true;
 
@@ -86,7 +86,7 @@ void setup() {
 
 
 void loop() {
- 
+
   if (touch()) {
     // as long as slider is being tocuhed and moved send position back to robot.
     DynamicJsonDocument write_doc(512);
@@ -102,7 +102,7 @@ void loop() {
   processButtons();
 
   // Process any data over Serial Port.
-   int how_many = 0;
+  int how_many = 0;
 
   // Read  Serial PORT to see if you received a command
   if (how_many = Serial.available()) {
@@ -244,11 +244,15 @@ void processAxis()
 void processButtons()
 {
   boolean pressed = false;
-
+  
   for (int i = 0; i < DS_BUTTON_COUNT; i++) {
     if (buttons[i] == A4 || buttons[i] == A5) {
       // process Analog pins differentl
-      pressed = analogRead(buttons[i]) / 1023;  // 1K = 5V max ADC value
+      pressed = map(analogRead(buttons[i]),0,1024,0,1);  // 1K = 5V max ADC value
+    }
+    else if (buttons[i] == -1) {
+      //Touch button
+      pressed = touch();
     }
     else {
       pressed = digitalRead(buttons[i]);
@@ -268,5 +272,5 @@ void processButtons()
       Joystick.releaseButton(i);
     }
   }
-
+  debug = false;
 }

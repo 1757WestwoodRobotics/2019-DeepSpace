@@ -21,7 +21,7 @@ public class Constants {
         TOP_LEFT(0), TOP_MIDDLE(0), TOP_RIGHT(7),
         BOTTOM_LEFT(10), BOTTOM_MIDDLE(9), BOTTOM_RIGHT(6),
         SWITCH_A(5), SWITCH_B(4), SWITCH_C(3), SWITCH_D(2), SWITCH_E(1),
-        BRB(8);
+        BRB(8), SLIDER_CONDUCTIVE(11);
 
         public int port;
 

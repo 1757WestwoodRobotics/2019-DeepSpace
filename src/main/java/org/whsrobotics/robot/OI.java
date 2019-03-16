@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.whsrobotics.commands.*;
@@ -64,6 +65,23 @@ public class OI {
         
         (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).whenPressed(new Endgame());
 
+
+        // |-------- Slider --------|
+
+        (new JoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
+                .whileHeld(new Command() {
+
+                    @Override
+                    protected void execute() {
+                        double value = OI.getSliderValue();
+                        (new MoveBallScrewToPosition(HatchMech.Units.NATIVE_TICKS, value * HatchMech.BALL_SCREW_FWD_LIMIT)).start();
+                    }
+
+                    @Override
+                    protected boolean isFinished() {
+                        return false;
+                    }
+                });
 
         // |-------- Xbox Buttons --------|
 
@@ -144,14 +162,13 @@ public class OI {
 
     }
 
+    // On button press, get Slider value TODO
     public static double getSliderValue(){
         return controlSystem.getRawAxis(0);
     }
-    
+
     public static void setSliderPosition(double position) {
-        getRobotTable().getEntry("Slider").setNumber(position);
-        
-        (new MoveBallScrewToPosition(HatchMech.Units.NATIVE_TICKS, position * HatchMech.BALL_SCREW_FWD_LIMIT)).start();
+        getRobotTable().getSubTable("Slider").getEntry("position").setNumber(position);
     }
 
     public static XboxController getXboxControllerA() {
