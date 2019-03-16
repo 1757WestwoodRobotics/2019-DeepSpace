@@ -48,8 +48,10 @@ public class OI {
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchDeploySolenoid()));
         //When switch is on, the superstructure is moved to its extended position
-        (new JoystickButton(controlSystem, 2)).whileHeld(
+        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_B.port)).whileHeld(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
+        //When switch is on, uses manual input over vision alignment for slider
+        //(new JoystickButton(controlSystem, ControlSystemPort.SWITCH_C.port)).whileHeld(command);
         
 
         // |-------- Buttons --------|
