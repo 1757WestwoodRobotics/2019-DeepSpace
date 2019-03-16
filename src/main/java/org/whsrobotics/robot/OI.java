@@ -51,7 +51,7 @@ public class OI {
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_B.port)).whileHeld(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //When switch is on, uses manual input over vision alignment for slider
-        //(new JoystickButton(controlSystem, ControlSystemPort.SWITCH_C.port)).whileHeld(command);
+        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_C.port)).whileHeld(new SliderOverride());
         
 
         // |-------- Buttons --------|
@@ -71,26 +71,13 @@ public class OI {
         // |-------- Slider --------|
 
         (new JoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
-                .whileHeld(new Command() {
-
-                    @Override
-                    protected void execute() {
-                        double value = OI.getSliderValue();
-                        (new MoveBallScrewToPosition(HatchMech.Units.NATIVE_TICKS, value * HatchMech.BALL_SCREW_FWD_LIMIT)).start();
-                    }
-
-                    @Override
-                    protected boolean isFinished() {
-                        return false;
-                    }
-                });
+                .whileHeld(new SliderOverride());
 
         // |-------- Xbox Buttons --------|
 
         // Drivetrain FAST/SLOW mode (FAST while held)
-        (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value))
-                .whileHeld(new SetDrivetrainFast(5));
-
+        (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value)).whileHeld(
+            new SetDrivetrainFast(5));
         //Compress
         (new JoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
