@@ -24,6 +24,11 @@
     <div id="camera"></div>
     <!-- The main body of the dashboard, by default contains the gyro monitor and the robot diagram -->
     <article>
+        <!-- Pressure Readouts -->
+        <svg id="pneumatics">
+            <text id="pressure" x="110" y="115">0 psi</text>
+            <text id="pressureSwitch" x="110" y="215"></text>
+        </svg>
         <!-- Gyroscope -->
         <svg id="gyro">
             <circle cx="85" cy="85" r="83"></circle>
