@@ -46,7 +46,7 @@ public class OI {
             new CompressStop());
         //When switch is on, the hatch mechanism is moved to its extended position
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
-            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchDeploySolenoid()));
+            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid())); 
         //When switch is on, the superstructure is moved to its extended position
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_B.port)).whileHeld(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
@@ -75,9 +75,6 @@ public class OI {
 
         // |-------- Xbox Buttons --------|
 
-        // Drivetrain FAST/SLOW mode (FAST while held)
-        (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value)).whileHeld(
-            new SetDrivetrainFast(5));
         //Compress
         (new JoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
@@ -93,6 +90,19 @@ public class OI {
         //Hatch Eject
         (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
             new HatchEjection());
+        //Slider Manual Override
+        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).toggleWhenPressed(
+            new SliderOverride());
+        //Endgame
+        (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
+            new Endgame());
+
+        /*  
+        XboxControleller A
+        Right Bumper - While Held - Fast Mode
+        */
+        (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value)).whileHeld(
+            new SetDrivetrainFast(5));
 
 
         // NETWORK TABLES STUFF

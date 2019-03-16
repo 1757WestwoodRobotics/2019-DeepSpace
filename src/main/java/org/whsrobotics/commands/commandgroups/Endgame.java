@@ -23,7 +23,7 @@ public class Endgame extends CommandGroup {
             Superstructure.instance, Superstructure.getSuperstructureSolenoid(), DoubleSolenoidModes.EXTENDED));
         addSequential(new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
-        addSequential(new RampDeployment());      
+        // addSequential(new RampDeployment());      
 
     }
 }
