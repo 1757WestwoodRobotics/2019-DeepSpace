@@ -140,7 +140,6 @@ public class HatchMech extends WolverinesSubsystem {
         INCH, CM, NATIVE_TICKS
     }
 
-    // TODO: Error if the position is greater than the exceeded range!!!
     public static void moveBallScrewMotionMagic(Units unit, double position) {
         switch (unit) {
             case INCH:
