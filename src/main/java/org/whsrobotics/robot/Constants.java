@@ -18,10 +18,10 @@ public class Constants {
      * Switches: A is leftmost, E is rightmost
      */
     public enum ControlSystemPort {
-        TOP_LEFT(0), TOP_MIDDLE(1), TOP_RIGHT(2),
-        BOTTOM_LEFT(3), BOTTOM_MIDDLE(4), BOTTOM_RIGHT(5),
-        SWITCH_A(6), SWITCH_B(7), SWITCH_C(8), SWITCH_D(9), SWITCH_E(10),
-        BRB(11);
+        TOP_LEFT(0), TOP_MIDDLE(0), TOP_RIGHT(7),
+        BOTTOM_LEFT(10), BOTTOM_MIDDLE(9), BOTTOM_RIGHT(6),
+        SWITCH_A(5), SWITCH_B(4), SWITCH_C(3), SWITCH_D(2), SWITCH_E(1),
+        BRB(8);
 
         public int port;
 
