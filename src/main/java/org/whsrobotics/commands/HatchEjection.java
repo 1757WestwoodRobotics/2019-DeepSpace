@@ -9,16 +9,17 @@ import edu.wpi.first.wpilibj.command.TimedCommand;
 public class HatchEjection extends TimedCommand {
 
     public HatchEjection() {
-        super(0.35);
+        //Was .35 seconds
+        super(5.0);
     }
     
     @Override
         protected void initialize() {
-            PneumaticsBase.setSolenoidPosition(HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED);
+            PneumaticsBase.setDoubleSolenoidPosition(HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED);
         }
         
         @Override
         protected void end() {
-            PneumaticsBase.setSolenoidPosition(HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED);
+            PneumaticsBase.setDoubleSolenoidPosition(HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED);
         }
 }

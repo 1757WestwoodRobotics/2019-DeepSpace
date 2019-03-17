@@ -2,23 +2,24 @@ package org.whsrobotics.commands;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
 import org.whsrobotics.subsystems.PneumaticsBase;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-public class SetDoubleSolenoid extends InstantCommand{
+public class SetSingleSolenoid extends InstantCommand{
 
     private WolverinesSubsystem subsystem;
-    private DoubleSolenoid solenoid;
-    private PneumaticsBase.DoubleSolenoidModes mode;
+    private Solenoid solenoid;
+    private PneumaticsBase.SingleSolenoidModes mode;
 
     /**
      * @param subsystem the subsystem that is being manipulated
      * @param solenoid the solenoid that is being set
      * @param mode the mode of the solenoid: extended, neutral, retracted
      */
-    public SetDoubleSolenoid(WolverinesSubsystem subsystem, DoubleSolenoid solenoid, PneumaticsBase.DoubleSolenoidModes mode) {
+    public SetSingleSolenoid(WolverinesSubsystem subsystem, Solenoid solenoid, PneumaticsBase.SingleSolenoidModes mode) {
         requires(subsystem);
         this.subsystem = subsystem;
         this.solenoid = solenoid;
@@ -29,7 +30,7 @@ public class SetDoubleSolenoid extends InstantCommand{
     protected void initialize() {
         if (subsystem.ensureInit()) {
             System.out.println("Moving " + solenoid.toString() + " to " + mode.toString());
-            PneumaticsBase.setDoubleSolenoidPosition(solenoid, mode);
+            PneumaticsBase.setSingleSolenoidPosition(solenoid, mode);
         } else {
             DriverStation.reportError("**** ERROR: Cannot move " + solenoid.toString() + " because the subsystem has failed initialization", false);
         }

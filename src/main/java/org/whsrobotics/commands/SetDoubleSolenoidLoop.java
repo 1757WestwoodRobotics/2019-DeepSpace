@@ -25,7 +25,7 @@ public class SetDoubleSolenoidLoop extends Command {
     
     @Override
     protected void initialize() {
-        PneumaticsBase.setSolenoidPosition(solenoid, DoubleSolenoidModes.EXTENDED);
+        PneumaticsBase.setDoubleSolenoidPosition(solenoid, DoubleSolenoidModes.EXTENDED);
     }
     
     @Override
@@ -35,6 +35,6 @@ public class SetDoubleSolenoidLoop extends Command {
 
     @Override
     protected void end() {
-        PneumaticsBase.setSolenoidPosition(solenoid, DoubleSolenoidModes.RETRACTED);
+        PneumaticsBase.setDoubleSolenoidPosition(solenoid, DoubleSolenoidModes.RETRACTED);
     }
 }

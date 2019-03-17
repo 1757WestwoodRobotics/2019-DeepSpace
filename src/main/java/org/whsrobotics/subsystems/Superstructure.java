@@ -1,16 +1,21 @@
 package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
+
 import org.whsrobotics.utils.WolverinesSubsystem;
 
-import static org.whsrobotics.robot.Constants.SolenoidPorts.SUPERSTRUCTURE;
+import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
 import static org.whsrobotics.subsystems.PneumaticsBase.*;
+
+import org.whsrobotics.robot.OI;
 
 public class Superstructure extends WolverinesSubsystem {
 
     public static Superstructure instance;
 
     private static DoubleSolenoid superstructureSolenoid;
+    private static Solenoid rampReleaseSolenoid;
 
     private Superstructure() {
         super(false);
@@ -28,8 +33,16 @@ public class Superstructure extends WolverinesSubsystem {
         superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
         superstructureSolenoid.setName("superstructureSolenoid");
 
+        rampReleaseSolenoid = new Solenoid(RAMP_RELEASE.module, RAMP_RELEASE.a);
+        rampReleaseSolenoid.setName("rampReleaseSolenoid");
+
         PneumaticsBase.registerDoubleSolenoid(superstructureSolenoid);
 
+    }
+
+    @Override
+    protected void reducedPeriodic() {
+        OI.getRobotTable().getEntry("rampReleaseSolenoid").setBoolean(rampReleaseSolenoid.get());
     }
 
     @Override
@@ -43,6 +56,10 @@ public class Superstructure extends WolverinesSubsystem {
 
     public static DoubleSolenoid getSuperstructureSolenoid() {
         return superstructureSolenoid;
+    }
+
+    public static Solenoid getRampReleaseSolenoid() {
+        return rampReleaseSolenoid;
     }
 
 }
