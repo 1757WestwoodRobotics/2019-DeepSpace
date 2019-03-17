@@ -9,10 +9,11 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.whsrobotics.commands.*;
-import org.whsrobotics.commands.commandgroups.Endgame;
 import org.whsrobotics.subsystems.HatchMech;
+import org.whsrobotics.subsystems.PneumaticsBase;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
+import org.whsrobotics.subsystems.PneumaticsBase.SingleSolenoidModes;
 import org.whsrobotics.utils.XboxController;
 
 import static org.whsrobotics.robot.Constants.ComputerPort;
@@ -62,10 +63,16 @@ public class OI {
         //When button is pressed, hatch is shot off the hatch mechanism
         (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
             new HatchEjection());
+        //Retracts drop arm solenoid
+        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_LEFT.port)).whenPressed(
+            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
+        //Extends drop arm solenoid
+        (new JoystickButton(controlSystem, ControlSystemPort.TOP_RIGHT.port)).whenPressed(
+            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
         
         // |-------- Big Red Button --------|
         
-        (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).whenPressed(new Endgame());
+        (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
 
 
         // |-------- Slider --------|
@@ -90,12 +97,15 @@ public class OI {
         //Hatch Eject
         (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
             new HatchEjection());
-        //Slider Manual Override
-        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).toggleWhenPressed(
-            new SliderOverride());
-        //Endgame
+        //Retracts drop arm solenoid
+        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
+            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
+        //Extends drop arm solenoid
+        (new JoystickButton(xboxControllerB, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
+            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
+        //Ramp Deployment
         (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
-            new Endgame());
+            new RampDeployment());
 
         /*  
         XboxControleller A
@@ -109,7 +119,12 @@ public class OI {
 
         robotTable = NetworkTableInstance.getDefault().getTable("/Robot");
         
-        
+        SmartDashboard.putData("Wing Retract", new RampDeployment());
+
+        //Returns Wing Retract to Normal Position (If needed, shoudld only press once ever)
+        SmartDashboard.putData("Return Wing", new SetSingleSolenoid(
+            Superstructure.instance, Superstructure.getRampReleaseSolenoid(), SingleSolenoidModes.RETRACTED));
+
         SmartDashboard.putData("Compress", new Compress());
 
         SmartDashboard.putData("Stop Compress", new CompressStop());

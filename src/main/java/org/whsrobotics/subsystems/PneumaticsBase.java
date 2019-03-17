@@ -2,7 +2,7 @@ package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
@@ -70,6 +70,19 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     }
 
+    public enum SingleSolenoidModes {
+        EXTENDED(true),
+        RETRACTED(false);
+
+        public boolean value;
+
+        SingleSolenoidModes(boolean value) {
+            this.value = value;
+        }
+
+    }
+    
+
     @Override
     protected void reducedPeriodic() {
         SmartDashboard.putNumber("Pressure (psi)", getPressure());
@@ -94,7 +107,11 @@ public class PneumaticsBase extends WolverinesSubsystem {
         setDefaultCommand(new Compress());
     }
 
-    public static void setSolenoidPosition(DoubleSolenoid solenoid, DoubleSolenoidModes mode) {
+    public static void setDoubleSolenoidPosition(DoubleSolenoid solenoid, DoubleSolenoidModes mode) {
+        solenoid.set(mode.value);
+    }
+
+    public static void setSingleSolenoidPosition(Solenoid solenoid, SingleSolenoidModes mode) {
         solenoid.set(mode.value);
     }
 

@@ -8,7 +8,7 @@ import org.whsrobotics.utils.WolverinesSubsystem;
 
 public class Robot extends TimedRobot {
 
-    public static final boolean isTestRobot = true;
+    public static final boolean isTestRobot = false;
 
     /**
      * This function is run when the robot is first started up and should be
