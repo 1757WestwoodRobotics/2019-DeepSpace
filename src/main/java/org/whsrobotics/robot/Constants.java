@@ -59,7 +59,6 @@ public class Constants {
         HATCH_FLOOR(canID.PCM_A, 2, 3),
         HATCH_DEPLOY(canID.PCM_A, 4, 5),
         DROP_ARMS(canID.PCM_A, 6, 7),
-        WING_DELPOY(canID.PCM_B, 2, 2);
 
         public int module;
         public int a;
