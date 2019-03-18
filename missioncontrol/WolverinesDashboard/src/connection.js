@@ -1,7 +1,12 @@
 const exec = require('child_process').exec;
 const fixPath = require('fix-path');
 const electron = require('electron');
-const spawnAdmin = require('spawn-as-admin');
+
+var sudo = require('sudo-prompt');
+var options = {
+    name: 'Electron',
+    icns: '/Applications/Electron.app/Contents/Resources/Electron.icns', // (optional)
+};
 
 let address = document.getElementById('connect-address'),
     connect = document.getElementById('connect'),
@@ -9,6 +14,7 @@ let address = document.getElementById('connect-address'),
 
 let pit_if = document.getElementById('ds_pit_ifconfig');
 let field_if = document.getElementById('ds_field_ifconfig');
+let dhcp_if = document.getElementById('ds_dhcp_ifconfig');
 
 let loginShown = true;
 
@@ -17,8 +23,14 @@ pit_if.onclick = () => {
     fixPath();
     // Windows
     if (process.platform === 'win32') {
-        spawnAdmin('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.255.255.0 0.0.0.0');
-        alert("changed IP settings to PIT configuration!");
+
+        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.255.255.0 10.17.57.1', options,
+            function (error, stdout, stderr) {
+                if (error) throw error;
+                console.log('stdout: ' + stdout);
+            });
+
+        alert("Changing IP settings to PIT configuration! Launching ADMIN UAC");
     }
 };
 
@@ -26,8 +38,29 @@ field_if.onclick = () => {
     fixPath();
     // Windows
     if (process.platform === 'win32') {
-        spawnAdmin('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.0.0.0 0.0.0.0');
-        alert("changed IP settings to FIELD configuration!");
+
+        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.0.0.0 10.17.57.1', options,
+            function (error, stdout, stderr) {
+                if (error) throw error;
+                console.log('stdout: ' + stdout);
+            });
+
+        alert("Changing IP settings to FIELD configuration! Launching ADMIN UAC");
+    }
+};
+
+dhcp_if.onclick = () => {
+    fixPath();
+    // Windows
+    if (process.platform === 'win32') {
+
+        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" dhcp', options,
+            function (error, stdout, stderr) {
+                if (error) throw error;
+                console.log('stdout: ' + stdout);
+            });
+
+        alert("Changing IP settings to DHCP configuration! Launching ADMIN UAC");
     }
 };
 

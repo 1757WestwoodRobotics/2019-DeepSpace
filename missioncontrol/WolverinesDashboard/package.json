@@ -26,6 +26,7 @@
   "dependencies": {
     "fix-path": "^2.1.0",
     "spawn-as-admin": "^0.1.3",
+    "sudo-prompt": "^8.2.5",
     "wpilib-nt-client": "^1.7.1"
   }
 }
