@@ -32,7 +32,9 @@ let ui = {
         document.getElementById('hatch1'),
         document.getElementById('hatch2')
     ],
-    test: document.getElementById('doesitwork')
+    test: document.getElementById('doesitwork'),
+    pindicator: document.getElementById('pressure'),
+    pswitch: document.getElementById('pressureSwitch')
 };
 
 let moveHatch = (xx) => {
@@ -90,6 +92,18 @@ NetworkTables.addKeyListener('/Robot/time', (key, value) => {
         ui.timer.style.backgroundColor = "red";         // 0-5
     };
 
+});
+
+NetworkTables.addKeyListener('/SmartDashboard/Pressure (psi)', (key, value) => {
+    ui.pindicator.innerHTML = value.toString() + " psi";
+});
+
+NetworkTables.addKeyListener('/SmartDashboard/Pressure Switch', (key, value) => {
+    if (value == true) {
+        ui.pswitch.innerHTML = "Pressure Full"
+    } else {
+        ui.pswitch.innerHTML = "Pneumatics Not Full"
+    }
 });
 
 // Load list of prewritten autonomous modes
