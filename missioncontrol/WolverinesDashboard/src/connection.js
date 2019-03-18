@@ -1,6 +1,7 @@
 const exec = require('child_process').exec;
 const fixPath = require('fix-path');
 const electron = require('electron');
+const spawnAdmin = require('spawn-as-admin');
 
 let address = document.getElementById('connect-address'),
     connect = document.getElementById('connect'),
@@ -13,17 +14,19 @@ let loginShown = true;
 
 
 pit_if.onclick = () => {
+    fixPath();
     // Windows
     if (process.platform === 'win32') {
-        exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.255.255.0 0.0.0.0');
+        spawnAdmin('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.255.255.0 0.0.0.0');
         alert("changed IP settings to PIT configuration!");
     }
 };
 
 field_if.onclick = () => {
+    fixPath();
     // Windows
     if (process.platform === 'win32') {
-        exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.0.0.0 0.0.0.0');
+        spawnAdmin('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.0.0.0 0.0.0.0');
         alert("changed IP settings to FIELD configuration!");
     }
 };
