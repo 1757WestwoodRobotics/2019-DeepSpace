@@ -58,6 +58,7 @@ typings/
 .env
 
 dist/
+*.pak
 package-lock.json
 .DS_Store
 .vscode/
