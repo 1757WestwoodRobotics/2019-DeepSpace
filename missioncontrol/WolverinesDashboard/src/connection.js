@@ -24,7 +24,7 @@ pit_if.onclick = () => {
     // Windows
     if (process.platform === 'win32') {
 
-        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.255.255.0 10.17.57.1', options,
+        sudo.exec('netsh interface ipv4 set address name="Ethernet" static 10.17.57.5 255.255.255.0 10.17.57.1', options,
             function (error, stdout, stderr) {
                 if (error) throw error;
                 console.log('stdout: ' + stdout);
@@ -39,7 +39,7 @@ field_if.onclick = () => {
     // Windows
     if (process.platform === 'win32') {
 
-        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" static 10.17.57.5 255.0.0.0 10.17.57.1', options,
+        sudo.exec('netsh interface ipv4 set address name="Ethernet" static 10.17.57.5 255.0.0.0 10.17.57.1', options,
             function (error, stdout, stderr) {
                 if (error) throw error;
                 console.log('stdout: ' + stdout);
@@ -54,7 +54,7 @@ dhcp_if.onclick = () => {
     // Windows
     if (process.platform === 'win32') {
 
-        sudo.exec('netsh interface ipv4 set address name="Wi-Fi" dhcp', options,
+        sudo.exec('netsh interface ipv4 set address name="Ethernet" dhcp', options,
             function (error, stdout, stderr) {
                 if (error) throw error;
                 console.log('stdout: ' + stdout);
