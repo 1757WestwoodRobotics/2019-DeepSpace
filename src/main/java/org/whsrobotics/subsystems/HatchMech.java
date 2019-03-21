@@ -14,7 +14,6 @@ import javax.naming.OperationNotSupportedException;
 import java.util.Optional;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
-import static org.whsrobotics.robot.Constants.SolenoidPorts.HATCH_DEPLOY;
 
 public class HatchMech extends WolverinesSubsystem {
 
@@ -26,11 +25,8 @@ public class HatchMech extends WolverinesSubsystem {
     public static final int BALL_SCREW_REV_LIMIT = -62_423;
     private static final int BALL_SCREW_S_CURVE = 2;
 
-
     private static DoubleSolenoid hatchMechSliderSolenoid;
-    private static DoubleSolenoid hatchDeploySolenoid;
-    private static DoubleSolenoid dropArmsSolenoid;
-    private static DoubleSolenoid floorHatchMechSolenoid;
+    private static DoubleSolenoid hatchMechActuationSolenoid;
 
     private static TalonSRX ballScrewTalon;
     
@@ -49,20 +45,15 @@ public class HatchMech extends WolverinesSubsystem {
 
     @Override
     protected void init(boolean onTestRobot) {
+        
         hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
         hatchMechSliderSolenoid.setName("hatchMechSliderSolenoid");
 
-        hatchDeploySolenoid = new DoubleSolenoid(HATCH_DEPLOY.module, HATCH_DEPLOY.a, HATCH_DEPLOY.b);
-        hatchDeploySolenoid.setName("hatchDeploySolenoid");
+        hatchMechActuationSolenoid = new DoubleSolenoid(HATCH_MECH_ACTUATION.module, HATCH_MECH_ACTUATION.a, HATCH_MECH_ACTUATION.b);
 
-        dropArmsSolenoid = new DoubleSolenoid(DROP_ARMS.module, DROP_ARMS.a, DROP_ARMS.b);
-        dropArmsSolenoid.setName("dropArmsSolenoid");
+        
 
-        floorHatchMechSolenoid = new DoubleSolenoid(HATCH_FLOOR.module, HATCH_FLOOR.a, HATCH_FLOOR.b);
-        floorHatchMechSolenoid.setName("floorHatchMechSolenoid");
-
-        PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid, hatchDeploySolenoid, dropArmsSolenoid, floorHatchMechSolenoid);
-
+        PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid);
 
         ballScrewTalon = new TalonSRX(7);
         ballScrewTalon.configFactoryDefault();
@@ -119,18 +110,6 @@ public class HatchMech extends WolverinesSubsystem {
 
     public static DoubleSolenoid getHatchMechSliderSolenoid() {
         return hatchMechSliderSolenoid;
-    }
-
-    public static DoubleSolenoid getHatchDeploySolenoid() {
-        return hatchDeploySolenoid;
-    }
-
-    public static DoubleSolenoid getDropArmsSolenoid() {
-        return dropArmsSolenoid;
-    }
-
-    public static DoubleSolenoid getFloorHatchMechSolenoid() {
-        return floorHatchMechSolenoid;
     }
 
 

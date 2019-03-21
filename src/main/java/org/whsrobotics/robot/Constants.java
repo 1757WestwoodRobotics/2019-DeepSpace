@@ -56,9 +56,8 @@ public class Constants {
         SUPERSTRUCTURE(canID.PCM_B, 0, 1),
 
         HATCH_MECH_SLIDER(canID.PCM_A, 0, 1),
-        HATCH_FLOOR(canID.PCM_A, 2, 3),
-        HATCH_DEPLOY(canID.PCM_A, 4, 5),
-        DROP_ARMS(canID.PCM_A, 6, 7),
+        HATCH_MECH_ACTUATION(canID.PCM_A, 2, 3),
+
         RAMP_RELEASE(canID.PCM_B, 2, 2);
 
         public int module;

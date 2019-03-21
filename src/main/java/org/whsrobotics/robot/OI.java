@@ -43,8 +43,10 @@ public class OI {
         // |-------- Switches --------|
 
         //When swtich is off, compression stops (compression is automatically on)
-        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whenInactive(
+        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whileHeld(
             new CompressStop());
+            
+
         //When switch is on, the hatch mechanism is moved to its extended position
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid())); 
@@ -58,17 +60,12 @@ public class OI {
         // |-------- Buttons --------|
 
         //When button is held, the hatch mechanism decends to the floor for hatch pickup
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_MIDDLE.port)).whileHeld(
-            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
+
         //When button is pressed, hatch is shot off the hatch mechanism
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
-            new HatchEjection());
+
         //Retracts drop arm solenoid
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_LEFT.port)).whenPressed(
-            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
+
         //Extends drop arm solenoid
-        (new JoystickButton(controlSystem, ControlSystemPort.TOP_RIGHT.port)).whenPressed(
-            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
         
         // |-------- Big Red Button --------|
         
@@ -89,20 +86,16 @@ public class OI {
         (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //Hatch Floor Grab
-        (new JoystickButton(xboxControllerB, Buttons.X.value)).whileHeld(
-            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
+
         //Hatch Extend
         (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Hatch Eject
-        (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
-            new HatchEjection());
+
         //Retracts drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
-            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
+
         //Extends drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
-            new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
+
         //Ramp Deployment
         (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());
@@ -146,33 +139,6 @@ public class OI {
 
         SmartDashboard.putData("Hatch Mech Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getHatchMechSliderSolenoid(), DoubleSolenoidModes.RETRACTED));
-
-        SmartDashboard.putData("Drop Arms Extended", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
-
-        SmartDashboard.putData("Drop Arms Neutral", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.NEUTRAL));
-
-        SmartDashboard.putData("Drop Arms Retracted", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
-
-        SmartDashboard.putData("Floor Drop Extended", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.EXTENDED));
-
-        SmartDashboard.putData("Floor Drop Neutral", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.NEUTRAL));
-
-        SmartDashboard.putData("Floor Drop Retracted", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getFloorHatchMechSolenoid(), DoubleSolenoidModes.RETRACTED));
-
-        SmartDashboard.putData("Hatch Deploy Extended", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.EXTENDED));
-
-        SmartDashboard.putData("Hatch Deploy Neutral", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.NEUTRAL));
-
-        SmartDashboard.putData("Hatch Deploy Retracted", new SetDoubleSolenoid(
-            HatchMech.instance, HatchMech.getHatchDeploySolenoid(), DoubleSolenoidModes.RETRACTED));
 
     }
 
