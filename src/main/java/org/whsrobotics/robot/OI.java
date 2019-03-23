@@ -44,9 +44,7 @@ public class OI {
 
         //When swtich is off, compression stops (compression is automatically on)
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whileHeld(
-            new CompressStop());
-            
-
+            new CompressStop());  
         //When switch is on, the hatch mechanism is moved to its extended position
         (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid())); 
@@ -59,18 +57,14 @@ public class OI {
 
         // |-------- Buttons --------|
 
-        //When button is held, the hatch mechanism decends to the floor for hatch pickup
-
-        //When button is pressed, hatch is shot off the hatch mechanism
-
-        //Retracts drop arm solenoid
-
-        //Extends drop arm solenoid
+        //When button is pressed, hatch mechanism toggles between being actuated and being folded in
+        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).toggleWhenPressed(
+            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechActuationSolenoid()));
         
         // |-------- Big Red Button --------|
         
+        //Deploys ramp
         (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
-
 
         // |-------- Slider --------|
 
@@ -85,17 +79,11 @@ public class OI {
         //Superstructure Extended
         (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
-        //Hatch Floor Grab
 
         //Hatch Extend
         (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
-        //Hatch Eject
-
-        //Retracts drop arm solenoid
-
-        //Extends drop arm solenoid
-
+       
         //Ramp Deployment
         (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());

@@ -50,10 +50,10 @@ public class HatchMech extends WolverinesSubsystem {
         hatchMechSliderSolenoid.setName("hatchMechSliderSolenoid");
 
         hatchMechActuationSolenoid = new DoubleSolenoid(HATCH_MECH_ACTUATION.module, HATCH_MECH_ACTUATION.a, HATCH_MECH_ACTUATION.b);
-
-        
+        hatchMechActuationSolenoid.setName("hatchMechActuationSolenoid");
 
         PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid);
+        PneumaticsBase.registerDoubleSolenoid(hatchMechActuationSolenoid);
 
         ballScrewTalon = new TalonSRX(7);
         ballScrewTalon.configFactoryDefault();
@@ -110,6 +110,10 @@ public class HatchMech extends WolverinesSubsystem {
 
     public static DoubleSolenoid getHatchMechSliderSolenoid() {
         return hatchMechSliderSolenoid;
+    }
+
+    public static DoubleSolenoid getHatchMechActuationSolenoid(){
+        return hatchMechActuationSolenoid;
     }
 
 
