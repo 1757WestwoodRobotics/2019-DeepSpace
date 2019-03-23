@@ -15,11 +15,11 @@ let ui = {
     robotDiagram: {
         arm: document.getElementById('robot-arm')
     },
-    example: {
-        button: document.getElementById('example-button'),
-        readout: document.getElementById('example-readout').firstChild
-    },
-    autoSelect: document.getElementById('auto-select'),
+    //example: {
+    //    button: document.getElementById('example-button'),
+    //    readout: document.getElementById('example-readout').firstChild
+    //},
+    // autoSelect: document.getElementById('auto-select'),
     armPosition: document.getElementById('arm-position'),
     compress_command: document.getElementById('compress_command'),
     hatch_toggle: document.getElementById('hatch'),
@@ -32,7 +32,9 @@ let ui = {
         document.getElementById('hatch1'),
         document.getElementById('hatch2')
     ],
-    test: document.getElementById('doesitwork')
+    test: document.getElementById('doesitwork'),
+    pindicator: document.getElementById('pressure'),
+    pswitch: document.getElementById('pressureSwitch')
 };
 
 let moveHatch = (xx) => {
@@ -72,11 +74,11 @@ NetworkTables.addKeyListener('/SmartDashboard/arm/encoder', (key, value) => {
 });
 
 // This button is just an example of triggering an event on the robot by clicking a button.
-NetworkTables.addKeyListener('/SmartDashboard/example_variable', (key, value) => {
+/*NetworkTables.addKeyListener('/SmartDashboard/example_variable', (key, value) => {
     // Set class active if value is true and unset it if it is false
     ui.example.button.classList.toggle('active', value);
     ui.example.readout.data = 'Value is ' + value;
-});
+});*/
 
 NetworkTables.addKeyListener('/Robot/time', (key, value) => {
     // We assume here that value is an integer representing the number of seconds left.
@@ -92,26 +94,38 @@ NetworkTables.addKeyListener('/Robot/time', (key, value) => {
 
 });
 
-// Load list of prewritten autonomous modes
-NetworkTables.addKeyListener('/SmartDashboard/autonomous/modes', (key, value) => {
-    // Clear previous list
-    while (ui.autoSelect.firstChild) {
-        ui.autoSelect.removeChild(ui.autoSelect.firstChild);
+NetworkTables.addKeyListener('/SmartDashboard/Pressure (psi)', (key, value) => {
+    ui.pindicator.innerHTML = value.toString() + " psi";
+});
+
+NetworkTables.addKeyListener('/SmartDashboard/Pressure Switch', (key, value) => {
+    if (value == true) {
+        ui.pswitch.innerHTML = "Pressure Full"
+    } else {
+        ui.pswitch.innerHTML = "Pneumatics Not Full"
     }
-    // Make an option for each autonomous mode and put it in the selector
-    for (let i = 0; i < value.length; i++) {
-        var option = document.createElement('option');
-        option.appendChild(document.createTextNode(value[i]));
-        ui.autoSelect.appendChild(option);
-    }
-    // Set value to the already-selected mode. If there is none, nothing will happen.
-    ui.autoSelect.value = NetworkTables.getValue('/SmartDashboard/currentlySelectedMode');
 });
 
 // Load list of prewritten autonomous modes
-NetworkTables.addKeyListener('/SmartDashboard/autonomous/selected', (key, value) => {
-    ui.autoSelect.value = value;
-});
+// NetworkTables.addKeyListener('/SmartDashboard/autonomous/modes', (key, value) => {
+//     // Clear previous list
+//     while (ui.autoSelect.firstChild) {
+//         ui.autoSelect.removeChild(ui.autoSelect.firstChild);
+//     }
+//     // Make an option for each autonomous mode and put it in the selector
+//     for (let i = 0; i < value.length; i++) {
+//         var option = document.createElement('option');
+//         option.appendChild(document.createTextNode(value[i]));
+//         ui.autoSelect.appendChild(option);
+//     }
+//     // Set value to the already-selected mode. If there is none, nothing will happen.
+//     ui.autoSelect.value = NetworkTables.getValue('/SmartDashboard/currentlySelectedMode');
+// });
+
+// Load list of prewritten autonomous modes
+// NetworkTables.addKeyListener('/SmartDashboard/autonomous/selected', (key, value) => {
+//     ui.autoSelect.value = value;
+// });
 
 ui.test.onclick = () => {
     alert(ui.hatch[0].getAttribute('x'));
@@ -268,9 +282,9 @@ ui.gyro.container.onclick = function() {
     updateGyro('/SmartDashboard/drive/navx/yaw', ui.gyro.val);
 };
 // Update NetworkTables when autonomous selector is changed
-ui.autoSelect.onchange = function() {
-    NetworkTables.putValue('/SmartDashboard/autonomous/selected', this.value);
-};
+// ui.autoSelect.onchange = function() {
+//     NetworkTables.putValue('/SmartDashboard/autonomous/selected', this.value);
+// };
 // Get value of arm height slider when it's adjusted
 ui.armPosition.oninput = function() {
     NetworkTables.putValue('/SmartDashboard/arm/encoder', parseInt(this.value));

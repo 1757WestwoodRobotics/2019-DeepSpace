@@ -74,5 +74,5 @@ public class Constants {
 
     public static final double MAX_SLOW_DRIVETRAIN = 0.5;
     public static final double ROTATION_FACTOR = 0.75;
-
+    
 }

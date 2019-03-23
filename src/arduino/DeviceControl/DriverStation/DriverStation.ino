@@ -5,7 +5,6 @@
 
 
 
-
 #define POT_R_PIN      A0    // Analog pot readings via this pin.
 #define POT_M_PIN      A1    // Analog pot readings via this pin.
 
@@ -16,12 +15,13 @@
 #define POT_REV_PIN     11
 #define TOUCH_PIN_WRITE 12
 #define TOUCH_PIN_READ  13
+#define TOUCH_B         100  // Virtual Arduino  PIN of 100
 #define TOUCH_THRESHOLD 200  // Will have to tune this appropriately
 
 // Various Joy Stick Buttons for the Driver station and their Ardunio Pin outs
 #define MIN_RANGE -512
 #define MAX_RANGE  512
-#define DS_BUTTON_COUNT 11   // We have 7 button and 5 toggle switches on the Driver Station
+#define DS_BUTTON_COUNT 13   // We have 7 button, 5 toggle and 1 touch switches on the Driver Station
 
 // Create Joystick
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
@@ -41,30 +41,24 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
                    false);
 
 // Arduino Pins the buttons are connected to
-const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
+const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5, TOUCH_B};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
-boolean debug = true;
+boolean debug = false;
 boolean touched = true;
 const bool autoSendMode = true;
 
 
-// Testing Capacitive Touch
-
+// Capacitive Touch sense setup
 CapacitiveSensor   cs = CapacitiveSensor(TOUCH_PIN_WRITE, TOUCH_PIN_READ);
 
 
 void setup() {
-
   cs.set_CS_AutocaL_Millis(0xFFFFFFFF);
 
   // set up console baud rate.
   Serial.begin(115200);
-  // wait until serial port opens for native USB devices
-  while (! Serial) {
-    delay(1);
-  }
-
+  Serial.print("Initilizing....\n");
   // Built in LED pin 13 as output
   pinMode (LED_BUILTIN, OUTPUT);
 
@@ -82,6 +76,8 @@ void setup() {
   // Set Range Values
   Joystick.setXAxisRange(MIN_RANGE, MAX_RANGE);
   Joystick.begin(autoSendMode);
+
+  Serial.print("Initilization complete....\n");
 }
 
 
@@ -155,8 +151,6 @@ boolean touch() {
     digitalWrite(LED_BUILTIN, LOW);
 
   return (touched);
-
-
 }
 
 // Servo control of the POT
@@ -233,6 +227,7 @@ void processAxis()
 {
   int val = map(analogRead(POT_R_PIN), MIN_POT_VALUE, MAX_POT_VALUE, MIN_RANGE, MAX_RANGE);
   Joystick.setXAxis(val);
+
   if (debug) {
     Serial.print("X Axis value - ");
     Serial.print(val);
@@ -244,13 +239,14 @@ void processAxis()
 void processButtons()
 {
   boolean pressed = false;
-  
+
   for (int i = 0; i < DS_BUTTON_COUNT; i++) {
     if (buttons[i] == A4 || buttons[i] == A5) {
       // process Analog pins differentl
-      pressed = map(analogRead(buttons[i]),0,1024,0,1);  // 1K = 5V max ADC value
+      int val =  analogRead(buttons[i]);
+      pressed = val > 1000 ? 1 : 0; // 1K = 5V max ADC value
     }
-    else if (buttons[i] == -1) {
+    else if (buttons[i] == TOUCH_B) {
       //Touch button
       pressed = touch();
     }
@@ -272,5 +268,4 @@ void processButtons()
       Joystick.releaseButton(i);
     }
   }
-  debug = false;
 }

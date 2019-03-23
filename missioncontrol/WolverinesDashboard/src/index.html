@@ -21,9 +21,14 @@
     </header>
     <!-- You'll need to mess around with the CSS of #camera (found in css/style.css) to get it to work.
         More explanation in that CSS rule. -->
-    <div id="camera"></div>
+    <canvas id="camera"></canvas>
     <!-- The main body of the dashboard, by default contains the gyro monitor and the robot diagram -->
     <article>
+        <!-- Pressure Readouts -->
+        <svg id="pneumatics">
+            <text id="pressure" x="110" y="115">0 psi</text>
+            <text id="pressureSwitch" x="110" y="135">Pneumatics Not Full</text>
+        </svg>
         <!-- Gyroscope -->
         <svg id="gyro">
             <circle cx="85" cy="85" r="83"></circle>
@@ -41,21 +46,21 @@
     <aside>
         <!-- Example button which toggles /SmartDashboard/exampleValue NetworkTables value.
             The <p> below then says the value. -->
-        <div id="example-section">
+        <!-- <div id="example-section">
             <button id="example-button">Change example value</button>
             <p id="example-readout">Value is undefined</p>
-        </div>
+        </div> -->
         <!-- Autonomous selector -->
-        <div class="select-container">
+        <!-- <div class="select-container">
             <select id="auto-select">
-                <option>No auto modes found</option>
-                <!-- This gets populated by JS -->
+                <option>No auto modes found</option> -->
+                <!-- This gets populated by JS
             </select>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
             <p>Adjust arm height</p>
             <input id="arm-position" type="range" min="0" max="1200" value="770">
-        </div>
+        </div> -->
         <div>
             <button id="doesitwork">Test</button>
             <button id="compress_command">Compress (toggle)</button>
@@ -70,10 +75,15 @@
     <div id="login">
         <input id="connect-address" type="text" value="localhost" disabled>
         <button id="connect" disabled>Connecting</button>
+
+        <button id="ds_pit_ifconfig">Apply Pit Networking Settings</button>
+        <button id="ds_field_ifconfig">Apply Field Networking Settings</button>
+        <button id="ds_dhcp_ifconfig">Apply DHCP Networking Settings</button>
     </div>
     <script src="networktables/networktables.js"></script>
     <script src="connection.js"></script>
     <script src="ui.js"></script>
+    <script src="stream.js"></script>
 </body>
 
 </html>

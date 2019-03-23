@@ -15,7 +15,9 @@ import org.whsrobotics.robot.OI;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -38,7 +40,6 @@ public class Drivetrain extends WolverinesSubsystem {
     private static double rightEncoderVelocity;
 
     private static Drivetrain instance;
-    private static boolean testRobot;
 
     private static DrivetrainSpeedMode drivetrainSpeedMode = DrivetrainSpeedMode.SLOW;
 
@@ -54,8 +55,6 @@ public class Drivetrain extends WolverinesSubsystem {
     }
 
     public void init(boolean onTestRobot) {
-
-        testRobot = onTestRobot;
 
         navX = new AHRS(SPI.Port.kMXP);     // Use SPI because it's the fastest (see documentation)
         navX.zeroYaw();
@@ -134,12 +133,20 @@ public class Drivetrain extends WolverinesSubsystem {
 //        differentialDrive.tankDrive(leftSpeed, rightSpeed);
 //    }
 
-    public static void getSparkMaxCurrents() {
-
+    // Contains nulls or 0.0!!!
+    public static double[] getMotorCurrents() {
+        return Stream.of(leftSet, rightSet)
+                .flatMap(Stream::of)
+                .mapToDouble(CANSparkMax::getOutputCurrent)
+                .toArray();
     }
 
-    public static void getSparkMaxTemperatures() {
-
+    // Contains nulls!!!
+    public static double[] getMotorTemperatures() {
+        return Stream.of(leftSet, rightSet)
+                .flatMap(Stream::of)
+                .mapToDouble(CANSparkMax::getMotorTemperature)
+                .toArray();
     }
 
     public static void setIdleMode(IdleMode idleMode) {
@@ -202,24 +209,19 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     public void reducedPeriodic() {
 
-       // SmartDashboard.putNumber("Encoder Position in Meters", rawPositionsToMeters(rawEncoderPositions[0]));
+        double[] currents = getMotorCurrents();
 
-        // System.out.println("Running Drivetrain periodic");
+        for (int i = 0; i < currents.length; i++) {
 
-//        getEncoderTelemetry();
-//        SmartDashboard.putNumberArray("Raw Encoder Positions", rawEncoderPositions);
-//        SmartDashboard.putNumberArray("Raw Encoder Velocities", rawEncoderVelocities);
-//
-//        rawPositionsToMeters(rawEncoderPositions[0]);
+            OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
+                    .getEntry("current").setDouble(currents[i]);
 
+            OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
+                    .getEntry("temperature").setDouble(currents[i]);
 
-        // TODO: Sean – report Spark Max currents and temperature (individually)
-        OI.getRobotTable().getEntry("SparkMax Currents");
-
+        }
 
         OI.getRobotTable().getEntry("angle").setDouble(navX.getAngle());        // Navx yaw angle (Z axis)
-
-
     }
 
     @Override
