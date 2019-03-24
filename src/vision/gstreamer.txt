@@ -5,6 +5,9 @@ gst-launch-1.0 v4l2src device=/dev/video0 ! 'video/x-raw, width=(int)640, height
 gst-launch-1.0 udpsrc port=554 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! glimagesink sync=false
 
 
+Raspberry Pi 3B+ (640x480)
+gst-launch-1.0 v4l2src device=/dev/video0 ! 'video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1, format=(string)I420' ! avenc_h264_omx ! rtph264pay mtu=1400 ! udpsink host=10.17.57.103 port=554
+
 
 FOR MAC OS (client):
 gst-launch-1.0 udpsrc port=554 ! "application/x-rtp, payload=127" ! rtph264depay ! avdec_h264 ! glimagesink sync=false
