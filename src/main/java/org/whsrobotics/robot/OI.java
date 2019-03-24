@@ -5,12 +5,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.whsrobotics.commands.*;
 import org.whsrobotics.subsystems.HatchMech;
-import org.whsrobotics.subsystems.PneumaticsBase;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
 import org.whsrobotics.subsystems.PneumaticsBase.SingleSolenoidModes;
@@ -37,7 +35,7 @@ public class OI {
     public static void init() {
 
         xboxControllerA = new XboxController(ComputerPort.XBOX_CONTROLLER.port);
-        xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLERB.port);
+        xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLER_B.port);
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
         // |-------- Switches --------|
@@ -89,7 +87,7 @@ public class OI {
             new RampDeployment());
 
         /*  
-        XboxControleller A
+        XboxController A
         Right Bumper - While Held - Fast Mode
         */
         (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value)).whileHeld(
@@ -130,7 +128,7 @@ public class OI {
 
     }
 
-    // On button press, get Slider value TODO
+    // On button press, get Slider value
     public static double getSliderValue(){
         return controlSystem.getRawAxis(0);
     }

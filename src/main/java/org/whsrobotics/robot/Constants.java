@@ -31,7 +31,7 @@ public class Constants {
     }
 
     public enum ComputerPort{
-        XBOX_CONTROLLER(0), CONTROL_SYSTEM(1), XBOX_CONTROLLERB(2);
+        XBOX_CONTROLLER(0), CONTROL_SYSTEM(1), XBOX_CONTROLLER_B(2);
 
         public int port;
 
