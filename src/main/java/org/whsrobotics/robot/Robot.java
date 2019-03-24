@@ -2,9 +2,7 @@ package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.subsystems.*;
 import org.whsrobotics.utils.WolverinesSubsystem;
@@ -31,8 +29,6 @@ public class Robot extends TimedRobot {
 
         OI.init();
 
-        ai = new AnalogInput(1);
-
     }
 
     /**
@@ -43,11 +39,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        if (ai.getVoltage() > 2.5) {
-            SmartDashboard.putBoolean("Reed", true);
-        } else {
-            SmartDashboard.putBoolean("Reed", false);
-        }
+
     }
 
     /**

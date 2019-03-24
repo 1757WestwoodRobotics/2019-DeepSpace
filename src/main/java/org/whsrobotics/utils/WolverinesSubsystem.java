@@ -157,9 +157,9 @@ public abstract class WolverinesSubsystem extends Subsystem {
                 failedSubsystems.add(ws);
 
                 if (ws.isMissionCritical)
-                    throw new RuntimeException("**** ERROR: The mission-critical" + ws.getName() + " subsystem has stopped working! ****");
+                    throw new RuntimeException("**** ERROR: The mission-critical " + ws.getName() + " subsystem has stopped working! ****");
                 else
-                    DriverStation.reportWarning("* WARNING: The non-mission-critical" + ws.getName() + " subsystem has stopped working! *", true);
+                    DriverStation.reportWarning("* WARNING: The non-mission-critical " + ws.getName() + " subsystem has stopped working! *", true);
 
                 // TODO: Push an update to Dashboard (for the option to reinit)
                 // TODO: Test if removing a subsystem still calls its reducedPeriodic() method

@@ -1,7 +1,6 @@
 package org.whsrobotics.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -18,10 +17,12 @@ public class Superstructure extends WolverinesSubsystem {
 
     private static DoubleSolenoid superstructureSolenoid;
     private static Solenoid rampReleaseSolenoid;
+
+    private static AnalogInput ai;
     
 
     private Superstructure() {
-        super(false);
+        super(true);
     }
 
     public static Superstructure getInstance() {
@@ -42,20 +43,20 @@ public class Superstructure extends WolverinesSubsystem {
 
         PneumaticsBase.registerDoubleSolenoid(superstructureSolenoid);
 
-        // ai = new AnalogInput(1);
+        ai = new AnalogInput(1);
 
     }
 
     @Override
     protected void reducedPeriodic() {
         OI.getRobotTable().getEntry("rampReleaseSolenoid").setBoolean(rampReleaseSolenoid.get());
-        // OI.getRobotTable().getEntry("limitSwitch").setBoolean(!limitSwitch.get());
-        
-    }
 
-    @Override
-    public void periodic() {
-        // System.out.println(ai.getVoltage());
+        if (ai.getVoltage() > 2.5) {
+            OI.getRobotTable().getEntry("Reed").setBoolean(true);
+        } else {
+            OI.getRobotTable().getEntry("Reed").setBoolean(false);
+        }
+        
     }
 
     @Override

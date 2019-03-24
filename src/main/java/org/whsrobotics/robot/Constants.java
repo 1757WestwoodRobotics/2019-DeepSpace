@@ -6,7 +6,7 @@ public class Constants {
         LEFT_A(1), LEFT_B(2), LEFT_C(3),
         RIGHT_A(4), RIGHT_B(5), RIGHT_C(6),
         BALL_SCREW(7),
-        PCM_A(10), PCM_B(11);    // TODO: Make all caps! Ex: LEFT_A
+        PCM_A(10), PCM_B(11);
 
         public int id;
 
