@@ -77,11 +77,12 @@ public class OI {
         //Superstructure Extended
         (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
-
+        //Hatch Mech Actuation
+        (new JoystickButton(xboxControllerB, Buttons.Y.value)).toggleWhenPressed(
+            new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechActuationSolenoid()));
         //Hatch Extend
         (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
-       
         //Ramp Deployment
         (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());
