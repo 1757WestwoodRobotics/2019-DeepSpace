@@ -14,7 +14,7 @@ import arduinoControl
 #arduino = arduinoControl.Arduino('/dev/cu.usbmodem52640001')
 
 #Teensy or Arduino connectd to PC on COM Ports. Modify COM13 tot he right COM Port
-arduino = arduinoControl.Arduino('COM7')
+arduino = arduinoControl.Arduino('COM22')
 
 command = '{ "sensor": "ringLight", "color": 0 }'
 print(command)
@@ -35,7 +35,6 @@ while True:
     try:
         command = '{ "sensor": "Lidar", "read": 1 }'
         cmd = json.loads(command)
-        print(json.dumps(cmd))
         # Ask Arduino to send the current Lidar reading
         arduino.write(json.dumps(cmd))
         # Read the Lidar Value
@@ -43,11 +42,14 @@ while True:
         if (data != ""):
             json_data = json.loads(data)
             distance = json_data["front"]
+            print "LIDAR Reading : ", distance, "mm"
             ld.putNumber("distance", distance+i)
+            print "Sending LIDAR Reading : ", distance+i, "mm"
             i = i+1
         else:
             ld.putNumber("distance", -10.0)
         time.sleep(0.2)
     except KeyboardInterrupt:
         arduino.close();
+        ld.putNumber("distance", -10.0)
         exit()

@@ -27,7 +27,7 @@ i = 0
 while True:
     try:
         if val == 0:
-            print("Object Distance:", ld.getNumber("distance", -10.0))
+            print "Object Distance:", ld.getNumber("distance", -10.0), "mm"
         elif val == 1:
             sd.putNumber("position", np.int(interp(i,[0, 1023], [-512, 512])))
             i+=1
