@@ -83,28 +83,28 @@ public class OI {
         // |-------- Xbox Buttons --------|
 
         //Compress
-        (new JoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
         //Superstructure Extended
-        (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //Hatch Floor Grab
-        (new JoystickButton(xboxControllerB, Buttons.X.value)).whileHeld(
+        (new JoystickButton(xboxControllerA, Buttons.X.value)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
         //Hatch Extend
-        (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Hatch Eject
-        (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.Y.value)).whenPressed(
             new HatchEjection());
         //Retracts drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
         //Extends drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
         //Ramp Deployment
-        (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
+        (new JoystickButton(xboxControllerA, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());
 
         /*  
