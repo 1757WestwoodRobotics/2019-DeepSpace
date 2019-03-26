@@ -123,7 +123,7 @@ void setup() {
   }
 
   // Setup LIDARS
-  setupLidars();
+  setupLidar();
 }
 
 
@@ -144,11 +144,14 @@ void loop() {
         if(read_doc["read"])
           writeLidar();
       }
+      else if(String(sensor) == "Lidar") {
+        if(read_doc["restart"])
+          setupLidar();
+      }
     }
   }
   // keep reading Lidars in the background
-  readLidars();
-  writeLidar();
+  readLidar();
   delay(100);
 }
 
@@ -222,7 +225,7 @@ void setRingLEDsColor(CHSV color) {
 */
 
 
-void setupLidars() {
+void setupLidar() {
 
   // Instantiate and configure LIDARS
 
@@ -233,27 +236,20 @@ void setupLidars() {
     Serial.println(F("Error: Failed to boot front LidarLite"));
     lidar_f_disabled = true;
   }
-
-  
+  else {
+    obj_distance = 0.0;
+  }
 }
 
 
-void readLidarLite() {
-  // Read front LIDAR
+void readLidar() {
+  // Read front LIDAR and update global obj_distance.
   if (!lidar_f_disabled) {
     obj_distance = frontLidar.distance();;
   }
   else {
-    obj_distance = -1;
+    obj_distance = -1.0;
   }
-}
-
-
-
-// Read all lidars Fron, Back, Lef & Right
-
-void readLidars() {
-  readLidarLite();
 }
 
 

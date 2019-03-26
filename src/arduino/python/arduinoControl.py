@@ -14,6 +14,10 @@ Example Lidar JSON:
   "read": 1
 }
 
+{
+"sensor": "Lidar",
+"restart": 1
+}
 
 Example Lidar Ring LED:
 
