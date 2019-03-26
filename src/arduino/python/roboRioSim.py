@@ -27,13 +27,12 @@ i = 0
 while True:
     try:
         if val == 0:
-            print("Object Distance:", ld.getNumber("distance", -1.0))
-            time.sleep(1)
+            print("Object Distance:", ld.getNumber("distance", -10.0))
         elif val == 1:
             sd.putNumber("position", np.int(interp(i,[0, 1023], [-512, 512])))
-            time.sleep(1)
             i+=1
             if(i > 1023):
                 i = 0
+        time.sleep(0.2)
     except KeyboardInterrupt:
         exit()

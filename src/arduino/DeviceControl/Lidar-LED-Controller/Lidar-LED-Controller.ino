@@ -233,7 +233,7 @@ void setupLidar() {
   frontLidar.begin(0, true); // Set configuration to default and I2C to 400 kHz
   frontLidar.configure(LL_CFG_DEF);
   if (frontLidar.status() != lidarState::Ok) {
-    Serial.println(F("Error: Failed to boot front LidarLite"));
+    //Serial.println(F("Error: Failed to boot front LidarLite"));
     lidar_f_disabled = true;
   }
   else {
@@ -256,7 +256,7 @@ void readLidar() {
 // Sends JSON output to serial port:
 void writeLidar() {
   DynamicJsonDocument root(512);
-  root["sensor"] = "lidar";
+  root["sensor"] = "Lidar";
   root["time"] = millis(); // current Arduino time elapsed since reboot.
   root["front"] = obj_distance;
   
