@@ -14,6 +14,10 @@ Example Lidar JSON:
   "read": 1
 }
 
+{
+"sensor": "Lidar",
+"restart": 1
+}
 
 Example Lidar Ring LED:
 
@@ -47,8 +51,8 @@ class Arduino():
 
     # returns a JSON object read from the serial port
 	def read(self):
-		return json.loads(self._port.readline())
-				
+                return self._port.readline()
+		
 	def close(self):
 		self._port.close()
 
