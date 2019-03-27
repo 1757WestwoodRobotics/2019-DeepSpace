@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.whsrobotics.commands.*;
@@ -12,6 +13,7 @@ import org.whsrobotics.subsystems.HatchMech;
 import org.whsrobotics.subsystems.Superstructure;
 import org.whsrobotics.subsystems.PneumaticsBase.DoubleSolenoidModes;
 import org.whsrobotics.subsystems.PneumaticsBase.SingleSolenoidModes;
+import org.whsrobotics.utils.BetterJoystickButton;
 import org.whsrobotics.utils.XboxController;
 
 import static org.whsrobotics.robot.Constants.ComputerPort;
@@ -30,6 +32,10 @@ public class OI {
      */
     private static Joystick controlSystem;
 
+    private static Joystick currentControlsJoystick;
+
+    private static Command currentControlsSwitcher;
+
     private static NetworkTable robotTable;
 
     public static void init() {
@@ -38,53 +44,55 @@ public class OI {
         xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLER_B.port);
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
+        setCurrentControlsJoystick(controlSystem);
+
         // |-------- Switches --------|
 
-        //When swtich is off, compression stops (compression is automatically on)
-        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whileHeld(
+        //When switch is off, compression stops (compression is automatically on)
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.SWITCH_E.port)).whileHeld(
             new CompressStop());  
         //When switch is on, the hatch mechanism is moved to its extended position
-        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.SWITCH_A.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid())); 
         //When switch is on, the superstructure is moved to its extended position
-        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_B.port)).whileHeld(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.SWITCH_B.port)).whileHeld(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //When switch is on, uses manual input over vision alignment for slider
-        (new JoystickButton(controlSystem, ControlSystemPort.SWITCH_C.port)).whileHeld(new SliderOverride());
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.SWITCH_C.port)).whileHeld(new SliderOverride());
         
 
         // |-------- Buttons --------|
 
         //When button is pressed, hatch mechanism toggles between being actuated and being folded in
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).toggleWhenPressed(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechActuationSolenoid()));
         
         // |-------- Big Red Button --------|
         
         //Deploys ramp
-        (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
 
         // |-------- Slider --------|
 
-        (new JoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
                 .whileHeld(new SliderOverride());
 
         // |-------- Xbox Buttons --------|
 
         //Compress
-        (new JoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.A.value)).toggleWhenPressed(
             new CompressStop());
         //Superstructure Extended
-        (new JoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
         //Hatch Mech Actuation
-        (new JoystickButton(xboxControllerB, Buttons.Y.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.Y.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechActuationSolenoid()));
         //Hatch Extend
-        (new JoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Ramp Deployment
-        (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());
 
         /*  
@@ -95,9 +103,33 @@ public class OI {
             new SetDrivetrainFast(5));
 
 
+        currentControlsSwitcher = new Command() {
+
+            @Override
+            protected void initialize() {
+                setCurrentControlsJoystick(xboxControllerB);
+            }
+
+            @Override
+            protected boolean isFinished() {
+                return false;
+            }
+
+            @Override
+            protected void end() {
+                setCurrentControlsJoystick(controlSystem);
+            }
+
+        };
+
+        (new JoystickButton(xboxControllerA, Buttons.START.value)).toggleWhenPressed(currentControlsSwitcher);
+
+
         // NETWORK TABLES STUFF
 
         robotTable = NetworkTableInstance.getDefault().getTable("/Robot");
+
+        SmartDashboard.putData("Controls Joystick Switcher", currentControlsSwitcher);
         
         SmartDashboard.putData("Wing Retract", new RampDeployment());
 
@@ -145,6 +177,23 @@ public class OI {
     public static XboxController getXboxControllerB() {
         return xboxControllerB;
     }
+
+    public static Joystick getControlSystem() {
+        return controlSystem;
+    }
+
+    /////
+
+    public static Joystick getCurrentControlsJoystick() {
+        return currentControlsJoystick;
+    }
+
+    private static void setCurrentControlsJoystick(Joystick currentControlsJoystick) {
+        getRobotTable().getEntry("ControlsJoystick").setString(currentControlsJoystick.getName());
+        OI.currentControlsJoystick = currentControlsJoystick;
+    }
+
+    /////
 
     public static DriverStation.Alliance getAlliance() {
         if (alliance == DriverStation.Alliance.Invalid) {
