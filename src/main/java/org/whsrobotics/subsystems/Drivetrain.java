@@ -210,6 +210,7 @@ public class Drivetrain extends WolverinesSubsystem {
     public void reducedPeriodic() {
 
         double[] currents = getMotorCurrents();
+        double[] temperatures = getMotorTemperatures();
 
         for (int i = 0; i < currents.length; i++) {
 
@@ -217,7 +218,7 @@ public class Drivetrain extends WolverinesSubsystem {
                     .getEntry("current").setDouble(currents[i]);
 
             OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
-                    .getEntry("temperature").setDouble(currents[i]);
+                    .getEntry("temperature").setDouble(temperatures[i]);
 
         }
 
