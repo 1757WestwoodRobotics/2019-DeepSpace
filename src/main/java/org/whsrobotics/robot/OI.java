@@ -44,7 +44,15 @@ public class OI {
         xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLER_B.port);
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
-        setCurrentControlsJoystick(controlSystem);
+        try {
+            setCurrentControlsJoystick(controlSystem);
+        } catch (NullPointerException ex) {
+            try {
+                setCurrentControlsJoystick(xboxControllerB);
+            } catch (NullPointerException e) {
+                DriverStation.reportError("**** ERROR: NO CONTROLS CONTROLLERS DETECTED! PRESS START ON MAIN CONTROLLER OR SMARTDASHBOARD! ****", false);
+            }
+        }
 
         // |-------- Switches --------|
 
