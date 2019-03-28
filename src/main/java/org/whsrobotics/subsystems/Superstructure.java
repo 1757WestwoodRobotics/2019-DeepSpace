@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
@@ -22,7 +23,7 @@ public class Superstructure extends WolverinesSubsystem {
     
 
     private Superstructure() {
-        super(true);
+        super(false);
     }
 
     public static Superstructure getInstance() {
@@ -35,26 +36,31 @@ public class Superstructure extends WolverinesSubsystem {
     @Override
     protected void init(boolean onTestRobot) {
 
-        superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
-        superstructureSolenoid.setName("superstructureSolenoid");
+        if (!onTestRobot) {
+            superstructureSolenoid = new DoubleSolenoid(SUPERSTRUCTURE.module, SUPERSTRUCTURE.a, SUPERSTRUCTURE.b);
+            superstructureSolenoid.setName("superstructureSolenoid");
 
-        rampReleaseSolenoid = new Solenoid(RAMP_RELEASE.module, RAMP_RELEASE.a);
-        rampReleaseSolenoid.setName("rampReleaseSolenoid");
+            rampReleaseSolenoid = new Solenoid(RAMP_RELEASE.module, RAMP_RELEASE.a);
+            rampReleaseSolenoid.setName("rampReleaseSolenoid");
 
-        PneumaticsBase.registerDoubleSolenoid(superstructureSolenoid);
+            PneumaticsBase.registerDoubleSolenoid(superstructureSolenoid);
 
-        ai = new AnalogInput(1);
+            ai = new AnalogInput(1);
+
+        }
 
     }
 
     @Override
     protected void reducedPeriodic() {
-        OI.getRobotTable().getEntry("rampReleaseSolenoid").setBoolean(rampReleaseSolenoid.get());
+        if (!Robot.isTestRobot) {
+            OI.getRobotTable().getEntry("rampReleaseSolenoid").setBoolean(rampReleaseSolenoid.get());
 
-        if (ai.getVoltage() > 2.5) {
-            OI.getRobotTable().getEntry("Reed").setBoolean(true);
-        } else {
-            OI.getRobotTable().getEntry("Reed").setBoolean(false);
+            if (ai.getVoltage() > 2.5) {
+                OI.getRobotTable().getEntry("Reed").setBoolean(true);
+            } else {
+                OI.getRobotTable().getEntry("Reed").setBoolean(false);
+            }
         }
         
     }

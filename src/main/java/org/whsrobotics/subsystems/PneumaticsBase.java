@@ -8,6 +8,7 @@ import org.whsrobotics.commands.Compress;
 import org.whsrobotics.hardware.AnalogPressureTransducer;
 import org.whsrobotics.robot.Constants;
 import org.whsrobotics.robot.OI;
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import java.util.Arrays;
@@ -32,18 +33,20 @@ public class PneumaticsBase extends WolverinesSubsystem {
     }
 
     private PneumaticsBase() {
-        super(true);
+        super(false);
     }
 
     @Override
     protected void init(boolean onTestRobot) {
-        compressor = new Compressor(Constants.canID.PCM_B.id);
-        compressor.clearAllPCMStickyFaults();
-        compressor.setClosedLoopControl(true);
+        if (!onTestRobot) {
+            compressor = new Compressor(Constants.canID.PCM_B.id);
+            compressor.clearAllPCMStickyFaults();
+            compressor.setClosedLoopControl(true);
 
-        pressureTransducer = new AnalogPressureTransducer(0);
+            pressureTransducer = new AnalogPressureTransducer(0);
 
-        doubleSolenoids = new HashSet<>();
+            doubleSolenoids = new HashSet<>();
+        }
     }
 
     public enum DoubleSolenoidModes {
@@ -84,16 +87,19 @@ public class PneumaticsBase extends WolverinesSubsystem {
 
     @Override
     protected void reducedPeriodic() {
-        SmartDashboard.putNumber("Pressure (psi)", getPressure());
-        SmartDashboard.putBoolean("Pressure Switch", getPressureSwitchState());
 
-        OI.getRobotTable().getEntry("compressor").setBoolean(getCompressorState());
-        OI.getRobotTable().getEntry("compressor_current").setDouble(getCompressorCurrent());
+        if (!Robot.isTestRobot) {
+            SmartDashboard.putNumber("Pressure (psi)", getPressure());
+            SmartDashboard.putBoolean("Pressure Switch", getPressureSwitchState());
 
-        // Update NetworkTables status for each DoubleSolenoid
-        doubleSolenoids.forEach(doubleSolenoid ->
-                OI.getRobotTable().getEntry(doubleSolenoid.getName())
-                        .setString(DoubleSolenoidModes.lookup(doubleSolenoid.get()).toString()));
+            OI.getRobotTable().getEntry("compressor").setBoolean(getCompressorState());
+            OI.getRobotTable().getEntry("compressor_current").setDouble(getCompressorCurrent());
+
+            // Update NetworkTables status for each DoubleSolenoid
+            doubleSolenoids.forEach(doubleSolenoid ->
+                    OI.getRobotTable().getEntry(doubleSolenoid.getName())
+                            .setString(DoubleSolenoidModes.lookup(doubleSolenoid.get()).toString()));
+        }
 
     }
 

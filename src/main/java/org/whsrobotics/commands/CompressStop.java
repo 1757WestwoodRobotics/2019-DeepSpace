@@ -11,7 +11,9 @@ public class CompressStop extends Command {
 
     @Override
     protected void initialize() {
-        PneumaticsBase.stopCompression(PneumaticsBase.getCompressor());
+        if (PneumaticsBase.getInstance().ensureInit()) {
+            PneumaticsBase.stopCompression(PneumaticsBase.getCompressor());
+        }
     }
 
     @Override
