@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public abstract class WolverinesSubsystem extends Subsystem {
@@ -15,8 +16,8 @@ public abstract class WolverinesSubsystem extends Subsystem {
     private static final double PERIODIC_TIME = 0.25;        // seconds
 
     // Collections for the subsystem references
-    private static volatile HashSet<WolverinesSubsystem> subsystems;
-    private static volatile HashSet<WolverinesSubsystem> failedSubsystems;
+    private static ArrayList<WolverinesSubsystem> subsystems;
+    private static ArrayList<WolverinesSubsystem> failedSubsystems;
 
     // The class that feeds the loop and keeps track of the time between loops
     private static Notifier notifier;
@@ -28,8 +29,8 @@ public abstract class WolverinesSubsystem extends Subsystem {
 
     // Initialize the collections with empty HashSets
     static {
-        subsystems = new HashSet<>();
-        failedSubsystems = new HashSet<>();
+        subsystems = new ArrayList<>();
+        failedSubsystems = new ArrayList<>();
     }
 
     /**
@@ -147,12 +148,14 @@ public abstract class WolverinesSubsystem extends Subsystem {
      *
      */
     private static void defineReducedPeriodic() {
+
         for (WolverinesSubsystem ws : subsystems) {
             try {
                 ws.reducedPeriodic();
             } catch (Exception ex) {
 
                 ws.hasSuccessfulInit = false;
+
                 subsystems.remove(ws);
                 failedSubsystems.add(ws);
 

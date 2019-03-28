@@ -12,6 +12,7 @@ import org.whsrobotics.commands.Drive;
 import org.whsrobotics.robot.Constants;
 import org.whsrobotics.robot.Constants.Math;
 import org.whsrobotics.robot.OI;
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import java.util.Arrays;
@@ -137,6 +138,7 @@ public class Drivetrain extends WolverinesSubsystem {
     public static double[] getMotorCurrents() {
         return Stream.of(leftSet, rightSet)
                 .flatMap(Stream::of)
+                .filter(Objects::nonNull)
                 .mapToDouble(CANSparkMax::getOutputCurrent)
                 .toArray();
     }
@@ -145,6 +147,7 @@ public class Drivetrain extends WolverinesSubsystem {
     public static double[] getMotorTemperatures() {
         return Stream.of(leftSet, rightSet)
                 .flatMap(Stream::of)
+                .filter(Objects::nonNull)
                 .mapToDouble(CANSparkMax::getMotorTemperature)
                 .toArray();
     }
@@ -209,20 +212,29 @@ public class Drivetrain extends WolverinesSubsystem {
     @Override
     public void reducedPeriodic() {
 
-        double[] currents = getMotorCurrents();
-        double[] temperatures = getMotorTemperatures();
+        try {
 
-        for (int i = 0; i < currents.length; i++) {
+            double[] currents = getMotorCurrents();
+            double[] temperatures = getMotorTemperatures();
 
-            OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
-                    .getEntry("current").setDouble(currents[i]);
+            for (int i = 0; i < currents.length; i++) {
 
-            OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
-                    .getEntry("temperature").setDouble(temperatures[i]);
+                OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
+                        .getEntry("current").setDouble(currents[i]);
 
+                OI.getRobotTable().getSubTable("SparkMax").getSubTable(String.valueOf(i))
+                        .getEntry("temperature").setDouble(temperatures[i]);
+
+            }
+
+            if (!Robot.isTestRobot) {
+                OI.getRobotTable().getEntry("angle").setDouble(navX.getAngle());        // Navx yaw angle (Z axis)
+            }
+
+        } catch (Exception ex) {
+            DriverStation.reportError("**** ERROR: Drivetrain Reduced Periodic **** " + ex.getMessage(), false);
         }
 
-        OI.getRobotTable().getEntry("angle").setDouble(navX.getAngle());        // Navx yaw angle (Z axis)
     }
 
     @Override

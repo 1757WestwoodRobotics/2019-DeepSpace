@@ -1,8 +1,6 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.subsystems.*;
 import org.whsrobotics.utils.WolverinesSubsystem;
@@ -10,8 +8,6 @@ import org.whsrobotics.utils.WolverinesSubsystem;
 public class Robot extends TimedRobot {
 
     public static final boolean isTestRobot = false;
-
-    AnalogInput ai;
 
     /**
      * This function is run when the robot is first started up and should be

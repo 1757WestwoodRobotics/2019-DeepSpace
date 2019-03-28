@@ -44,16 +44,6 @@ public class OI {
         xboxControllerB = new XboxController(ComputerPort.XBOX_CONTROLLER_B.port);
         controlSystem = new Joystick(ComputerPort.CONTROL_SYSTEM.port);
 
-        try {
-            setCurrentControlsJoystick(controlSystem);
-        } catch (NullPointerException ex) {
-            try {
-                setCurrentControlsJoystick(xboxControllerB);
-            } catch (NullPointerException e) {
-                DriverStation.reportError("**** ERROR: NO CONTROLS CONTROLLERS DETECTED! PRESS START ON MAIN CONTROLLER OR SMARTDASHBOARD! ****", false);
-            }
-        }
-
         // |-------- Switches --------|
 
         //When switch is off, compression stops (compression is automatically on)
@@ -129,6 +119,7 @@ public class OI {
             }
 
         };
+        currentControlsSwitcher.setRunWhenDisabled(true);
 
         (new JoystickButton(xboxControllerA, Buttons.START.value)).toggleWhenPressed(currentControlsSwitcher);
 
@@ -166,6 +157,17 @@ public class OI {
 
         SmartDashboard.putData("Hatch Mech Retracted", new SetDoubleSolenoid(
             HatchMech.instance, HatchMech.getHatchMechSliderSolenoid(), DoubleSolenoidModes.RETRACTED));
+
+        try {
+            setCurrentControlsJoystick(controlSystem);
+        } catch (NullPointerException ex) {
+            try {
+                setCurrentControlsJoystick(xboxControllerB);
+            } catch (NullPointerException e) {
+                DriverStation.reportError("**** ERROR: NO CONTROLS CONTROLLERS DETECTED! PRESS START ON MAIN CONTROLLER OR SMARTDASHBOARD! ****", false);
+            }
+        }
+
 
     }
 

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.whsrobotics.robot.OI;
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.utils.WolverinesSubsystem;
 import org.whsrobotics.vision.VisionNetwork;
 
@@ -45,60 +46,66 @@ public class HatchMech extends WolverinesSubsystem {
 
     @Override
     protected void init(boolean onTestRobot) {
-        
-        hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
-        hatchMechSliderSolenoid.setName("hatchMechSliderSolenoid");
 
-        hatchMechActuationSolenoid = new DoubleSolenoid(HATCH_MECH_ACTUATION.module, HATCH_MECH_ACTUATION.a, HATCH_MECH_ACTUATION.b);
-        hatchMechActuationSolenoid.setName("hatchMechActuationSolenoid");
+        if (!onTestRobot) {
+            hatchMechSliderSolenoid = new DoubleSolenoid(HATCH_MECH_SLIDER.module, HATCH_MECH_SLIDER.a, HATCH_MECH_SLIDER.b);
+            hatchMechSliderSolenoid.setName("hatchMechSliderSolenoid");
 
-        PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid);
-        PneumaticsBase.registerDoubleSolenoid(hatchMechActuationSolenoid);
+            hatchMechActuationSolenoid = new DoubleSolenoid(HATCH_MECH_ACTUATION.module, HATCH_MECH_ACTUATION.a, HATCH_MECH_ACTUATION.b);
+            hatchMechActuationSolenoid.setName("hatchMechActuationSolenoid");
 
-        ballScrewTalon = new TalonSRX(7);
-        ballScrewTalon.configFactoryDefault();
+            PneumaticsBase.registerDoubleSolenoid(hatchMechSliderSolenoid);
+            PneumaticsBase.registerDoubleSolenoid(hatchMechActuationSolenoid);
 
-        ballScrewTalon.setNeutralMode(NeutralMode.Brake);
-        ballScrewTalon.setSensorPhase(false);
+            ballScrewTalon = new TalonSRX(7);
+            ballScrewTalon.configFactoryDefault();
 
-        ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-        ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
-        ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+            ballScrewTalon.setNeutralMode(NeutralMode.Brake);
+            ballScrewTalon.setSensorPhase(false);
 
-        ballScrewTalon.configPeakOutputForward(0.5);
-        ballScrewTalon.configPeakOutputReverse(-0.5);
+            ballScrewTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+            ballScrewTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+            ballScrewTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
 
-        ballScrewTalon.configClosedLoopPeakOutput(0, 0.5);
+            ballScrewTalon.configPeakOutputForward(0.5);
+            ballScrewTalon.configPeakOutputReverse(-0.5);
 
-        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
-        ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
+            ballScrewTalon.configClosedLoopPeakOutput(0, 0.5);
 
-        ballScrewTalon.selectProfileSlot(0, 0);
-        ballScrewTalon.config_kF(0, 0.0);
-        ballScrewTalon.config_kP(0, 0.1);
-        ballScrewTalon.config_kI(0, 0);
-        ballScrewTalon.config_kD(0, 0);
+            ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10);
+            ballScrewTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10);
 
-        ballScrewTalon.configForwardSoftLimitEnable(true);
-        ballScrewTalon.configReverseSoftLimitEnable(true);
+            ballScrewTalon.selectProfileSlot(0, 0);
+            ballScrewTalon.config_kF(0, 0.0);
+            ballScrewTalon.config_kP(0, 0.1);
+            ballScrewTalon.config_kI(0, 0);
+            ballScrewTalon.config_kD(0, 0);
 
-        ballScrewTalon.configForwardSoftLimitThreshold(BALL_SCREW_FWD_LIMIT);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
-        ballScrewTalon.configReverseSoftLimitThreshold(BALL_SCREW_REV_LIMIT);
+            ballScrewTalon.configForwardSoftLimitEnable(true);
+            ballScrewTalon.configReverseSoftLimitEnable(true);
 
-        ballScrewTalon.configAllowableClosedloopError(0, BALL_SCREW_MAX_ERROR);
+            ballScrewTalon.configForwardSoftLimitThreshold(BALL_SCREW_FWD_LIMIT);     // 2*3" of travel, 5 mm/rot, 4096 ticks/rot
+            ballScrewTalon.configReverseSoftLimitThreshold(BALL_SCREW_REV_LIMIT);
 
-        ballScrewTalon.configMotionCruiseVelocity(BALL_SCREW_MAX_VELOCITY);    // Represents 2"/sec
-        ballScrewTalon.configMotionAcceleration(BALL_SCREW_MAX_ACCEL);
+            ballScrewTalon.configAllowableClosedloopError(0, BALL_SCREW_MAX_ERROR);
 
-        // "Nine levels (0 through 8), where 0 represents no smoothing (same as classic trapezoidal profiling) and 8 represents max smoothing." - CTRE
-        ballScrewTalon.configMotionSCurveStrength(BALL_SCREW_S_CURVE);
+            ballScrewTalon.configMotionCruiseVelocity(BALL_SCREW_MAX_VELOCITY);    // Represents 2"/sec
+            ballScrewTalon.configMotionAcceleration(BALL_SCREW_MAX_ACCEL);
+
+            // "Nine levels (0 through 8), where 0 represents no smoothing (same as classic trapezoidal profiling) and 8 represents max smoothing." - CTRE
+            ballScrewTalon.configMotionSCurveStrength(BALL_SCREW_S_CURVE);
+        }
 
     }
 
     @Override
     protected void reducedPeriodic() {
-        OI.getRobotTable().getEntry("Hatch Mech Position").setNumber(ballScrewTalon.getSelectedSensorPosition());
-        OI.getRobotTable().getEntry("Hatch Mech Velocity").setNumber(ballScrewTalon.getSelectedSensorVelocity());
+
+        if (!Robot.isTestRobot) {
+            OI.getRobotTable().getEntry("Hatch Mech Position").setNumber(ballScrewTalon.getSelectedSensorPosition());
+            OI.getRobotTable().getEntry("Hatch Mech Velocity").setNumber(ballScrewTalon.getSelectedSensorVelocity());
+        }
+
     }
 
     @Override
