@@ -41,7 +41,7 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
                    false);
 
 // Arduino Pins the buttons are connected to
-const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A4, A5, TOUCH_B};
+const int buttons[DS_BUTTON_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, TOUCH_B};
 
 // Global Variables hold object distance as seen by the ultrasonic sensor, led commands etc.
 boolean debug = false;
@@ -241,10 +241,15 @@ void processButtons()
   boolean pressed = false;
 
   for (int i = 0; i < DS_BUTTON_COUNT; i++) {
-    if (buttons[i] == A4 || buttons[i] == A5) {
+    if (buttons[i] == A3 || buttons[i] == A5) {
       // process Analog pins differentl
       int val =  analogRead(buttons[i]);
-      pressed = val > 1000 ? 1 : 0; // 1K = 5V max ADC value
+      if (debug) {
+        Serial.print(" Button ----> ");
+        Serial.print(val);
+        Serial.println();
+      }
+      pressed = val > 600 ? 1 : 0; // 654 = 3.3V max ADC value
     }
     else if (buttons[i] == TOUCH_B) {
       //Touch button
