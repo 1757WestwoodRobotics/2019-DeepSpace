@@ -40,7 +40,8 @@ let ui = {
     ],
     pneumatics: document.getElementById('pneumatics'),
     pindicator: document.getElementById('pressure'),
-    pswitch: document.getElementById('pressureSwitch')
+    pswitch: document.getElementById('pressureSwitch'),
+    lidar: document.getElementById('lidar')
 };
 
 let moveHatch = (xx) => {
@@ -112,6 +113,10 @@ NetworkTables.addKeyListener('/SmartDashboard/Pressure Switch', (key, value) => 
         ui.pswitch.innerHTML = "Pressure Not Full";
         ui.pneumatics.style.backgroundColor = "inherit";
     }
+});
+
+NetworkTables.addKeyListener('/Lidar/distance', (key, value) => {
+    ui.lidar.innerHTML = value.toString() + " cm";
 });
 
 NetworkTables.addKeyListener('/Robot/SparkMax/0/current', (key, value) => {
