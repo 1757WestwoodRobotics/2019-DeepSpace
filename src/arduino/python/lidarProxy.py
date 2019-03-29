@@ -1,8 +1,6 @@
 """
-Test Driver program to test USB communication with Arduino. Use this
-as an example to communicate with Arduino in you Python code.
-Cummunication to Arduino using JSON and can be extened to do other
-things.
+Lidar Proxy: Bridges communication between the Arduino controlling the LIDAR and
+RoboRio. Uses Network table "Lidar" and Key "distance" to send measurements.
 """
 import sys
 import json
@@ -28,9 +26,7 @@ print(json.dumps(cmd))
 arduino.write(json.dumps(cmd))
 
 ######################################################################
-# Sit in a loop reading the Network table for Slider
-# and update Arduino via serial port to move the slider pot.
-# Postion values are bound  to -512 to 512 by the arduino.
+# Sit in a loop sending Lidar measurements to RoboRio
 ######################################################################
 #NetworkTables.initialize(server="127.0.0.1")
 NetworkTables.initialize(server='10.17.57.2')
