@@ -47,9 +47,7 @@ while True:
         if (data != ""):
             json_data = json.loads(data)
             distance = json_data["front"]
-            print "LIDAR Reading : ", distance, "mm"
             ld.putNumber("distance", distance)
-            print "Sending LIDAR Reading : ", distance, "mm"
         else:
             ld.putNumber("distance", -10.0)
         time.sleep(0.2)
