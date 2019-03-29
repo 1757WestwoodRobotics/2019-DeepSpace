@@ -26,8 +26,6 @@
   "dependencies": {
     "fix-path": "^2.1.0",
     "sudo-prompt": "^8.2.5",
-    "wcjs-gs": "^0.3.4",
-    "webgl-video-renderer": "^0.2.0",
     "wpilib-nt-client": "^1.7.1"
   }
 }

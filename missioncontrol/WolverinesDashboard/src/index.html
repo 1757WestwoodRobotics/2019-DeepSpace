@@ -21,13 +21,13 @@
     </header>
     <!-- You'll need to mess around with the CSS of #camera (found in css/style.css) to get it to work.
         More explanation in that CSS rule. -->
-    <canvas id="camera"></canvas>
+    <canvas id="camera" hidden></canvas>
     <!-- The main body of the dashboard, by default contains the gyro monitor and the robot diagram -->
     <article>
         <!-- Pressure Readouts -->
         <svg id="pneumatics">
             <text id="pressure" x="110" y="115">0 psi</text>
-            <text id="pressureSwitch" x="110" y="135">Pneumatics Not Full</text>
+            <text id="pressureSwitch" x="110" y="135">Pressure Not Full</text>
         </svg>
         <!-- Gyroscope -->
         <svg id="gyro">
@@ -37,7 +37,16 @@
             <text id="gyro-number" x="90" y="115">0º</text>
         </svg>
         <!-- Example robot diagram, arm moves when encoder value changes -->
-        <svg id="robot-diagram" width="332" height="450">
+        <svg id="robot-diagram" width="500" height="450">
+
+            <text id="sparkmax-0" x="300" y="320">0: </text>
+            <text id="sparkmax-1" x="300" y="340">1: </text>
+            <text id="sparkmax-2" x="300" y="360">2: </text>
+
+            <text id="sparkmax-3" x="400" y="320">3: </text>
+            <text id="sparkmax-4" x="400" y="340">4: </text>
+            <text id="sparkmax-5" x="400" y="360">5: </text>
+
             <rect id="hatch1" x="75" y="400" width="130" height="20"></rect>
             <rect id="hatch2" x="205" y="320" width="20" height="100"></rect>
         </svg>
@@ -62,7 +71,6 @@
             <input id="arm-position" type="range" min="0" max="1200" value="770">
         </div> -->
         <div>
-            <button id="doesitwork">Test</button>
             <button id="compress_command">Compress (toggle)</button>
             <button id="hatch">Hatch Extension</button>
             <button id="superstructure">Superstructure</button>
@@ -83,7 +91,6 @@
     <script src="networktables/networktables.js"></script>
     <script src="connection.js"></script>
     <script src="ui.js"></script>
-    <script src="stream.js"></script>
 </body>
 
 </html>

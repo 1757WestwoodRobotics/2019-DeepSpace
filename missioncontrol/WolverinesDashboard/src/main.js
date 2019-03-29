@@ -8,7 +8,7 @@ const exec = require('child_process').exec;
 const fixPath = require('fix-path');
 
 // The client will try to reconnect after 1 second
-client.setReconnectDelay(1000)
+client.setReconnectDelay(1000);
 
 /** Module to control application life. */
 const app = electron.app;

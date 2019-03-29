@@ -13,7 +13,13 @@ let ui = {
         number: document.getElementById('gyro-number')
     },
     robotDiagram: {
-        arm: document.getElementById('robot-arm')
+        arm: document.getElementById('robot-arm'),
+        spark0: document.getElementById('sparkmax-0'),
+        spark1: document.getElementById('sparkmax-1'),
+        spark2: document.getElementById('sparkmax-2'),
+        spark3: document.getElementById('sparkmax-3'),
+        spark4: document.getElementById('sparkmax-4'),
+        spark5: document.getElementById('sparkmax-5')
     },
     //example: {
     //    button: document.getElementById('example-button'),
@@ -32,7 +38,7 @@ let ui = {
         document.getElementById('hatch1'),
         document.getElementById('hatch2')
     ],
-    test: document.getElementById('doesitwork'),
+    pneumatics: document.getElementById('pneumatics'),
     pindicator: document.getElementById('pressure'),
     pswitch: document.getElementById('pressureSwitch')
 };
@@ -40,7 +46,7 @@ let ui = {
 let moveHatch = (xx) => {
     for (i = 0; i < ui.hatch.length; i++) {
         ui.hatch[i].setAttribute("x", xx);
-    };
+    }
 };
 
 let cylinders = [
@@ -99,11 +105,37 @@ NetworkTables.addKeyListener('/SmartDashboard/Pressure (psi)', (key, value) => {
 });
 
 NetworkTables.addKeyListener('/SmartDashboard/Pressure Switch', (key, value) => {
-    if (value == true) {
-        ui.pswitch.innerHTML = "Pressure Full"
+    if (value === true) {
+        ui.pswitch.innerHTML = "Pressure Full";
+        ui.pneumatics.style.backgroundColor = "green";
     } else {
-        ui.pswitch.innerHTML = "Pneumatics Not Full"
+        ui.pswitch.innerHTML = "Pressure Not Full";
+        ui.pneumatics.style.backgroundColor = "inherit";
     }
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/0/current', (key, value) => {
+    ui.robotDiagram.spark0.innerHTML = "0: " + Math.round(value * 100) / 100;
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/1/current', (key, value) => {
+    ui.robotDiagram.spark1.innerHTML = "1: " + Math.round(value * 100) / 100;
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/2/current', (key, value) => {
+    ui.robotDiagram.spark2.innerHTML = "2: " + Math.round(value * 100) / 100;
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/3/current', (key, value) => {
+    ui.robotDiagram.spark3.innerHTML = "3: " + Math.round(value * 100) / 100;
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/4/current', (key, value) => {
+    ui.robotDiagram.spark4.innerHTML = "4: " + Math.round(value * 100) / 100;
+});
+
+NetworkTables.addKeyListener('/Robot/SparkMax/5/current', (key, value) => {
+    ui.robotDiagram.spark5.innerHTML = "5: " + Math.round(value * 100) / 100;
 });
 
 // Load list of prewritten autonomous modes
@@ -126,10 +158,10 @@ NetworkTables.addKeyListener('/SmartDashboard/Pressure Switch', (key, value) => 
 // NetworkTables.addKeyListener('/SmartDashboard/autonomous/selected', (key, value) => {
 //     ui.autoSelect.value = value;
 // });
-
-ui.test.onclick = () => {
-    alert(ui.hatch[0].getAttribute('x'));
-}
+//
+// ui.test.onclick = () => {
+//     alert(ui.hatch[0].getAttribute('x'));
+// };
 
 ui.compress_command.onclick = () => {
 
@@ -270,10 +302,7 @@ ui.hatch_toggle.onclick = () => {
 }*/
 
 // The rest of the doc is listeners for UI elements being clicked on
-ui.example.button.onclick = function() {
-    // Set NetworkTables values to the opposite of whether button has active class.
-    NetworkTables.putValue('/SmartDashboard/example_variable', this.className != 'active');
-};
+
 // Reset gyro value to 0 on click
 ui.gyro.container.onclick = function() {
     // Store previous gyro val, will now be subtracted from val for callibration
@@ -286,9 +315,9 @@ ui.gyro.container.onclick = function() {
 //     NetworkTables.putValue('/SmartDashboard/autonomous/selected', this.value);
 // };
 // Get value of arm height slider when it's adjusted
-ui.armPosition.oninput = function() {
-    NetworkTables.putValue('/SmartDashboard/arm/encoder', parseInt(this.value));
-};
+// ui.armPosition.oninput = function() {
+//     NetworkTables.putValue('/SmartDashboard/arm/encoder', parseInt(this.value));
+// };
 
 
 addEventListener('error',(ev)=>{
