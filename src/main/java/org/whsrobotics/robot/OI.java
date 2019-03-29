@@ -113,6 +113,8 @@ public class OI {
         */
         (new JoystickButton(xboxControllerA, Buttons.RIGHT_BUMPER.value)).whileHeld(
             new SetDrivetrainFast(5));
+        (new JoystickButton(xboxControllerA, Buttons.A.value)).whenPressed(
+            new HatchEjection());
 
 
         // NETWORK TABLES STUFF
