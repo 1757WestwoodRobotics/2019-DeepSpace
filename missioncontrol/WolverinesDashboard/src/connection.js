@@ -15,6 +15,7 @@ let address = document.getElementById('connect-address'),
 let pit_if = document.getElementById('ds_pit_ifconfig');
 let field_if = document.getElementById('ds_field_ifconfig');
 let dhcp_if = document.getElementById('ds_dhcp_ifconfig');
+let dev_if = document.getElementById('dev_pit_ifconfig');
 
 let loginShown = true;
 
@@ -61,6 +62,21 @@ dhcp_if.onclick = () => {
             });
 
         alert("Changing IP settings to DHCP configuration! Launching ADMIN UAC");
+    }
+};
+
+dev_if.onclick = () => {
+    fixPath();
+    // Windows
+    if (process.platform === 'win32') {
+
+        sudo.exec('netsh interface ipv4 set address name="Ethernet" static 10.17.57.50 255.255.255.0 10.17.57.1', options,
+            function (error, stdout, stderr) {
+                if (error) throw error;
+                console.log('stdout: ' + stdout);
+            });
+
+        alert("Changing IP settings to DEVELOPER configuration! Launching ADMIN UAC");
     }
 };
 
