@@ -64,21 +64,21 @@ public class OI {
         // |-------- Buttons --------|
 
         //When button is held, the hatch mechanism decends to the floor for hatch pickup
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_MIDDLE.port)).whileHeld(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BOTTOM_MIDDLE.port)).whileHeld(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getFloorHatchMechSolenoid()));
         //When button is pressed, hatch is shot off the hatch mechanism
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BOTTOM_RIGHT.port)).whenPressed(
             new HatchEjection());
         //Retracts drop arm solenoid
-        (new JoystickButton(controlSystem, ControlSystemPort.BOTTOM_LEFT.port)).whenPressed(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BOTTOM_LEFT.port)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
         //Extends drop arm solenoid
-        (new JoystickButton(controlSystem, ControlSystemPort.TOP_RIGHT.port)).whenPressed(
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.TOP_RIGHT.port)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
         
         // |-------- Big Red Button --------|
         
-        (new JoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
+        (new BetterJoystickButton(controlSystem, ControlSystemPort.BRB.port)).toggleWhenPressed(new RampDeployment());
 
 
         // |-------- Slider --------|
@@ -94,21 +94,20 @@ public class OI {
         //Superstructure Extended
         (new BetterJoystickButton(xboxControllerB, Buttons.B.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(Superstructure.instance, Superstructure.getSuperstructureSolenoid()));
-
         //Hatch Extend
         (new BetterJoystickButton(xboxControllerB, Buttons.BACK.value)).toggleWhenPressed(
             new SetDoubleSolenoidLoop(HatchMech.instance, HatchMech.getHatchMechSliderSolenoid()));
         //Hatch Eject
-        (new JoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.Y.value)).whenPressed(
             new HatchEjection());
         //Retracts drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.LEFT_STICK_BUTTON.value)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.RETRACTED));
         //Extends drop arm solenoid
-        (new JoystickButton(xboxControllerB, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.RIGHT_STICK_BUTTON.value)).whenPressed(
             new SetDoubleSolenoid(HatchMech.instance, HatchMech.getDropArmsSolenoid(), DoubleSolenoidModes.EXTENDED));
         //Ramp Deployment
-        (new JoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
+        (new BetterJoystickButton(xboxControllerB, Buttons.START.value)).toggleWhenPressed(
             new RampDeployment());
 
         /*  
@@ -157,7 +156,7 @@ public class OI {
 
         SmartDashboard.putData("Wing Retract", new RampDeployment());
 
-        //Returns Wing Retract to Normal Position (If needed, shoudld only press once ever)
+        //Returns Wing Retract to Normal Position (If needed, should only press once ever)
         SmartDashboard.putData("Return Wing", new SetSingleSolenoid(
             Superstructure.instance, Superstructure.getRampReleaseSolenoid(), SingleSolenoidModes.RETRACTED));
 
