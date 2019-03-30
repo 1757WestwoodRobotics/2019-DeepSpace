@@ -1,6 +1,7 @@
 package org.whsrobotics.robot;
 
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.whsrobotics.subsystems.*;
 import org.whsrobotics.utils.WolverinesSubsystem;
@@ -15,6 +16,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
+
+        LiveWindow.disableAllTelemetry();
 
         WolverinesSubsystem.initSubsystems(isTestRobot,
                 ElectronicsSystem.getInstance(),
