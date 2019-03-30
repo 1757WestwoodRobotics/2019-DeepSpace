@@ -36,8 +36,6 @@ public class OI {
 
     private static Joystick currentControlsJoystick;
 
-    private static Command currentControlsSwitcher;
-
     private static NetworkTable robotTable;
 
     public static void init() {
@@ -83,8 +81,8 @@ public class OI {
 
         // |-------- Slider --------|
 
-        (new BetterJoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
-                .whileHeld(new SliderOverride());
+        // (new BetterJoystickButton(controlSystem, ControlSystemPort.SLIDER_CONDUCTIVE.port))
+        //         .whileHeld(new SliderOverride());
 
         // |-------- Xbox Buttons --------|
 
@@ -119,28 +117,7 @@ public class OI {
         (new JoystickButton(xboxControllerA, Buttons.A.value)).whenPressed(
             new HatchEjection());
 
-
-        currentControlsSwitcher = new Command() {
-
-            @Override
-            protected void initialize() {
-                setCurrentControlsJoystick(xboxControllerB);
-            }
-
-            @Override
-            protected boolean isFinished() {
-                return false;
-            }
-
-            @Override
-            protected void end() {
-                setCurrentControlsJoystick(controlSystem);
-            }
-
-        };
-        currentControlsSwitcher.setRunWhenDisabled(true);
-
-        (new JoystickButton(xboxControllerA, Buttons.START.value)).toggleWhenPressed(currentControlsSwitcher);
+        (new JoystickButton(xboxControllerA, Buttons.START.value)).toggleWhenPressed(new ControlSwitch());
 
 
         // NETWORK TABLES STUFF
@@ -154,7 +131,7 @@ public class OI {
             Superstructure.instance, Superstructure.getRampReleaseSolenoid(), SingleSolenoidModes.RETRACTED));
 
 
-        SmartDashboard.putData("Controls Joystick Switcher", currentControlsSwitcher);
+        SmartDashboard.putData("Controls Joystick Switcher", new ControlSwitch());
 
         SmartDashboard.putData("Wing Retract", new RampDeployment());
 
@@ -247,7 +224,7 @@ public class OI {
         return currentControlsJoystick;
     }
 
-    private static void setCurrentControlsJoystick(Joystick currentControlsJoystick) {
+    public static void setCurrentControlsJoystick(Joystick currentControlsJoystick) {
         getRobotTable().getEntry("ControlsJoystick").setString(currentControlsJoystick.getName());
         OI.currentControlsJoystick = currentControlsJoystick;
     }
