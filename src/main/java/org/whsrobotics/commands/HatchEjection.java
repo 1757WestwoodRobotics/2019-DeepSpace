@@ -10,7 +10,7 @@ public class HatchEjection extends TimedCommand {
 
     public HatchEjection() {
         //Was .35 seconds
-        super(3.0);
+        super(5.0);
     }
 
     @Override
