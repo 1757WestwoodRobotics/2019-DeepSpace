@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 
+import org.whsrobotics.robot.Robot;
 import org.whsrobotics.utils.WolverinesSubsystem;
 
 import static org.whsrobotics.robot.Constants.SolenoidPorts.*;
